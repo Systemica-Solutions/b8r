@@ -1,0 +1,39 @@
+
+.logo{
+  border-radius: 50%;
+  margin-top: 20%;
+  margin-bottom: 12%;
+  zoom: 1.2;
+
+  }
+
+ .container{
+    /* background-color: black; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10%;
+ }
+
+ .btn-signup{
+
+  background-color: #d0fae3;
+  color: rgb(16, 15, 15);
+
+  font-size: 32px;
+  margin-top: 10%;
+  margin-bottom: 10%;
+  box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.3);
+
+  padding: 1%;
+  border: 1px solid black;
+  border-radius: 10px;
+
+
+ }
+
+
+ .btn-signup:hover {
+  transform: scale(1.2);
+
+ }

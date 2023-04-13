@@ -1,0 +1,30 @@
+button,
+input[type="button"],
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover {
+  background-color: #3e8e41;
+}
+.button-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+   justify-content: center;
+   gap: 10px;
+
+  }
+
+  .myBtn{
+    background-color: red;
+  }
+  

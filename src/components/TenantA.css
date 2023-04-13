@@ -1,0 +1,38 @@
+
+
+
+.addedTenant{
+    margin-top: 50% !important;
+    position: relative;
+    z-index: 1;
+    background: #FFFFFF;
+    max-width: 360px;
+    /* margin: 0 auto 100px; */
+    padding: 45px;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    width: 360px;
+    padding: 8% 0 0;
+    margin: auto;
+    height: 40vh;
+    border: 0;
+}
+
+.TenantBtn{
+    font-family: "Roboto", sans-serif;
+    text-transform: uppercase;
+    text-decoration: none;
+    outline: 0;
+    background: #3B413C;
+    width: 80%;
+    border: 0;
+    padding: 15px;
+    color: #FFFFFF !important;
+    font-size: 14px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    cursor: pointer;
+    margin-top: 6%;
+    border-radius: 20px;
+    text-decoration: none;
+}

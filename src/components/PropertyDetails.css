@@ -1,0 +1,56 @@
+.propd , .propf{
+    margin: 10% auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  flex-direction: row;
+  width: 360px;
+  align-self: center;
+  text-align: center;
+  padding: auto 10px;
+ 
+
+}
+.propd > h4{
+    font-size: larger;
+    font-family: Poppins;
+    font-style: normal;
+}
+.propf > h4{
+    font-size: larger;
+    font-family: Poppins;
+    font-style: normal;
+    text-align: center;
+
+
+}
+
+
+.PropertyTableRow{
+    background-color: #9DB5B2;
+    color: black;
+    border: 1px soild black;
+    font-size: 22px;
+}
+
+.PropertyTableColumn{
+    background-color: rgba(255, 255, 255, 0.365);
+    color: rgb(15, 8, 8);
+    font-weight: 800;
+    border: 1px soild black;
+    font-size: 18px;
+    margin: 2%;
+
+}
+
+.PropertyTableColumn > tr > td{ 
+
+    padding: 3% 5px;
+    border: 1px solid;
+    
+
+}
+
+th, td {
+    margin-right: 10% !important;
+}

@@ -1,0 +1,81 @@
+.dashbordbutton
+{
+   
+    box-shadow: 4px 4px 4px 6px rgba(0, 0, 0, 0.3);
+    width: 80%;
+    margin: 0 auto;
+
+
+}
+.dbutton
+{
+    margin-top: 50%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+.dbutton > button{
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #3B413C;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.1s;
+}
+.dbutton > button:hover{
+    background-color: #9DB5B2;
+
+}
+.dbutton > button a{
+    text-decoration: none;
+    color: #FFFF;
+}
+
+
+.row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    justify-items: center;
+
+}
+
+.rowTwo {
+    display: flex !important;
+    flex-direction: row !important;
+    /* justify-content: space-between !important; */
+    justify-content: space-around;
+
+}
+
+
+.containered{
+    padding: 5%;
+    margin: 5%;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.name{
+    font-size: 15px;
+    text-decoration: none !important;
+    color: #000;
+}
+
+a:link { text-decoration: none; color: black;}
+
+
+  .form {
+    margin-top: 200px !important;
+    position: relative;
+    z-index: 1;
+    background: #FFFFFF;
+    max-width: 360px;
+    /* margin: 0 auto 100px; */
+    padding: 45px;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  }

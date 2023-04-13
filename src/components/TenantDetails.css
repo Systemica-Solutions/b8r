@@ -1,0 +1,40 @@
+.tablef{
+    border-collapse: collapse;
+    border-spacing: 0 10px;
+    width: 80%;
+    border: 1px solid rgb(3, 3, 3);
+    text-align: center;
+    margin-top: 10%;
+    margin-left: 10%;
+    box-shadow:0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24) ;
+    
+}
+.tablef .tableh{
+    background-color: #9DB5B2;
+  font-weight: bold;
+  font-size: 18px;
+}
+.tableb  {
+    background-color: #f2f2f2;
+  }
+
+.tableb > tr > td{
+    line-height: 0.5cm;
+    padding-top: 20px;
+    border: 1px solid;
+}
+th, td {
+    margin-right: 10% !important;
+
+}
+.form {
+  margin-top: 200px !important;
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  max-width: 360px;
+  /* margin: 0 auto 100px; */
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
