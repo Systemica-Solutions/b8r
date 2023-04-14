@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "## Install NPM",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-amplify/cli": "^11.0.3",
+    "@octokit/core": "^3.2.5",
+    "axios": "^0.21.1",
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.1",
+    "mongoose": "^5.11.15",
+    "multer": "^1.4.4",
+    "multer-gridfs-storage": "^5.0.2",
+    "nodemon": "^2.0.7",
+    "react-file-base64": "^1.0.3",
+    "redux": "^4.0.5",
+    "redux-localstorage-simple": "^2.4.0",
+    "redux-thunk": "^2.3.0"
+  }
+}
