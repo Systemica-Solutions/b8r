@@ -2,16 +2,18 @@ import React, { Component, useState }  from 'react';
 import {Link} from 'react-router-dom';
 import AddTenantcss from './AddTenant.css';
 import axios from 'axios';
+import backgroundSecond from "./other_bg.png";
+import vector from "./vector.png"
+import Footer from './Footer';
+
 function AddTenant(){
 
     const [formData, setFormData] = useState({
 		tenant_name: '',
-		email: '',
+	
 		contact_number: '',
-		house_type: '1BHK',
-		rent_range: '',
-		society_type: '',
-		availability_type: '',
+    email: '',
+	
     isOnBoard : 'false'
 	  });
 	
@@ -35,7 +37,7 @@ function AddTenant(){
 	  const handleSubmit = event => {
 		event.preventDefault();
 		console.log()
-		axios.post('http://localhost:5000/addtenant',  formData, axiosConfig )
+		axios.post('http://18.117.158.99/backend/addtenant',  formData, axiosConfig )
 		  .then(response => {
 			console.log(response.data.userID);
 			alert("Your Tenant details has been submitted");
@@ -51,77 +53,50 @@ function AddTenant(){
 
     //STYLES
          
-      const styles = {
-        backgroundColor:"white",
-        padding: "10px",
-        borderRadius: "5px",
-        border: "1px solid grey",
-        boxShadow: "0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24)",
-      };
+    const styles = {
+      backgroundColor:"#F5F5F5",
+      padding: "10px",
+      borderRadius: "10px",
+      border: "1px solid #52796F",
+      boxShadow: "0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24)",
+    };
     
 
     return(
         <>
-        <div className="login_page">
-            <div className="form" style={{ borderRadius: "16px" }} >
-            <h2>Add New Tenant</h2>
+        <div className="login-page">
+           
+            <div class="form" style={{  borderRadius: "16px", marginTop: "10%", backgroundRepeat: 'no-repeat' , backgroundImage: `url(${backgroundSecond})`, backgroundRepeat: 'no-repeat' , backgroundSize : '100% 100%' }}>
+            <h2 style={{color:"#52796F"}}>Add Tenant</h2>
 
             
             <form action='/AddTenant' onSubmit={handleSubmit} >
-                    <label for="name"> </label>
-                    <input type="text" id="name" name="tenant_name" value={formData.tenant_name} onChange={handleChange} placeholder ="Tenant Name" required  style={ styles }/>
+                    <label for="name" style={{textAlign: "left",display: "block",marginBottom: "0.5rem",fontWeight: "300",float: "left"}}> Tenant Name</label>
+                    <input type="text" id="name" name="tenant_name" value={formData.tenant_name} onChange={handleChange}  required  style={ styles }/>
 
-                    <label for="email"> </label>
-                    <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder ="Email" required  style={ styles }/>
+                    <label for="phone" style={{textAlign: "left",display: "block",marginBottom: "0.5rem",fontWeight: "300",float: "left"}}>Tenant Mobile Number </label>
+                    <input type="tel" id="contact_number" name="contact_number" value={formData.contact_number} onChange={handleChange}  required style={ styles }/>
 
-                    <label for="phone"> </label>
-                    <input type="tel" id="contact_number" name="contact_number" value={formData.contact_number} onChange={handleChange} placeholder="Contact Number" required style={ styles }/>
+                    <label for="email" style={{textAlign: "left",display: "block",marginBottom: "0.5rem",fontWeight: "300",float: "left"}}>Tenant Email</label>
+                    <input type="email" id="email" name="email" value={formData.email} onChange={handleChange}  required  style={ styles }/>
+               
+                    <div style={{marginTop:"50px"}}>
 
-                    <label for="house_type"></label>
-                    <select id="house_type" name="house_type" value={formData.house_type} onChange={handleChange}  style={ styles }>
-                    <option value="1BHK">Home Type</option>
-                    <option value="1BHK">1BHK</option>
-                    <option value="2BHK">2BHK</option>
-                    <option value="3BHK">3BHK</option>
-                    <option value="4BHK">4BHK</option>
-                    <option value="Villa">Villa</option>
-                    </select>
+                    </div>
 
-                    <label for="rent_range"> </label>
-                    <input type="text" id="rent_range" name="rent_range" value={formData.rent_range} onChange={handleChange} placeholder="rent range (INR)" required  style={ styles }/>
-
+                    <div class="buttonBackNext">
+                    <button className="CommonnBackButton" style={{  fontSize: "16px", fontWeight: "1000" , textAlign: "right", fontStyle: "normal", width: "35%" }}>Back <img className="vectorBack" src={vector} alt="fireSpot"  style={{ float: "left", marginLeft: "-5%" }}/></button>
+                    <button className="CommonnButton" style={{  fontWeight: "1000" , textAlign: "left", fontStyle: "normal", width: "55%" }}>Save and Next <img className="vectorSignIn" src={vector} alt="fireSpot"/></button>
+                    </div>
                     
-                    <label for="society_type"></label>
-                    <select id="society_type" name="society_type" value={formData.society_type} onChange={handleChange}  style={ styles }>
-                    <option value="gated_society">Society Type</option>
-                    <option value="gated_society">Gated Society</option>
-                    <option value="standalone_apartment">Standalone Apartment</option>
-                    <option value="individual_house">Individual House</option>
-                    <option value="no_preference">No Preference</option>
-                    </select>
-
-                    <label for="availability_type"></label>
-                    <select id="availability_type" name="availability_type" value={formData.availability_type} onChange={handleChange}  style={ styles }>
-                    <option value="gated_society">Availability type</option> 
-                    <option value="gated_society">Immediate (0 to 15) Days</option>
-                    <option value="standalone_apartment">15 to 230 Days</option>
-                    <option value="individual_house">More Than 30 Days</option>
-                   
-                    </select>
-                    
-                    
-                    <br></br>
-                    <hr></hr>
-                    <button style={{  fontWeight: "900" }}>Submit</button><br></br>
-                    <br></br>
-                    
-                    {/* <Link to="/TenantPref"> <button type="submit"  style={{ color: "white" , fontSize: "16px" }} >Next</button></Link> */}
-                   
+                    <Footer/>
             
             </form>
+         
 
 
             </div>
+           
         </div>
         </>
 

@@ -28,7 +28,7 @@ function PropertyDetails() {
 		// event.preventDefault();
     const fetchPosts = async () => {
       setLoading(true);
-		    axios.get('http://localhost:5000/getProperty', axiosConfig )
+		    axios.get('http://18.117.158.99/backend/getProperty', axiosConfig )
 		  .then(response => {
 			console.log(response);
 

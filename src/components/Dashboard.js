@@ -3,11 +3,16 @@ import Dashboardcss from './Dashboard.css';
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import UserLoginDetails from ".//UserLoginDetails";
-
-import Image1 from "./add_prop.png";
-import Image2 from "./add_tenant.png";
-import Image3 from "./prop.png";
-import Image4 from "./tenant.png";
+import homeDown from "./homeDown.png";
+import peopleDown from "./peopleDown.png";
+import Footer from "./Footer";
+import vector from "./vector.png"
+import backgroundSecond from "./other_bg.png";
+import rentedOut from "./rentedOut.png";
+import sharedOut from "./sharedOut.png";
+import shortListed from "./shortListed.png";
+import yetShared from "./yetShared.png";
+import YashImg from "./Yash.png";
 
 
 function Dashboard(){
@@ -26,53 +31,114 @@ function Dashboard(){
     return(
         <>
 
+        <div className="form" style={{ borderRadius: "16px", marginTop: "10%", backgroundRepeat: 'no-repeat' , backgroundImage: `url(${backgroundSecond})`, backgroundRepeat: 'no-repeat' , backgroundSize : '100% 100%'}}>
+            <h2 style={{color:"#52796F"}}>Agent Dashboard</h2>
+        <div className="containered form" style={{height:"150px", borderRadius:"15px",boxShadow:"0px 4px 4px rgba(0, 0, 0, 0.25)"}}>
+            <div style={{display:"flex",flexDirection:"row",alignItems:"center"}}>
+                {/* for image */}
+                <div>
+                    <img src={YashImg} alt="Yash img" style={{height:"100px",marginTop:"20px"}}/>
+                </div>
+                {/* for title and text */}
+                <div>
 
-        <div className="containered form" style={{ borderRadius: "16px"}} >
-            
-               
-
-                <div className="rowTwo">
-                        <div className="cover">
-                        <Link to="/Propertydetails">
-                             <img classname="propimg" src={Image3} alt="Image_3" height={105} />
-                            <h3 className="name" style={{zIndex:"-3", marginTop:"1px", textAlign:"right"}}>View Properties</h3>
-                            </Link>
-                        </div>
-                       
-
-
-                        <div className="cover">
-                        <Link to="/Tenantdetails">
-                             <img src={Image4} alt="Image_3" height={90} />
-                            <h3 className="name" >View Tenants</h3>
-                            </Link>
-                        </div>
+                
+                <label>Hey Yash,</label><br/>
+                <h5>Welcome to one-stop<br/> place for all your listing</h5>
+                </div>
+                <div>
 
                 </div>
-                <hr></hr>
-                <br></br>
-                <div className="row">
-                        <div className="cover">
-                        <Link to="/PropertyInfo">
-                             <img src={Image1} alt="Image_1"  height={90}  />
-                            <h3 className="name">Add Property</h3>
-                            </Link>
-                            </div>
-        
-          
-                        <div className="cover">
-                            <Link to="/AddTenant">
-                            <img src={Image2} alt="Image_2" height={90} />
-                            <h3 className="name">Add  Tenant</h3>
-                            </Link>
-                        </div>
-
             </div>
             
+        </div>
+         {/* BODY */}
+         
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                {/* left side */}
+                
+                <div style={{width:"150px",height:"360px",background:"#E8E7E7",borderRadius:"15px",marginTop:"-60px",marginBottom:"5px",marginRight:"40px",marginLeft:"13px"}}>
 
+                <div style={{height:"60px",background:"#FFFFFF",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                
+                <img src={rentedOut} alt={rentedOut} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{ marginTop:"0px", marginBottom:"5px"}}>
+                {/* <h3>12</h3> */}
+                <h5>Rented Out</h5>
+                </div>
+                </div>
+
+
+                {/* 2 */}
+                <div style={{height:"60px",background:"#FFFFFF",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={sharedOut} alt={sharedOut} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Shared Property</h5>
+                </div>
+                </div>
+
+                {/* 3 */}
+                <div style={{height:"60px",background:"#FFFFFF",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={shortListed} alt={shortListed} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Shortlisted</h5>
+                </div>
+                </div>
+                {/* 4 */}
+                <div style={{height:"60px",background:"#FFFFFF",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={yetShared} alt={yetShared} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Yet to share</h5>
+                </div>
+                </div>
+                <img src={homeDown} alt={homeDown} height={31}/>
+
+                </div>
+                
+                {/* right side */}
+                <div style={{width:"150px",height:"360px",background:"#B1D7CD",borderRadius:"15px",marginTop:"-60px",marginBottom:"5px"}}>
+                <div style={{height:"60px",background:"#F0FBF8",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={rentedOut} alt={rentedOut} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Rented Out</h5>
+                </div>
+                </div>
+                {/* 2 */}
+                <div style={{height:"60px",background:"#F0FBF8",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={sharedOut} alt={sharedOut} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Shared Property</h5>
+                </div>
+                </div>
+                {/* 3 */}
+                <div style={{height:"60px",background:"#F0FBF8",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={shortListed} alt={shortListed} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Shortlisted</h5>
+                </div>
+                </div>
+                {/* 4 */}
+                <div style={{height:"60px",background:"#F0FBF8",marginTop:"20px",marginLeft:"15px",marginRight:"15px",borderRadius:"15px"}}>
+                <img src={yetShared} alt={yetShared} height={30} style={{ float: "left",marginLeft:"5px", marginRight: "10px", marginTop: "14px", marginBottom: "auto" }}/>
+                <div style={{marginTop:"0px", marginBottom:"5px"}}>
+                <h5 >Awating Sharing</h5>
+                </div>
+                </div>
+                <img src={peopleDown} alt={peopleDown} height={30}/>
+                </div>
+            </div>
+
+        <div class="buttonBackNext" style={{marginTop:"50px"}}>
+        <button className="CommonnButton" style={{color:"#5D6560;",  fontWeight: "1000" , textAlign: "left", fontStyle: "normal", width: "55%", marginRight:"20px" }}>All Properties<img className="vectorSignIn" src={vector} alt="fireSpot"/></button>
+        <button className="CommonnButton" style={{fontWeight: "1000" , textAlign: "left", fontStyle: "normal", width: "55%" }}>All Tenants<img className="vectorSignIn" src={vector} alt="fireSpot"/></button>
+        </div>
+        <div class="buttonBackNext" style={{marginTop:"100px"}}>
+       <Link to="/propertyinfo"> <button className="CommonnButton" style={{ color:"#5D6560",fontWeight:"bold",marginLeft: "20px", fontStyle: "normal",height:"82px", width: "95%" , textAlign: "left"}}>Add <br/> New <br/> Property<img className="vectorSignIn" src={vector} alt="fireSpot"/></button></Link>
+        <button className="CommonnButton" style={{  fontWeight: "1000" , textAlign: "left", fontStyle: "normal", height:"82px",width: "45%" }}>Add <br/> New <br/>Tenant<img className="vectorSignIn" src={vector} alt="fireSpot"/></button>
         </div>
 
-
+            <Footer/>
+        </div>
         </>
     );
 }

@@ -23,7 +23,7 @@ function TenantDetails() {
     const fetchPosts = async () => {
       setLoading(true);
       axios
-        .get("http://localhost:5000/getTenants", axiosConfig)
+        .get("http://18.117.158.99/backend/getTenants", axiosConfig)
         .then((response) => {
           setresponseTenant(response.data);
           console.log(responseTenant);

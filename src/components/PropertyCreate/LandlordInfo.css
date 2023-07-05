@@ -1,0 +1,56 @@
+.vectorBack{
+    display: inline-block;
+    /* width: 2em; */
+    height: 1.8em;
+    border-radius: 40%;
+    /* margin-left: 1.5em; */
+    margin-bottom: 50% !important;
+    margin-top: -10%;
+    margin-left: 80%;
+    -ms-transform: rotate(180deg); /* IE 9 */
+    transform: rotate(180deg);
+  }
+
+  .vectorSignIn{
+    display: inline-block;
+    /* width: 2em; */
+    height: 1.9em;
+    border-radius: 40%;
+    /* margin-left: 1.5em; */
+    margin-bottom: 50% !important;
+    margin-top: -15%;
+    margin-left: 80%;
+  }
+
+  .CommonnBackButton {
+    box-sizing: border-box;
+  
+    gap: 8px;
+  
+    /* position: absolute; */
+    width: 100px;
+    height: 45px;
+    left: calc(50% - 174px / 2 + 1px);
+    /* top: 1025px; */
+    /* text-align: left !important; */
+    padding-left:10px;
+    font-size: 16px;
+    background: #7e7474 !important;
+    border: 3px solid #daf0ee !important;
+    box-shadow: 0px 5px 4px rgba(3, 3, 3, 0.25);
+    border-radius: 10px;
+  }
+
+  .buttonBackNext{
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .inner-background{
+    background-color: linear-gradient(180deg, #5e5b5b 10%, rgba(245, 245, 245, 0) 100%);
+    /* background-color: #ff0000; */
+    padding: 4%;
+    z-index: 5;
+    border: 1px solid #CFD3D2;
+    border-radius:  30px;
+  }
