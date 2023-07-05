@@ -2,42 +2,39 @@ import registeredUsersModel from "../models/registeredUser.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "NOTESAPI";
+const SECRET_KEY = "B";
 
 //ADD
 export const registerUsersPost = async (req, res, next) => {
   const {
-    username,
     email,
+    full_name,
     password,
-    first_name,
-    last_name,
+    c_password,
+    icode,
     phone,
-    agent_type,
     status,
-    type,
   } = req.body;
 
   try {
     //Check exesting Users
-    const existingUser = await registeredUsersModel.findOne({ username });
+    const existingUser = await registeredUsersModel.findOne({ email });
     if (existingUser) {
-      return res.status(401).json({ error: " User Already Registered" });
+      return res.status(404).json({ error: " User Already Registered" });
     }
 
     //Hasing Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await registeredUsersModel.create({
-      username: username,
+      
       email: email,
+      full_name: full_name,
       password: hashedPassword,
-      first_name: first_name,
-      last_name: last_name,
+      c_password: hashedPassword,
+      icode: icode,
       phone: phone,
-      agent_type: agent_type,
       status: status,
-      type: type,
     });
 
     //JWT Token
@@ -50,11 +47,11 @@ export const registerUsersPost = async (req, res, next) => {
 };
 
 export const loginauth = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
 
   try {
-    const existingUser = await registeredUsersModel.findOne({ username });
+    const existingUser = await registeredUsersModel.findOne({ email });
     if (!existingUser) {
     console.log("User Not Found");
       return res.status(404).json({ error: "User Not Found" });
@@ -77,8 +74,8 @@ export const loginauth = async (req, res, next) => {
     return res
       .status(200)
       .json({
-        user: existingUser.username,
-        name: existingUser.first_name,
+        user: existingUser.email,
+        name: existingUser.full_name,
         token: token,
       });
   } catch (error) {

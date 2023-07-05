@@ -14,35 +14,32 @@ const PropertyInfo = new mongoose.Schema({
     type: String,
     required: true,
   },
-  property_name: {
+  house_type: {
     type: String,
     required: true,
   },
-  society_name: {
+  house_conf: {
     type: String,
     required: true,
   },
-  location: {
+  house_num: {
     type: String,
     required: true,
   },
-  area_name: {
+  society_type: {
     type: String,
     required: true,
   },
-  property_type: {
-    type: String,
-    required: true,
-  },
+ 
   pin_code: {
     type: String,
     required: true,
   },
-  address: {
+  area: {
     type: String,
     required: true,
   },
-  city: {
+  map: {
     type: String,
     required: false,
   },

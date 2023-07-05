@@ -2,43 +2,100 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 //schema mongoose
 const PropertyDI = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  propertyid: {
+    type: String,
+    required: true,
+  },
+  gated_security: {
+    type: Boolean,
+    required: true,
+  },
+  twentyfour_seven: {
+    type: Boolean,
+    required: true,
+  },
+  grocery_store: {
+    type: Boolean,
+    required: true,
+  },
+  Swimming_pool: {
+    type: Boolean,
+    required: true,
+  },
+  Gym: {
+    type: Boolean,
+    required: true,
+  },
+  club_house: {
+    type: Boolean,
+    required: true,
+  },
+  Super_Carpet: {
+    type: String,
+    required: true,
+  },
+  Your_Floor: {
+    type: String,
+    required: true,
+  },
+  Total_Floor: {
+    type: String,
+    required: true,
+  },
+  parking: {
+    type: String,
+    required: true,
+  },
+  broom: {
+    type: String,
+    required: true,
+  },
+  numofbath: {
+    type: String,
+    required: true,
+  },
+  numofbal: {
+    type: String,
+    required: false,
+  },
+  furnish: {
+    type: String,
+    required: false,
+  },
+  air_condition: {
+    type: Boolean,
+    required: true,
+  },
+  nonveg: {
+    type: Boolean,
+    required: true,
+  },
+
+  const_year: {
+    type: String,
+    required: false,
+  },  
+  avail_from: {
+    type: String,
+    required: false,
+  },
   rent: {
     type: String,
-    required: true,
-  },
-  maintenance: {
-    type: String,
-    required: true,
-  },
-  total_deposit: {
-    type: String,
-    required: true,
-  },
-  furnishing_type: {
-    type: String,
-    required: true,
-  },
-  total_floors: {
-    type: String,
-    required: true,
-  },
-  house_floor_number: {
-    type: String,
-    required: true,
-  },
-  carpet_area: {
-    type: String,
-    required: true,
-  },
-  num_bedrooms: {
+    required: false,
+  },  
+  sec_dep: {
     type: String,
     required: false,
-  },
-  num_bathrooms: {
+  },  
+  maint: {
     type: String,
     required: false,
-  },
-  flat_number: {
+  },  
+  lockin: {
     type: String,
     required: false,
   },

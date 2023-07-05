@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 //schema mongoose
 const TenantPref = new mongoose.Schema({
+
   duration_of_stay: {
     type: String,
     required: true,
@@ -13,7 +14,23 @@ const TenantPref = new mongoose.Schema({
     type: String,
     required: true,
   },
+  house_conf:{
+    type:String,
+    required:true,
+  },
   type_of_furnishing: {
+    type: String,
+    required: true,
+  },
+  house_type: {
+    type: String,
+    required: true,
+  },
+  movein_from: {
+    type: String,
+    required: true,
+  },
+  rent: {
     type: String,
     required: true,
   },

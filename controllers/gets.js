@@ -1,6 +1,8 @@
-import registeredUsersModel from "../models/registeredUser.js";
 import AddTenantExportModel from "../models/AddTenant.js";
 import AddPropertyExportModel from "../models/PropertyInfo.js";
+import bcrypt from "bcrypt";
+import registeredUsersModel from "../models/registeredUser.js";
+import PropertyDIex from "../models/PropertyDI.js";
 
 
 
@@ -41,6 +43,95 @@ export const getregisteredProperty = async (req, res , next) => {
 };
 
 
+//UPDATE ONE
+export const updatePassword = async (req, res) => {
+  console.log("password", req.body.phone);
+  console.log("password", req.body.c_password);
+  // console.log("phone", req.params.phone);
+  const { phone, c_password, password } = req.body;
+  if (req.body.password != undefined) {
+  // console.log("phone", req.body.phone);
+
+      //Hasing Password
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      // console.log(hashedPassword);
+    try {
+      
+      // const options = { new: true };
+      // const getId = await registeredUsersModel.findOne({ phone });
+      // // console.log(getId)
+      // const updatedUser = await registeredUsersModel.findOneAndUpdate(getId, {
+      //   password: hashedPassword,
+      //   c_password: hashedPassword,
+      // });
+      // res.status(200).json(updatedUser);
+      const filter = { phone };
+      const update = { password: hashedPassword, c_password: hashedPassword };
+      const options = { new: true };
+      const updatedUser = await registeredUsersModel.findOneAndUpdate(filter, update, options);
+      res.status(200).json(updatedUser);
+
+    } 
+    
+    
+    catch (error) {
+      res.status(400).json({ msg: error });
+    }
+  }
+
+
+
+
+  // if (req.body.isCompleted == true) {
+  //   console.log(req.body.isCompleted);
+  //   try {
+  //     const getId = posts.findById(req.params.id);
+  //     const updatedTodo = await posts.findOneAndUpdate(getId, {
+  //       isCompleted: `${req.body.isCompleted}`,
+  //     });
+  //     res.status(200).json(updatedTodo);
+  //   } catch (error) {
+  //     res.status(400).json({ msg: error });
+  //   }
+  // }
+};
+
+
+//GET ONE REGISTERED USERS
+export const getpropertyInfoById = async (req, res) => {
+  console.log(req.params.ids);
+  try {
+    const getpropertyInfoById = await AddPropertyExportModel.findById( req.params.id );
+    const getpropertyDIById = await PropertyDIex.find({ propertyid : req.params.id});
+    res.status(200).json( {getpropertyInfoById, getpropertyDIById});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
+
+//lookUp JOIN -- PROPERTY CREATED
+export const joinPropertyCreated = async (req, res) => {
+  console.log(PropertyDIex.propertyId);
+  console.log(AddPropertyExportModel);
+  try {
+    const lookUp = await PropertyDIex.aggregate([
+      {
+        $lookup: {
+          from: "PropertyInfoExports",
+          localField: "propertyId",
+          foreignField: "_id",
+          as: "joinPropertyCreated",
+        },
+      },
+    ]);
+    res.status(200).json(lookUp);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+
+
 // //PROJECTSTITLE GET ALL
 // export const getProjects = async (req, res) => {
 //   try {
@@ -70,34 +161,6 @@ export const getregisteredProperty = async (req, res , next) => {
 //     res.status(200).json(deleteMessage);
 //   } catch (error) {
 //     res.status(400).json("ID NOT FOUND", error.message);
-//   }
-// };
-
-// //UPDATE ONE
-// export const updatePost = async (req, res) => {
-//   console.log("Title", req.body.title);
-//   if (req.body.title != undefined) {
-//     try {
-//       const getId = posts.findById(req.params.id);
-//       const updatedTodo = await posts.findOneAndUpdate(getId, {
-//         title: `${req.body.title}`,
-//       });
-//       res.status(200).json(updatedTodo);
-//     } catch (error) {
-//       res.status(400).json({ msg: error });
-//     }
-//   }
-//   if (req.body.isCompleted == true) {
-//     console.log(req.body.isCompleted);
-//     try {
-//       const getId = posts.findById(req.params.id);
-//       const updatedTodo = await posts.findOneAndUpdate(getId, {
-//         isCompleted: `${req.body.isCompleted}`,
-//       });
-//       res.status(200).json(updatedTodo);
-//     } catch (error) {
-//       res.status(400).json({ msg: error });
-//     }
 //   }
 // };
 

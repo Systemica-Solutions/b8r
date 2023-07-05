@@ -2,23 +2,24 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 //schema mongoose
 const registeredUsers = new mongoose.Schema({
-  username: {
+  
+  email: {
     type: String,
     required: true,
   },
-  email: {
+  full_name: {
     type: String,
     required: true,
   },
   password: {
     type: String,
-    required: true,
+    required: false,
   },
-  first_name: {
+  c_password: {
     type: String,
-    required: true,
+    required: false,
   },
-  last_name: {
+  icode: {
     type: String,
     required: false,
   },
@@ -26,18 +27,9 @@ const registeredUsers = new mongoose.Schema({
     type: String,
     required: true,
   },
-  status: {
-    type: String,
-    required: false,
-  },
-  agent_type: {
-    type: String,
-    required: false,
-  },
-  registration_number: {
-    type: String,
-    required: false,
-  },
+  
+ 
+  
 
 
   createdDate: {

@@ -14,7 +14,7 @@ router.post('/login', jsonParser, loginauth);
 
 
 //Property Details Route
-router.post('/propertyinfo', autho ,  jsonParser, propertyInfoController);
+router.post('/propertyinfo', autho, jsonParser, propertyInfoController);
 router.post('/propertydi', autho, jsonParser,propertyDIcontroller);
 
 //Tenant Details Route
@@ -24,9 +24,6 @@ router.post('/tenantpref',jsonParser, TenantPrefController );
 
 //Landlord Details Route
 router.post('/addlandlord', autho, jsonParser, LandlordInfoController);
-
-
-
 
 
 

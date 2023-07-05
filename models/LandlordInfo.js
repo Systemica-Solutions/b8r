@@ -7,15 +7,15 @@ const LandlordInfo = new mongoose.Schema({
     type: String,
     required: true,
   },
-  landlord_name: {
+  propertyid: {
     type: String,
     required: true,
   },
-  landlord_pan_card: {
+  landlord_first_name: {
     type: String,
     required: true,
   },
-  email: {
+  landlord_last_name: {
     type: String,
     required: true,
   },
@@ -23,11 +23,11 @@ const LandlordInfo = new mongoose.Schema({
     type: String,
     required: true,
   },
-  residing_country: {
+  pan_card: {
     type: String,
     required: true,
   },
-  residing_city: {
+  residing_country: {
     type: String,
     required: true,
   },
@@ -36,7 +36,6 @@ const LandlordInfo = new mongoose.Schema({
     required: true,
     default: () => Date.now() + 5.5 * 60 * 60 * 1000,
   },
-  
 });
 
 
