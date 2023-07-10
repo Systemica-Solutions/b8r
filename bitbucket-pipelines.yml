@@ -1,0 +1,31 @@
+image: node:14
+
+definitions:
+  services:
+    docker:
+      memory: 1024
+
+pipelines:
+  branches:
+    staging:
+      - step:
+          name: Installation
+          caches:
+            - node
+          script:
+            - rm -rf package-lock.json
+            - npm install
+            - npm run build
+            - apt-get update && apt-get install zip
+            - zip -r server.zip dist package.json
+          artifacts:
+            - server.zip
+      - step:
+          name: Deployment
+          script:
+            - pipe: atlassian/scp-deploy:1.2.1
+              variables:
+                USER: $STAGE_USER
+                SERVER: $STAGE_HOST
+                REMOTE_PATH: '/var/www/html/b8r_home/server'
+                LOCAL_PATH: 'server.zip'

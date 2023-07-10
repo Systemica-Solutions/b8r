@@ -1,0 +1,15 @@
+dist/
+**/*.icloud
+node_modules/
+node_modules
+.env*
+yarn-error.log
+useful-scripts
+credentials*
+.idea
+deployed-constants
+collections
+assets/geography.json
+logger/logs
+env
+
