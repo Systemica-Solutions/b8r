@@ -38,9 +38,9 @@ export const signupUserValidation = async (req, res, next) => {
             .required(),
         userRole: Joi.string().valid(...Object.keys(roleCode)),
         inviteCode: Joi.any().optional(),
-        otp: Joi.any().optional(),
-        otpExpireAt: Joi.any().optional()
-    });    
+        // otp: Joi.any().optional(),
+        // otpExpireAt: Joi.any().optional()
+    });
     const value = schema.validate(req.body);
     if (value.error) {
         return failureResponse(

@@ -17,11 +17,13 @@ const UserSchema: Schema = new Schema({
         validate: [EmailValidation, 'Please fill a valid email address']
     },
     password: {
-      type: Schema.Types.String
+      type: Schema.Types.String,
+      required: true
     },
     phoneNumber: {
       type: Schema.Types.String,
-      required: true
+      required: true,
+      unique: true
     },
     userRole: {
       type: Schema.Types.String,
@@ -30,16 +32,16 @@ const UserSchema: Schema = new Schema({
     },
     inviteCode: {
       type: Schema.Types.String,
-      default: ""
+      default: ''
     },
-    otp: {
-      type: Schema.Types.String,
-      default: ""
-    },
-    otpExpireAt: {
-      type: Schema.Types.Date,
-      default: null
-    }
+    // otp: {
+    //   type: Schema.Types.String,
+    //   default: ''
+    // },
+    // otpExpireAt: {
+    //   type: Schema.Types.Date,
+    //   default: null
+    // }
 }, { timestamps: true });
 
 export default model(MODELS.USERS, UserSchema);

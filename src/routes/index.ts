@@ -5,7 +5,7 @@ import { successResponse, failureResponse } from '../helpers/api-response.helper
 const router = Router();
 
 /* Check server is working or not */
-router.get('/', function(req, res, next) {
+router.get('/', function(_, res) {
   try {
     return successResponse(res, 200, 'Better homes server working properly.');
   } catch (error) {

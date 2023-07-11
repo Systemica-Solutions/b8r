@@ -1,16 +1,16 @@
 import { Schema } from 'mongoose';
-import { houseType, houseConfiguration } from '../constants/global.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType } from '../constants/global.constants';
 
 export const PropertyBasicInfo: Schema = new Schema({
     houseType: {
         type: Schema.Types.String,
+        trim: true,
         enum: houseType,
-        default: houseType.Individual_House
     },
     houseConfig: {
         type: Schema.Types.String,
+        trim: true,
         enum: houseConfiguration,
-        default: houseConfiguration.TWO_BHK
     },
     houseName: {
         type: Schema.Types.String,
@@ -28,18 +28,16 @@ export const PropertyBasicInfo: Schema = new Schema({
         type: Schema.Types.String,
     },
     purpose: {
-      rent: { 
+      rent: {
         type: Schema.Types.Boolean,
-        default: false
       },
-      sale: { 
+      sale: {
         type: Schema.Types.Boolean,
-        default: false
      }
     }
-});
+}, { _id: false });
 
-export const PropertyOwnerInfo: Schema = new Schema({ 
+export const PropertyOwnerInfo: Schema = new Schema({
     name: {
         first: {
             type: Schema.Types.String,
@@ -63,32 +61,26 @@ export const PropertyOwnerInfo: Schema = new Schema({
     city: {
         type: Schema.Types.String,
     }
-});
+}, { _id: false });
 
-export const PropertyFeatureInfo: Schema = new Schema({ 
+export const PropertyFeatureInfo: Schema = new Schema({
     gatedSecurity: {
         type: Schema.Types.Boolean,
-        default: false
     },
     twentyFourSeven: {
         type: Schema.Types.Boolean,
-        default: false
     },
     groceryStore: {
         type: Schema.Types.Boolean,
-        default: false
     },
     swimmingPool: {
         type: Schema.Types.Boolean,
-        default: false
     },
     gym: {
         type: Schema.Types.Boolean,
-        default: false
     },
     clubHouse: {
         type: Schema.Types.Boolean,
-        default: false
     },
     carpetArea: {
         type: Schema.Types.String
@@ -102,18 +94,26 @@ export const PropertyFeatureInfo: Schema = new Schema({
         }
     },
     parking: {
-        car: { 
-            type: Schema.Types.Number
+        car: {
+            type: Schema.Types.String,
+            trim: true,
+            enum: carParking,
         },
         bike: {
-            type: Schema.Types.Number
-        }, 
+            type: Schema.Types.String,
+            trim: true,
+            enum: bikeParking,
+        },
         type: {
-            type: Schema.Types.String
+            type: Schema.Types.String,
+            trim: true,
+            enum: parkingType,
         }
     },
     houseHelpRoom: {
-        type: Schema.Types.String
+        type: Schema.Types.String,
+        trim: true,
+        enum: houseHelpRoom,
     },
     bathrooms: {
         type: Schema.Types.Number
@@ -122,15 +122,15 @@ export const PropertyFeatureInfo: Schema = new Schema({
         type: Schema.Types.Number
     },
     furnishingType: {
-        type: Schema.Types.String
+        type: Schema.Types.String,
+        trim: true,
+        enum: furnishingType,
     },
     ac: {
         type: Schema.Types.Boolean,
-        default: false
     },
     nonVeg: {
         type: Schema.Types.Boolean,
-        default: false
     },
     constructionYear: {
         type: Schema.Types.String
@@ -164,6 +164,6 @@ export const PropertyFeatureInfo: Schema = new Schema({
         },
         moveIn: {
             type: Schema.Types.Number
-        } 
+        }
     }
-});
+}, { _id: false });

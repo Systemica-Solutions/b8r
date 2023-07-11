@@ -17,14 +17,14 @@ export const signUpUser = async (req: Request, res: Response) => {
         console.log('req', req.body);
         let userData: any = {};
         userData = req.body;
-        const userExist = await User.findOne({ email: userData.email });
+        const userExist = await User.findOne({ email: userData.email, phoneNumber: userData.phoneNumber });
         if (!userExist) {
               const userObj = new User(req.body);
               const userSave = await userObj.save();
               const jwtToken = generateJWTToken(userSave);
               return successResponse(res, 200, { user: userSave, jwt_token: jwtToken }, 'User Signup Successfully.');
         } else {
-            return failureResponse(res, 403, [], 'Already exists given email id.');
+            return failureResponse(res, 403, [], 'Already exists given email id or phone number');
         }
     } catch (error) {
        return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
@@ -55,7 +55,7 @@ export const signInUser = async (req: Request, res: Response) => {
       const dbPassword = await decrypt(userData.password, userExist.password);
       if (dbPassword) {
         const jwtToken = generateJWTToken(userExist);
-        return successResponse(res, 200, { user: userExist, jwtToken: jwtToken }, 'User Login Successfully.');
+        return successResponse(res, 200, { user: userExist, jwtToken }, 'User Login Successfully.');
       } else {
         return failureResponse(res, 401, [], 'Unauthorized Access');
       }
@@ -69,14 +69,16 @@ export const signInUser = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const updatedData = req.body;
-    User.findOneAndUpdate({  phoneNumber: updatedData.phoneNumber }, { $set: { password: updatedData.password,  confirmPassword: updatedData.confirmPassword} }, (err, user) => {
-      if (err) {
-        return failureResponse(res, 500, err, err.message || 'Internal Server Error');
-      } else if (user) {
-        return successResponse(res, 200, { user }, 'Password Updated Successfully.');
-      } else {
-        return failureResponse(res, 404, err, err.message || 'Phone Number Not Found');
-      }
+    User.findOneAndUpdate({  phoneNumber: updatedData.phoneNumber },
+      { $set: { password: updatedData.password,  confirmPassword: updatedData.confirmPassword} },
+      (err, user) => {
+        if (err) {
+          return failureResponse(res, 500, err, err.message || 'Internal Server Error');
+        } else if (user) {
+          return successResponse(res, 200, { user }, 'Password Updated Successfully.');
+        } else {
+          return failureResponse(res, 404, err, err.message || 'Phone Number Not Found');
+        }
     });
   } catch (error) {
     return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');

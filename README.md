@@ -74,20 +74,6 @@ S3_BUCKET_NAME = ""
 S3_BUCKET_URL = ""
 S3_BUCKET_REGION = ""
 
-# FIREBASE_DB_URL = ""
-GOOGLE_CAPTCHA_SITE_KEY = ""
-GOOGLE_CAPTCHA_SECRET = ""
-
-`@deprecated`
-# STATIC KEY BASED LOGIN
-STATIC_LOGIN_KEY_PAIRS = ''
-
-# EMAIL SERVER WHICH IS USED TO SEND EMAILS
-EMAIL_SERVER_URL= ''
-
-################ ENVIRONMENT KEYS END ################
-```
-
 #### Development Environment
 
 Set the `NODE_ENV` as 'development'
