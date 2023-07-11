@@ -1,18 +1,18 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { PropertyBasicInfo, PropertyFeatureInfo, PropertyOwnerInfo } from './common.model';
+import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema({
     propertyInfo: {
-        type: PropertyBasicInfo,
+        type: propertyBasicInfo,
         default: null
     },
     ownerInfo: {
-        type: PropertyOwnerInfo,
+        type: propertyOwnerInfo,
         default: null
     },
     featureInfo: {
-        type: PropertyFeatureInfo,
+        type: propertyFeatureInfo,
         default: null
     },
     userId: {

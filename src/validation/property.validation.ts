@@ -27,7 +27,7 @@ const propertyBasicInfo = Joi.object().keys({
     houseConfig: Joi.string().valid(...Object.values(houseConfiguration)),
     houseName: Joi.string().optional(),
     societyName: Joi.string().optional(),
-    pinCode: Joi.string().optional(),
+    pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
     area: Joi.string().optional(),
     mapLocation: Joi.string().optional(),
     purpose: Joi.object().keys({
@@ -41,7 +41,7 @@ const ownerBasicInfo = Joi.object().keys({
         first: Joi.string().required(),
         last: Joi.string().required()
     }),
-    phoneNumber: Joi.string().optional(),
+    phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
     panNumber: Joi.string().optional(),
     country: Joi.string().required(),
     city: Joi.string().optional(),
@@ -54,7 +54,7 @@ const featureBasicInfo = Joi.object().keys({
     swimmingPool: Joi.boolean().optional(),
     gym: Joi.boolean().optional(),
     clubHouse: Joi.boolean().optional(),
-    carpetArea: Joi.string().optional(),
+    carpetArea: Joi.number().optional(),
     floors: Joi.object().keys({
         total: Joi.number().optional(),
         your: Joi.number().optional()
@@ -65,8 +65,8 @@ const featureBasicInfo = Joi.object().keys({
         type: Joi.string().valid(...Object.keys(parkingType))
     }),
     houseHelpRoom:  Joi.string().valid(...Object.keys(houseHelpRoom)),
-    bathrooms: Joi.number().optional(),
-    balconies: Joi.number().optional(),
+    bathrooms: Joi.number().integer().min(0).max(10).optional(),
+    balconies: Joi.number().integer().min(0).max(10).optional(),
     furnishingType:  Joi.string().valid(...Object.keys(furnishingType)),
     ac: Joi.boolean().optional(),
     nonVeg: Joi.boolean().optional(),

@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType } from '../constants/global.constants';
 
-export const PropertyBasicInfo: Schema = new Schema({
+export const propertyBasicInfo: Schema = new Schema({
     houseType: {
         type: Schema.Types.String,
         trim: true,
@@ -37,7 +37,7 @@ export const PropertyBasicInfo: Schema = new Schema({
     }
 }, { _id: false });
 
-export const PropertyOwnerInfo: Schema = new Schema({
+export const propertyOwnerInfo: Schema = new Schema({
     name: {
         first: {
             type: Schema.Types.String,
@@ -50,6 +50,7 @@ export const PropertyOwnerInfo: Schema = new Schema({
     },
     phoneNumber: {
         type: Schema.Types.String,
+        required: true
     },
     panNumber: {
         type: Schema.Types.String,
@@ -63,7 +64,7 @@ export const PropertyOwnerInfo: Schema = new Schema({
     }
 }, { _id: false });
 
-export const PropertyFeatureInfo: Schema = new Schema({
+export const propertyFeatureInfo: Schema = new Schema({
     gatedSecurity: {
         type: Schema.Types.Boolean,
     },
@@ -83,7 +84,7 @@ export const PropertyFeatureInfo: Schema = new Schema({
         type: Schema.Types.Boolean,
     },
     carpetArea: {
-        type: Schema.Types.String
+        type: Schema.Types.Number
     },
     floors: {
         total: {
