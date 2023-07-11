@@ -15,11 +15,19 @@ const PropertySchema: Schema = new Schema({
         type: propertyFeatureInfo,
         default: null
     },
-    userId: {
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: MODELS.USERS
+    },
+    approvedBy: {
         type: Schema.Types.ObjectId,
         ref: MODELS.USERS,
-        index: true,
+        default: null
     },
+    status: {
+        type: Schema.Types.Boolean,
+        default: false
+    }
 }, { timestamps: true });
 
 export default model(MODELS.PROPERTY, PropertySchema);

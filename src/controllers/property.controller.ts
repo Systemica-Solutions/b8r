@@ -5,7 +5,7 @@ import Property from '../models/property.model';
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
     try {
-        req.body.userId = req.user.user._id;
+        req.body.createdBy = req.user.user._id;
         const propertyObj = new Property(req.body);
         const saveObj = await propertyObj.save();
         return successResponse(res, 200, { property: saveObj }, 'New property added successfully.');
@@ -40,4 +40,4 @@ export const getPriorityById = async (req: Request, res: Response) => {
       } catch (error) {
         return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
       }
- };
+};

@@ -17,7 +17,7 @@ export const signUpUser = async (req: Request, res: Response) => {
         console.log('req', req.body);
         let userData: any = {};
         userData = req.body;
-        const userExist = await User.findOne({ email: userData.email, phoneNumber: userData.phoneNumber });
+        const userExist = await User.findOne({$or: [{ email: userData.email }, { phoneNumber: userData.phoneNumber }]});
         if (!userExist) {
               const userObj = new User(req.body);
               const userSave = await userObj.save();
@@ -55,7 +55,7 @@ export const signInUser = async (req: Request, res: Response) => {
       const dbPassword = await decrypt(userData.password, userExist.password);
       if (dbPassword) {
         const jwtToken = generateJWTToken(userExist);
-        return successResponse(res, 200, { user: userExist, jwtToken }, 'User Login Successfully.');
+        return successResponse(res, 200, { user: userExist, jwtToken }, 'User login successfully.');
       } else {
         return failureResponse(res, 401, [], 'Unauthorized Access');
       }
@@ -75,9 +75,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
         if (err) {
           return failureResponse(res, 500, err, err.message || 'Internal Server Error');
         } else if (user) {
-          return successResponse(res, 200, { user }, 'Password Updated Successfully.');
+          return successResponse(res, 200, { user }, 'Password updated successfully.');
         } else {
-          return failureResponse(res, 404, err, err.message || 'Phone Number Not Found');
+          return failureResponse(res, 404, err, err.message || 'Phone number not found');
         }
     });
   } catch (error) {
