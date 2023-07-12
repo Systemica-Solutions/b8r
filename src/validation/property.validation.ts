@@ -2,7 +2,7 @@ import Joi from '@hapi/joi';
 import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType } from '../constants/global.constants';
 import { failureResponse } from '../helpers/api-response.helper';
 
-// Check validation while add property
+// Check validations while add property
 export const addPropertyValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
         propertyInfo: propertyBasicInfo.required(),
@@ -23,8 +23,8 @@ export const addPropertyValidation = async (req, res, next) => {
 };
 
 const propertyBasicInfo = Joi.object().keys({
-    houseType:  Joi.string().valid(...Object.values(houseType)),
-    houseConfig: Joi.string().valid(...Object.values(houseConfiguration)),
+    houseType:  Joi.string().valid(...Object.values(houseType)).optional(),
+    houseConfig: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
     houseName: Joi.string().optional(),
     societyName: Joi.string().optional(),
     pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
@@ -60,14 +60,14 @@ const featureBasicInfo = Joi.object().keys({
         your: Joi.number().optional()
     }),
     parking: Joi.object().keys({
-        car: Joi.string().valid(...Object.keys(carParking)),
-        bike: Joi.string().valid(...Object.keys(bikeParking)),
-        type: Joi.string().valid(...Object.keys(parkingType))
+        car: Joi.string().valid(...Object.keys(carParking)).optional(),
+        bike: Joi.string().valid(...Object.keys(bikeParking)).optional(),
+        type: Joi.string().valid(...Object.keys(parkingType)).optional()
     }),
-    houseHelpRoom:  Joi.string().valid(...Object.keys(houseHelpRoom)),
+    houseHelpRoom:  Joi.string().valid(...Object.keys(houseHelpRoom)).optional(),
     bathrooms: Joi.number().integer().min(0).max(10).optional(),
     balconies: Joi.number().integer().min(0).max(10).optional(),
-    furnishingType:  Joi.string().valid(...Object.keys(furnishingType)),
+    furnishingType:  Joi.string().valid(...Object.keys(furnishingType)).optional(),
     ac: Joi.boolean().optional(),
     nonVeg: Joi.boolean().optional(),
     constructionYear:  Joi.string().optional(),

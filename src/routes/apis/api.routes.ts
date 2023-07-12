@@ -6,11 +6,11 @@ import tenantRoutes from '../apis/tenant.routes';
 
 const router = Router();
 
-router.use('/users', userRoutes);
+router.use('/user', userRoutes);
 
 router.use('/property', propertyRoutes);
 
-router.use('tenant', tenantRoutes);
+router.use('/tenant', tenantRoutes);
 
 router.use('/buyer', buyerRoutes);
 

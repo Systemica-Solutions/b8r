@@ -29,7 +29,7 @@ export const getAllPropertyList = async (_: Request, res: Response) => {
 };
 
 
-// Get propert by id
+// Get property by id
 export const getPriorityById = async (req: Request, res: Response) => {
     try {
         const property = await Property.findById(req.params.id).lean();

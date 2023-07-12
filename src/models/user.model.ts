@@ -11,7 +11,7 @@ const UserSchema: Schema = new Schema({
       maxlength: 200,
     },
     email: {
-        type: String,
+        type: Schema.Types.String,
         required: true,
         unique: true,
         validate: [EmailValidation, 'Please fill a valid email address']
