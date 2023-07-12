@@ -38,6 +38,7 @@ export const signupUserValidation = async (req, res, next) => {
             .required(),
         userRole: Joi.string().valid(...Object.keys(roleCode)),
         inviteCode: Joi.any().optional(),
+        authCode: Joi.string().optional()
         // otp: Joi.any().optional(),
         // otpExpireAt: Joi.any().optional()
     });

@@ -17,6 +17,10 @@ const TenantSchema: Schema = new Schema({
         type: Schema.Types.String,
         required: true
       },
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: MODELS.USERS
+      },
       stayDuration: {
         type: Schema.Types.String,
       },

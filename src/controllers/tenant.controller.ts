@@ -5,7 +5,7 @@ import Tenant from '../models/tenant.model';
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
     try {
-        req.body.createdBy = req.user.user._id;
+        req.body.userId = req.user.user._id;
         const tenantObj = new Tenant(req.body);
         const saveObj = await tenantObj.save();
         return successResponse(res, 200, { tenant: saveObj }, 'New tenant added successfully.');

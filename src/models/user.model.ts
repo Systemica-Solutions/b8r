@@ -34,6 +34,10 @@ const UserSchema: Schema = new Schema({
       type: Schema.Types.String,
       default: ''
     },
+    authCode: {
+      type: Schema.Types.String,
+      default: null
+    }
     // otp: {
     //   type: Schema.Types.String,
     //   default: ''

@@ -52,7 +52,7 @@ For ease of development you can keep `.env.prod` for production environment and 
 
 NODE_ENV = "development"
 APP_KEY = ''
-PORT = 3000
+PORT = 8080
 DB_URI = "mongodb://127.0.0.1:27017/b8r_home"
 API_PREFIX = '/api/v1'
 
@@ -61,18 +61,6 @@ SECRET = ''
 
 HOST_URL = 'http://localhost:[$PORT]/'
 
-EMAIL_SERVICE = 'SMTP'
-EMAIL_HOST = 'smtp'
-EMAIL_PORT = 465
-EMAIL_AUTH_USERNAME = ''
-EMAIL_AUTH_PASSWORD = ''
-EMAIL_FROM = ''
-
-S3_ACCESS_KEY_ID = ""
-S3_SECRET_ACCESS_KEY = ""
-S3_BUCKET_NAME = ""
-S3_BUCKET_URL = ""
-S3_BUCKET_REGION = ""
 
 #### Development Environment
 
