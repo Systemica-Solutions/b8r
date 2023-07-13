@@ -48,7 +48,7 @@ export const getAllUsersList = async (_: Request, res: Response) => {
 export const signInUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
-    const userExist = await User.findOne({$and: [{ email: userData.email }, { phoneNumber: userData.phoneNumber }]});
+    const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
     if (!userExist) {
       return failureResponse(res, 404, [], 'User not found!');
     } else {

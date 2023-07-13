@@ -38,14 +38,6 @@ const UserSchema: Schema = new Schema({
       type: Schema.Types.String,
       default: null
     }
-    // otp: {
-    //   type: Schema.Types.String,
-    //   default: ''
-    // },
-    // otpExpireAt: {
-    //   type: Schema.Types.Date,
-    //   default: null
-    // }
 }, { timestamps: true });
 
 export default model(MODELS.USERS, UserSchema);

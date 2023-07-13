@@ -39,8 +39,6 @@ export const signupUserValidation = async (req, res, next) => {
         userRole: Joi.string().valid(...Object.keys(roleCode)),
         inviteCode: Joi.any().optional(),
         authCode: Joi.string().optional()
-        // otp: Joi.any().optional(),
-        // otpExpireAt: Joi.any().optional()
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -59,7 +57,6 @@ export const signupUserValidation = async (req, res, next) => {
 // Sign-in schema validation
 export const signinUserValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
-        email: Joi.string().email().required(),
         password: Joi.string().required(),
         phoneNumber: Joi.string().min(7).max(10).pattern(/^[0-9]+$/).required()
     });
