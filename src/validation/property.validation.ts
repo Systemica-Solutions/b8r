@@ -92,8 +92,8 @@ const statusInfo = Joi.object().keys({
     version: Joi.number().optional(),
     status: Joi.string().valid(...Object.keys(propertyStatus)).optional(),
     lastEditDate: Joi.date().optional(),
-    verifyDate: Joi.string().optional(),
-    closeDate: Joi.string().optional(),
+    verifyDate: Joi.date().optional(),
+    closeDate: Joi.date().optional(),
     closureReason: Joi.string().optional(),
     closureSubReason: Joi.string().optional(),
 });

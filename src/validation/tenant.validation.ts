@@ -27,7 +27,11 @@ export const addTenantValidation = async (req, res, next) => {
         ac: Joi.boolean().optional(),
         nonVeg: Joi.boolean().optional(),
         bathoroom: Joi.boolean().optional(),
-        onBoard: Joi.boolean().optional()
+        onBoard: Joi.boolean().optional(),
+        status: Joi.boolean().optional(),
+        deactivateDate: Joi.date().optional(),
+        deactivateReason: Joi.string().optional(),
+        deactivateSubReason: Joi.string().optional()
     });
     const value = schema.validate(req.body);
     if (value.error) {

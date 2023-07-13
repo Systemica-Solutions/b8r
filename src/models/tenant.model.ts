@@ -88,6 +88,19 @@ const TenantSchema: Schema = new Schema({
       onBoard: {
         type: Schema.Types.Boolean,
         default: false
+      },
+      status:{
+        type: Schema.Types.Boolean,
+        default: false
+      },
+      deactivateDate: {
+        type: Schema.Types.Date
+      },
+      deactivateReason: {
+        type: Schema.Types.String,
+      },
+      deactivateSubReason: { 
+        type: Schema.Types.String,
       }
 });
 
