@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo } from './common.model';
+import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, propertyStatusInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema({
     propertyInfo: {
@@ -15,18 +15,9 @@ const PropertySchema: Schema = new Schema({
         type: propertyFeatureInfo,
         default: null
     },
-    createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: MODELS.USERS
-    },
-    approvedBy: {
-        type: Schema.Types.ObjectId,
-        ref: MODELS.USERS,
+    statusInfo: {
+        type: propertyStatusInfo,
         default: null
-    },
-    status: {
-        type: Schema.Types.Boolean,
-        default: false
     }
 }, { timestamps: true });
 

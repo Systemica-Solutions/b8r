@@ -1,5 +1,6 @@
 import { Schema } from 'mongoose';
-import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType } from '../constants/global.constants';
+import { MODELS } from '../constants/model.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, propertyStatus } from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema({
     houseType: {
@@ -166,5 +167,37 @@ export const propertyFeatureInfo: Schema = new Schema({
         moveIn: {
             type: Schema.Types.Number
         }
+    }
+}, { _id: false });
+
+export const propertyStatusInfo: Schema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: MODELS.USERS
+    },
+    version: {
+        type: Schema.Types.Number,
+        default: 1,
+    },
+    status: {
+        type: Schema.Types.String,
+        trim: true,
+        enum: propertyStatus,
+        default: 'Pending Verification'
+    },
+    lastEditDate: {
+        type: Schema.Types.Date
+    },
+    verifyDate: {
+        type: Schema.Types.Date
+    },
+    closeDate: {
+        type: Schema.Types.Date
+    },
+    closureReason: {
+        type: Schema.Types.String
+    },
+    closureSubReason: {
+        type: Schema.Types.String
     }
 }, { _id: false });

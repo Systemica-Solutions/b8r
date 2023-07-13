@@ -46,3 +46,9 @@ export enum furnishingType {
     'Semi-furnished',
     'Fully-furnished'
 }
+
+export enum propertyStatus {
+    'Pending Verification',
+    'Verified',
+    'Closed'
+}

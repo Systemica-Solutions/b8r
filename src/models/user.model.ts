@@ -13,7 +13,6 @@ const UserSchema: Schema = new Schema({
     email: {
         type: Schema.Types.String,
         required: true,
-        unique: true,
         validate: [EmailValidation, 'Please fill a valid email address']
     },
     password: {
@@ -32,11 +31,15 @@ const UserSchema: Schema = new Schema({
     },
     inviteCode: {
       type: Schema.Types.String,
-      default: ''
+      default: null
     },
     authCode: {
       type: Schema.Types.String,
       default: null
+    },
+    isFieldAgent: {
+      type: Schema.Types.Boolean,
+      default: false
     }
 }, { timestamps: true });
 

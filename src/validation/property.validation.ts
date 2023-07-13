@@ -1,5 +1,5 @@
 import Joi from '@hapi/joi';
-import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType } from '../constants/global.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, propertyStatus } from '../constants/global.constants';
 import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
@@ -8,6 +8,7 @@ export const addPropertyValidation = async (req, res, next) => {
         propertyInfo: propertyBasicInfo.required(),
         ownerInfo: ownerBasicInfo.required(),
         featureInfo: featureBasicInfo.required(),
+        statusInfo: statusInfo.required()
     });
     const value = schema.validate(req.body);
     if (value.error) {
@@ -67,7 +68,7 @@ const featureBasicInfo = Joi.object().keys({
     houseHelpRoom:  Joi.string().valid(...Object.keys(houseHelpRoom)).optional(),
     bathrooms: Joi.number().integer().min(0).max(10).optional(),
     balconies: Joi.number().integer().min(0).max(10).optional(),
-    furnishingType:  Joi.string().valid(...Object.keys(furnishingType)).optional(),
+    furnishingType: Joi.string().valid(...Object.keys(furnishingType)).optional(),
     ac: Joi.boolean().optional(),
     nonVeg: Joi.boolean().optional(),
     constructionYear:  Joi.string().optional(),
@@ -84,4 +85,15 @@ const featureBasicInfo = Joi.object().keys({
         maintenance: Joi.number().optional(),
         moveIn: Joi.number().optional(),
     })
+});
+
+const statusInfo = Joi.object().keys({
+    userId: Joi.string().optional(),
+    version: Joi.number().optional(),
+    status: Joi.string().valid(...Object.keys(propertyStatus)).optional(),
+    lastEditDate: Joi.date().optional(),
+    verifyDate: Joi.string().optional(),
+    closeDate: Joi.string().optional(),
+    closureReason: Joi.string().optional(),
+    closureSubReason: Joi.string().optional(),
 });

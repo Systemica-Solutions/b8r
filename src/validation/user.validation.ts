@@ -38,7 +38,8 @@ export const signupUserValidation = async (req, res, next) => {
             .required(),
         userRole: Joi.string().valid(...Object.keys(roleCode)),
         inviteCode: Joi.any().optional(),
-        authCode: Joi.string().optional()
+        authCode: Joi.string().optional(),
+        isFieldAgent: Joi.boolean().optional()
     });
     const value = schema.validate(req.body);
     if (value.error) {

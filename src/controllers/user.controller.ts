@@ -17,14 +17,14 @@ export const signUpUser = async (req: Request, res: Response) => {
         console.log('req', req.body);
         let userData: any = {};
         userData = req.body;
-        const userExist = await User.findOne({$or: [{ email: userData.email }, { phoneNumber: userData.phoneNumber }]});
+        const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
         if (!userExist) {
               const userObj = new User(req.body);
               const userSave = await userObj.save();
               const jwtToken = generateJWTToken(userSave);
               return successResponse(res, 200, { user: userSave, jwt_token: jwtToken }, 'User Signup Successfully.');
         } else {
-            return failureResponse(res, 403, [], 'Already exists given email id or phone number');
+            return failureResponse(res, 403, [], 'Phone number already exists');
         }
     } catch (error) {
        return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
