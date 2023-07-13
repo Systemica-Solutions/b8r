@@ -1,5 +1,4 @@
 const Joi = require('@hapi/joi');
-import { roleCode } from '../constants/global.constants';
 import { failureResponse } from '../helpers/api-response.helper';
 import { encrypt } from '../services/crypto.service';
 
@@ -36,7 +35,6 @@ export const signupUserValidation = async (req, res, next) => {
             .max(10)
             .pattern(/^[0-9]+$/)
             .required(),
-        userRole: Joi.string().valid(...Object.keys(roleCode)),
         inviteCode: Joi.any().optional(),
         authCode: Joi.string().optional(),
         isFieldAgent: Joi.boolean().optional()

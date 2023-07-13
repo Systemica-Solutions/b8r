@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import { EmailValidation } from '../helpers/validation.helper';
-import { roleCode } from '../constants/global.constants';
 
 const UserSchema: Schema = new Schema({
     name: {
@@ -24,18 +23,12 @@ const UserSchema: Schema = new Schema({
       required: true,
       unique: true
     },
-    userRole: {
-      type: Schema.Types.String,
-      enum: roleCode,
-      default: roleCode.AGENT
-    },
     inviteCode: {
       type: Schema.Types.String,
       default: null
     },
     authCode: {
-      type: Schema.Types.String,
-      default: null
+      type: Schema.Types.String
     },
     isFieldAgent: {
       type: Schema.Types.Boolean,

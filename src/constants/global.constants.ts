@@ -1,7 +1,8 @@
 
-export enum roleCode {
-    AGENT = 'AGENT',
-    FIELDAGENT = 'FIELDAGENT'
+export enum authCodeType {
+    'Field Agent',
+    'Property Agent',
+    'Other'
 }
 
 export enum houseType {
@@ -48,7 +49,7 @@ export enum furnishingType {
 }
 
 export enum propertyStatus {
-    'Pending Verification',
+    'Pending',
     'Verified',
     'Closed'
 }

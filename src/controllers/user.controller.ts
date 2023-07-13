@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { successResponse, failureResponse } from '../helpers/api-response.helper';
 import User from '../models/user.model';
+import Authcode from '../models/authcode.model';
 import { encrypt, decrypt } from '../services/crypto.service';
 
 /**
@@ -21,14 +22,32 @@ export const signUpUser = async (req: Request, res: Response) => {
         if (!userExist) {
               const userObj = new User(req.body);
               const userSave = await userObj.save();
-              const jwtToken = generateJWTToken(userSave);
-              return successResponse(res, 200, { user: userSave, jwt_token: jwtToken }, 'User Signup Successfully.');
+              const authObj = await saveAuthCode(userObj);
+              return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
         } else {
             return failureResponse(res, 403, [], 'Phone number already exists');
         }
     } catch (error) {
        return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
    }
+};
+
+// Save auth code after sign-up
+const saveAuthCode = async (userObj: any) => {
+    try {
+      const authRegistery = {
+        userId : userObj._id,
+        authCode: userObj.authCode,
+        entity: userObj.name,
+        authCodeType: userObj.authCode.substring(0, 2) === 'FL' ? 'Field Agent' :
+        userObj.authCode.substring(0, 2) === 'BA' ? 'Property Agent' : 'Other'
+      };
+      const authObj = new Authcode(authRegistery);
+      const saveObj = await authObj.save();
+      return saveObj;
+    } catch (error) {
+        return error;
+    }
 };
 
 //  Get all users

@@ -183,7 +183,7 @@ export const propertyStatusInfo: Schema = new Schema({
         type: Schema.Types.String,
         trim: true,
         enum: propertyStatus,
-        default: 'Pending Verification'
+        default: 'Pending'
     },
     lastEditDate: {
         type: Schema.Types.Date
