@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, propertyStatusInfo } from './common.model';
+import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, staticStatusInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema({
     propertyInfo: {
@@ -16,7 +16,7 @@ const PropertySchema: Schema = new Schema({
         default: null
     },
     statusInfo: {
-        type: propertyStatusInfo,
+        type: staticStatusInfo,
         default: null
     }
 }, { timestamps: true });

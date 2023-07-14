@@ -1,14 +1,32 @@
 import { Request, Response } from 'express';
 import { successResponse, failureResponse } from '../helpers/api-response.helper';
 import Tenant from '../models/tenant.model';
+import { Types } from 'mongoose';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
     try {
-        req.body.userId = req.user.user._id;
-        const tenantObj = new Tenant(req.body);
-        const saveObj = await tenantObj.save();
-        return successResponse(res, 200, { tenant: saveObj }, 'New tenant added successfully.');
+      const tenantData = req.body;
+      tenantData.userId = new Types.ObjectId(req.user.user._id);
+
+      //  Check version of tenant based on below conditions while add new tenant
+      //   1. If same user try to enter again same value for tenantName & status
+      //         it should return as already exist tenant with this values
+      //   2. If another user try to add tenant and it matches with tenantName & status then increment it's version
+      Tenant.find({ $and: [{ name: tenantData.name }, { status: tenantData.status }]})
+        .exec(async (error: any, tenantExist: any) => {
+          if (error) { return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong'); }
+          else if (tenantExist && tenantExist.length) {
+            const tenantObj = tenantExist.filter((x) => x.userId.equals(tenantData.userId));
+            if (tenantObj && tenantObj.length) {
+              return failureResponse(res, 403, [], 'Tenant already exist with this value');
+            }
+            else { tenantData.version = tenantExist[tenantExist.length - 1].version + 1; }
+          }
+          const newTenant = new Tenant(tenantData);
+          const saveObj = await newTenant.save();
+          return successResponse(res, 200, { tenant: saveObj }, 'New tenant added successfully.');
+      });
     } catch (error) {
         return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
     }

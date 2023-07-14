@@ -18,7 +18,7 @@ const AuthCodeSchema: Schema = new Schema({
         enum: authCodeType
     },
     status: {
-      type: Schema.Types.Boolean,
+      type: Schema.Types.Boolean,       // Active / Inactive
       default: false
     },
     startTime: {

@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, propertyStatus } from '../constants/global.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus } from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema({
     houseType: {
@@ -170,7 +170,7 @@ export const propertyFeatureInfo: Schema = new Schema({
     }
 }, { _id: false });
 
-export const propertyStatusInfo: Schema = new Schema({
+export const staticStatusInfo: Schema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: MODELS.USERS
@@ -182,7 +182,7 @@ export const propertyStatusInfo: Schema = new Schema({
     status: {
         type: Schema.Types.String,
         trim: true,
-        enum: propertyStatus,
+        enum: staticStatus,
         default: 'Pending'
     },
     lastEditDate: {

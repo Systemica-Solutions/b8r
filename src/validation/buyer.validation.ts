@@ -1,6 +1,6 @@
 import Joi from '@hapi/joi';
 import { failureResponse } from '../helpers/api-response.helper';
-import { furnishingType, houseConfiguration, houseType } from '../constants/global.constants';
+import { furnishingType, houseConfiguration, houseType, staticStatus } from '../constants/global.constants';
 
 // Check validations while add buyer
 export const addBuyerValidation = async (req, res, next) => {
@@ -15,6 +15,8 @@ export const addBuyerValidation = async (req, res, next) => {
         preferredLocation: Joi.string().optional(),
         moveIn: Joi.string().optional(),
         budget: Joi.string().optional(),
+        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
+        version: Joi.number().optional(),
     });
     const value = schema.validate(req.body);
     if (value.error) {

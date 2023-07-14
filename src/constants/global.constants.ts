@@ -48,7 +48,7 @@ export enum furnishingType {
     'Fully-furnished'
 }
 
-export enum propertyStatus {
+export enum staticStatus {
     'Pending',
     'Verified',
     'Closed'

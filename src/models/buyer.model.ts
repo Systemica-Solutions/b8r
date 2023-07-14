@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import { EmailValidation } from '../helpers/validation.helper';
-import { furnishingType, houseConfiguration, houseType } from '../constants/global.constants';
+import { furnishingType, houseConfiguration, houseType, staticStatus } from '../constants/global.constants';
 
 const BuyerSchema: Schema = new Schema({
     name: {
@@ -48,6 +48,16 @@ const BuyerSchema: Schema = new Schema({
     },
     moveIn: {
         type: Schema.Types.String,
+    },
+    version: {
+        type: Schema.Types.Number,
+        default: 1,
+    },
+    status: {
+        type: Schema.Types.String,
+        trim: true,
+        enum: staticStatus,
+        default: 'Pending'
     }
 }, { timestamps: true });
 

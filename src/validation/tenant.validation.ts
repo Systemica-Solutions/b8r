@@ -1,6 +1,6 @@
 import Joi from '@hapi/joi';
 import { failureResponse } from '../helpers/api-response.helper';
-import { furnishingType, houseConfiguration, houseType } from '../constants/global.constants';
+import { furnishingType, houseConfiguration, houseType, staticStatus } from '../constants/global.constants';
 
 // Check validations while add tenant
 export const addTenantValidation = async (req, res, next) => {
@@ -28,10 +28,11 @@ export const addTenantValidation = async (req, res, next) => {
         nonVeg: Joi.boolean().optional(),
         bathoroom: Joi.boolean().optional(),
         onBoard: Joi.boolean().optional(),
-        status: Joi.boolean().optional(),
         deactivateDate: Joi.date().optional(),
         deactivateReason: Joi.string().optional(),
-        deactivateSubReason: Joi.string().optional()
+        deactivateSubReason: Joi.string().optional(),
+        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
+        version: Joi.number().optional(),
     });
     const value = schema.validate(req.body);
     if (value.error) {

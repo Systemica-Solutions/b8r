@@ -1,5 +1,5 @@
 import Joi from '@hapi/joi';
-import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, propertyStatus } from '../constants/global.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus } from '../constants/global.constants';
 import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
@@ -90,7 +90,7 @@ const featureBasicInfo = Joi.object().keys({
 const statusInfo = Joi.object().keys({
     userId: Joi.string().optional(),
     version: Joi.number().optional(),
-    status: Joi.string().valid(...Object.keys(propertyStatus)).optional(),
+    status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
     lastEditDate: Joi.date().optional(),
     verifyDate: Joi.date().optional(),
     closeDate: Joi.date().optional(),
