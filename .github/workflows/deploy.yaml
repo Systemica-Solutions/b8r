@@ -23,8 +23,8 @@ jobs:
         - name: Deploy to EB
           uses: einaregilsson/beanstalk-deploy@v18
           with:
-            aws_access_key: AKIAXFTHGIOESKIJBZ6E
-            aws_secret_key: 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
+            aws_access_key: AKIAXFTHGIOE64KPXVXF
+            aws_secret_key: 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
             application_name: betterhomes-backend
             environment_name: Betterhomes-backend-env
             existing_bucket_name: elasticbeanstalk-ap-south-1-493063914377
