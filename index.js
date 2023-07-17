@@ -15,8 +15,7 @@ app.use(bodyParser.json());
 app.use(cors());
 var datetime = new Date();
 console.log(datetime.toISOString().split('T')[0]);
-const CONNECTION_URL =
-  "mongodb+srv://b8r:homes@cluster0.sbfwcs4.mongodb.net/b8r?retryWrites=true&w=majority";
+const CONNECTION_URL = process.env.MONGO_URI;
 const PORT = process.env.PORT || 5000;
 
 //Init Mongo
@@ -54,6 +53,9 @@ app.use("/backend/", getRoutes);
 app.get("/backend", (req, res) => {
   res.json({ message: "Welcome to B8r Homes Server!!! The world of API " });
 });
+app.get("/", (req, res) => {
+  res.json({message: "Server is up..."});
+})
 
 // post('/backend/file', upload.single('file'), (req, res, next) => {
 //   const file = req.file;
