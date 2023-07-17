@@ -25,9 +25,9 @@ jobs:
           with:
             aws_access_key: AKIAXFTHGIOESKIJBZ6E
             aws_secret_key: 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
-            application_name: docker-react
-            environment_name: Dockerreact-env
-            existing_bucket_name: elasticbeanstalk-ap-south-1-008177965126
+            application_name: betterhomes-backend
+            environment_name: Betterhomes-backend-env
+            existing_bucket_name: elasticbeanstalk-ap-south-1-493063914377
             region: ap-south-1
             version_label: ${{ github.sha }}
             deployment_package: deploy.zip
