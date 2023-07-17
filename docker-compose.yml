@@ -1,0 +1,12 @@
+version: '3'
+services:
+  b8r-api:
+    image: urvish91/betterhomes-backend:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_URI=mongodb+srv://b8r:homes@cluster0.sbfwcs4.mongodb.net/b8r?retryWrites=true&w=majority
+      - PORT=5000
+    ports:
+      - "5000:5000"

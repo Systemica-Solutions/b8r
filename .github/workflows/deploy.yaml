@@ -1,0 +1,33 @@
+# DOCKER_USERNAME = urvish91
+# DOCKER_HUBTOKEN = dckr_pat_TqpSOirk7Z-S21Qe4E8mAcyaN7M
+# AWS_ACCESS_KEY = 
+# AWS_SECRET_KEY = 
+name: Deploy BetterHomes Backend
+on:
+  push:
+    branches:
+      - b8rhome_server
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+        - run: docker login -u urvish91 -p dckr_pat_TqpSOirk7Z-S21Qe4E8mAcyaN7M
+        - run: docker build -t urvish91/betterhomes-backend .
+        - run: docker push urvish91/betterhomes-backend
+
+        - name: Generate deployment package
+          run: zip -r deploy.zip . -x '*.git*'
+
+        - name: Deploy to EB
+          uses: einaregilsson/beanstalk-deploy@v18
+          with:
+            aws_access_key: AKIAXFTHGIOESKIJBZ6E
+            aws_secret_key: 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
+            application_name: docker-react
+            environment_name: Dockerreact-env
+            existing_bucket_name: elasticbeanstalk-ap-south-1-008177965126
+            region: ap-south-1
+            version_label: ${{ github.sha }}
+            deployment_package: deploy.zip
