@@ -50,39 +50,51 @@ const TenantSchema: Schema = new Schema({
       },
       rent: {
         type: Schema.Types.Number,
+        default: false
       },
       gatedSecurity: {
         type: Schema.Types.Boolean,
+        default: false
       },
-      twentyFourSeven: {
+      powerBackup: {
         type: Schema.Types.Boolean,
+        default: false
       },
       groceryStore: {
         type: Schema.Types.Boolean,
+        default: false
       },
       swimmingPool: {
         type: Schema.Types.Boolean,
+        default: false
       },
       gym: {
         type: Schema.Types.Boolean,
+        default: false
       },
       clubHouse: {
         type: Schema.Types.Boolean,
+        default: false
       },
       carParking: {
         type: Schema.Types.Boolean,
+        default: false
       },
       bikeParking: {
         type: Schema.Types.Boolean,
+        default: false
       },
       ac: {
         type: Schema.Types.Boolean,
+        default: false
       },
       nonVeg: {
         type: Schema.Types.Boolean,
+        default: false
       },
       bathoroom: {
         type: Schema.Types.Boolean,
+        default: false
       },
       onBoard: {
         type: Schema.Types.Boolean,

@@ -17,7 +17,7 @@ export const addTenantValidation = async (req, res, next) => {
         moveIn: Joi.string().optional(),
         rent: Joi.number().optional(),
         gatedSecurity: Joi.boolean().optional(),
-        twentyFourSeven: Joi.boolean().optional(),
+        powerBackup: Joi.boolean().optional(),
         groceryStore: Joi.boolean().optional(),
         swimmingPool: Joi.boolean().optional(),
         gym: Joi.boolean().optional(),

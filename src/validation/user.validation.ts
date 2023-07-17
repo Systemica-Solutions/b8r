@@ -30,13 +30,8 @@ export const signupUserValidation = async (req, res, next) => {
             }),
         confirmPassword: Joi.valid(Joi.ref('password'))
             .messages({'any.only': 'Passwords must match.'}),
-        phoneNumber: Joi.string()
-            .min(7)
-            .max(10)
-            .pattern(/^[0-9]+$/)
-            .required(),
+        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
         inviteCode: Joi.any().optional(),
-        authCode: Joi.string().optional(),
         isFieldAgent: Joi.boolean().optional()
     });
     const value = schema.validate(req.body);

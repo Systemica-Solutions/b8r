@@ -11,14 +11,15 @@ const AuthCodeSchema: Schema = new Schema({
         type: Schema.Types.String,
     },
     authCode: {
-        type: Schema.Types.String,     // FL=field-agent, BA=property-agent, DA=other
+        type: Schema.Types.String,
+        unique: true
     },
     authCodeType: {
-        type: Schema.Types.String,
+        type: Schema.Types.String,     // FL=field-agent, BA=property-agent, DA=other
         enum: authCodeType
     },
     status: {
-      type: Schema.Types.Boolean,       // Active / Inactive
+      type: Schema.Types.Boolean,       // Active/Inactive
       default: false
     },
     startTime: {

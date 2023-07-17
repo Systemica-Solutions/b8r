@@ -28,13 +28,13 @@ export const propertyBasicInfo: Schema = new Schema({
     mapLocation: {
         type: Schema.Types.String,
     },
-    purpose: {
-      rent: {
+    purposeRent: {
         type: Schema.Types.Boolean,
-      },
-      sale: {
+        default: false
+    },
+    purposeSale: {
         type: Schema.Types.Boolean,
-     }
+        default: false
     }
 }, { _id: false });
 
@@ -68,21 +68,27 @@ export const propertyOwnerInfo: Schema = new Schema({
 export const propertyFeatureInfo: Schema = new Schema({
     gatedSecurity: {
         type: Schema.Types.Boolean,
+        default: false
     },
-    twentyFourSeven: {
+    powerBackup: {
         type: Schema.Types.Boolean,
+        default: false
     },
     groceryStore: {
         type: Schema.Types.Boolean,
+        default: false
     },
     swimmingPool: {
         type: Schema.Types.Boolean,
+        default: false
     },
     gym: {
         type: Schema.Types.Boolean,
+        default: false
     },
     clubHouse: {
         type: Schema.Types.Boolean,
+        default: false
     },
     carpetArea: {
         type: Schema.Types.Number
@@ -130,9 +136,11 @@ export const propertyFeatureInfo: Schema = new Schema({
     },
     ac: {
         type: Schema.Types.Boolean,
+        default: false
     },
     nonVeg: {
         type: Schema.Types.Boolean,
+        default: false
     },
     constructionYear: {
         type: Schema.Types.String
@@ -140,33 +148,29 @@ export const propertyFeatureInfo: Schema = new Schema({
     availableFrom: {
         type: Schema.Types.String
     },
-    rent: {
-        amount: {
-            type: Schema.Types.Number
-        },
-        deposit: {
-            type: Schema.Types.Number
-        },
-        maintenance: {
-            type: Schema.Types.Number
-        },
-        lockInPeriod: {
-            type: Schema.Types.Number
-        }
+    rentAmount: {
+        type: Schema.Types.Number
     },
-    sale: {
-        amount: {
-            type: Schema.Types.Number
-        },
-        deposit: {
-            type: Schema.Types.Number
-        },
-        maintenance: {
-            type: Schema.Types.Number
-        },
-        moveIn: {
-            type: Schema.Types.Number
-        }
+    rentDeposit: {
+        type: Schema.Types.Number
+    },
+    rentMaintenance: {
+        type: Schema.Types.Number
+    },
+    lockInPeriod: {
+        type: Schema.Types.Number
+    },
+    saleAmount: {
+        type: Schema.Types.Number
+    },
+    saleDeposit: {
+        type: Schema.Types.Number
+    },
+    saleMaintenance: {
+        type: Schema.Types.Number
+    },
+    moveInFrom: {
+        type: Schema.Types.Number
     }
 }, { _id: false });
 

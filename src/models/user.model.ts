@@ -27,9 +27,6 @@ const UserSchema: Schema = new Schema({
       type: Schema.Types.String,
       default: null
     },
-    authCode: {
-      type: Schema.Types.String
-    },
     isFieldAgent: {
       type: Schema.Types.Boolean,
       default: false
