@@ -35,6 +35,10 @@ export const propertyBasicInfo: Schema = new Schema({
     purposeSale: {
         type: Schema.Types.Boolean,
         default: false
+    },
+    rented: {
+        type: Schema.Types.Boolean,
+        default: false
     }
 }, { _id: false });
 

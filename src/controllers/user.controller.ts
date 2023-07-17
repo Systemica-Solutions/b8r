@@ -37,8 +37,8 @@ const saveAuthCode = async (userObj: any) => {
     try {
       const authRegistery = {
         userId : userObj._id,
-        authCode: userObj.authCode,
         entity: userObj.name,
+        authCode: userObj.authCode,
         authCodeType: userObj.authCode.substring(0, 2) === 'FL' ? 'Field Agent' :
         userObj.authCode.substring(0, 2) === 'BA' ? 'Property Agent' : 'Other'
       };

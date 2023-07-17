@@ -4,6 +4,20 @@ import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
 export const addPropertyValidation = async (req, res, next) => {
+    
+    const propertyBasicInfo = Joi.object().keys({
+        houseType:  Joi.string().valid(...Object.values(houseType)).optional(),
+        houseConfig: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
+        houseName: Joi.string().optional(),
+        societyName: Joi.string().optional(),
+        pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
+        area: Joi.string().optional(),
+        mapLocation: Joi.string().optional(),
+        purposeRent: Joi.boolean().required(),
+        purposeSale: Joi.boolean().required(),
+        rented: Joi.boolean().optional()
+    });
+
     const ownerBasicInfo = Joi.object().keys({
         name: Joi.object().keys({
             first: Joi.string().required(),
@@ -14,19 +28,6 @@ export const addPropertyValidation = async (req, res, next) => {
         country: Joi.string().required(),
         city: Joi.string().optional(),
     });
-
-    const propertyBasicInfo = Joi.object().keys({
-        houseType:  Joi.string().valid(...Object.values(houseType)).optional(),
-        houseConfig: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
-        houseName: Joi.string().optional(),
-        societyName: Joi.string().optional(),
-        pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
-        area: Joi.string().optional(),
-        mapLocation: Joi.string().optional(),
-        purposeRent: Joi.boolean().required(),
-        purposeSale: Joi.boolean().required()
-    });
-
 
     const featureBasicInfo = Joi.object().keys({
         gatedSecurity: Joi.boolean().optional(),
