@@ -9,7 +9,8 @@
         "moduleResolution": "node",
         "importHelpers": true,
         "sourceMap": true,
-        "outDir": "./dist/",
+        "rootDir": "./src",
+        "outDir": "./dist",
         "baseUrl": ".",
         "skipLibCheck": true,
         "paths": {

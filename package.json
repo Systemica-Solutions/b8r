@@ -10,7 +10,7 @@
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node -r dotenv/config .",
+    "start": "node -r dotenv/config dist/app.js",
     "dev": "node -r dotenv/config src/app.ts"
   },
   "dependencies": {
