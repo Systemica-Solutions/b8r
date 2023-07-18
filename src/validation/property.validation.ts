@@ -4,7 +4,7 @@ import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
 export const addPropertyValidation = async (req, res, next) => {
-    
+
     const propertyBasicInfo = Joi.object().keys({
         houseType:  Joi.string().valid(...Object.values(houseType)).optional(),
         houseConfig: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
