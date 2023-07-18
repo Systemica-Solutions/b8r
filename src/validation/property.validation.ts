@@ -3,19 +3,21 @@ import { houseType, houseConfiguration, carParking, bikeParking, parkingType, ho
 import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
-export const addPropertyValidation = async (req, res, next) => {
+export const propertyDetailValidation = async (req, res, next) => {
 
     const propertyBasicInfo = Joi.object().keys({
         houseType:  Joi.string().valid(...Object.values(houseType)).optional(),
         houseConfig: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
-        houseName: Joi.string().optional(),
-        societyName: Joi.string().optional(),
-        pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
         area: Joi.string().optional(),
         mapLocation: Joi.string().optional(),
         purposeRent: Joi.boolean().required(),
         purposeSale: Joi.boolean().required(),
-        rented: Joi.boolean().optional()
+        rented: Joi.boolean().optional(),
+        lastEditDate: Joi.date().optional(),
+        verifyDate: Joi.date().optional(),
+        closeDate: Joi.date().optional(),
+        closureReason: Joi.string().optional(),
+        closureSubReason: Joi.string().optional(),
     });
 
     const ownerBasicInfo = Joi.object().keys({
@@ -96,22 +98,34 @@ export const addPropertyValidation = async (req, res, next) => {
         }),
     });
 
-    const statusInfo = Joi.object().keys({
-        userId: Joi.string().optional(),
-        version: Joi.number().optional(),
-        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
-        lastEditDate: Joi.date().optional(),
-        verifyDate: Joi.date().optional(),
-        closeDate: Joi.date().optional(),
-        closureReason: Joi.string().optional(),
-        closureSubReason: Joi.string().optional(),
-    });
-
     const schema = Joi.object().keys({
+        version: Joi.number().optional(),
+        userId: Joi.string().optional(),
         propertyInfo: propertyBasicInfo.required(),
         ownerInfo: ownerBasicInfo.required(),
-        featureInfo: featureBasicInfo.required(),
-        statusInfo: statusInfo.required()
+        featureInfo: featureBasicInfo.required()
+    });
+    const value = schema.validate(req.body.propertyData);
+    if (value.error) {
+        return failureResponse(
+            res,
+            400,
+            value.error,
+            value.error.details[0].message ? value.error.details[0].message : 'Bad request'
+        );
+    } else {
+        next();
+    }
+};
+
+export const addPropertyValidation = async (req, res, next) => {
+    const schema = Joi.object().keys({
+        houseName: Joi.string().optional(),
+        societyName: Joi.string().optional(),
+        pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
+        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
+        propertyData: Joi.any().optional(),
+        propertyDetails: Joi.array().items(Joi.string()).optional()
     });
     const value = schema.validate(req.body);
     if (value.error) {

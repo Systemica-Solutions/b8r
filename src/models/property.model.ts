@@ -4,10 +4,6 @@ import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, staticStatus
 import { staticStatus } from '../constants/global.constants';
 
 const PropertySchema: Schema = new Schema({
-    // userId: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: MODELS.USERS
-    // },
     houseName: {
         type: Schema.Types.String,
     },

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getAllPropertyList, addProperty, getPriorityById } from '../../controllers/property.controller';
-import { addPropertyValidation } from '../../validation/property.validation';
+import { addPropertyValidation, propertyDetailValidation } from '../../validation/property.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
 const router = Router();
@@ -9,8 +9,7 @@ const router = Router();
 router.get('/', userAuth, getAllPropertyList);
 
 // Add new property
-// router.post('/', userAuth,  addPropertyValidation, addProperty);
-router.post('/', userAuth, addProperty);
+router.post('/', userAuth, addPropertyValidation, propertyDetailValidation, addProperty);
 
 // Get property by id
 router.get('/:id', userAuth, getPriorityById);
