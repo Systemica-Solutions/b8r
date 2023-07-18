@@ -33,8 +33,7 @@ export const addProperty = async (req: Request, res: Response) => {
                 const savedObj: any = await detailObj.save();
                 updatePropertyDetails(propertyExist[0]._id, savedObj._id, res);
               }
-            }
-            else {
+            } else {
               const detailObj =  new PropertyDetail(tempData.propertyData);
               const savedObj: any = await detailObj.save();
               const propertyObj = new Property(tempData);

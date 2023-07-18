@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, staticStatusInfo } from './common.model';
+import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo } from './common.model';
 
 const PropertyDetailSchema: Schema = new Schema({
     propertyInfo: {

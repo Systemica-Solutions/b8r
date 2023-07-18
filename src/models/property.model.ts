@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, staticStatusInfo } from './common.model';
 import { staticStatus } from '../constants/global.constants';
 
 const PropertySchema: Schema = new Schema({

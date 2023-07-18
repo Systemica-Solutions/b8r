@@ -3,9 +3,9 @@ import { failureResponse } from '../helpers/api-response.helper';
 import { furnishingType, houseConfiguration, houseType, staticStatus } from '../constants/global.constants';
 
 // Check validations while add tenant
-export const addTenantValidation = async (req, res, next) => {
+export const tenantDetailValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
-        name: Joi.string().required(),
+        userId: Joi.string().optional(),
         email: Joi.string().email().required(),
         phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
         stayDuration: Joi.string().optional(),
@@ -31,8 +31,27 @@ export const addTenantValidation = async (req, res, next) => {
         deactivateDate: Joi.date().optional(),
         deactivateReason: Joi.string().optional(),
         deactivateSubReason: Joi.string().optional(),
-        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
         version: Joi.number().optional(),
+    });
+    const value = schema.validate(req.body.tenantData);
+    if (value.error) {
+        return failureResponse(
+            res,
+            400,
+            value.error,
+            value.error.details[0].message ? value.error.details[0].message : 'Bad request'
+        );
+    } else {
+        next();
+    }
+};
+
+export const addTenantValidation = async (req, res, next) => {
+    const schema = Joi.object().keys({
+        name: Joi.string().required(),
+        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
+        tenantDetails: Joi.array().items(Joi.string()).optional(),
+        tenantData: Joi.any().optional()
     });
     const value = schema.validate(req.body);
     if (value.error) {

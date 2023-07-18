@@ -1,5 +1,4 @@
 import { Schema } from 'mongoose';
-import { MODELS } from '../constants/model.constants';
 import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus } from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema({
@@ -181,24 +180,5 @@ export const propertyFeatureInfo: Schema = new Schema({
     },
     moveInFrom: {
         type: Schema.Types.Number
-    }
-}, { _id: false });
-
-export const staticStatusInfo: Schema = new Schema({
-
-    lastEditDate: {
-        type: Schema.Types.Date
-    },
-    verifyDate: {
-        type: Schema.Types.Date
-    },
-    closeDate: {
-        type: Schema.Types.Date
-    },
-    closureReason: {
-        type: Schema.Types.String
-    },
-    closureSubReason: {
-        type: Schema.Types.String
     }
 }, { _id: false });
