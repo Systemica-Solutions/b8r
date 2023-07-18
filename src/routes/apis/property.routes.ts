@@ -9,7 +9,8 @@ const router = Router();
 router.get('/', userAuth, getAllPropertyList);
 
 // Add new property
-router.post('/', userAuth,  addPropertyValidation, addProperty);
+// router.post('/', userAuth,  addPropertyValidation, addProperty);
+router.post('/', userAuth, addProperty);
 
 // Get property by id
 router.get('/:id', userAuth, getPriorityById);

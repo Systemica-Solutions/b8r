@@ -13,15 +13,6 @@ export const propertyBasicInfo: Schema = new Schema({
         trim: true,
         enum: houseConfiguration,
     },
-    houseName: {
-        type: Schema.Types.String,
-    },
-    societyName: {
-        type: Schema.Types.String,
-    },
-    pinCode: {
-        type: Schema.Types.String,
-    },
     area: {
         type: Schema.Types.String,
     },
@@ -39,6 +30,21 @@ export const propertyBasicInfo: Schema = new Schema({
     rented: {
         type: Schema.Types.Boolean,
         default: false
+    },
+    lastEditDate: {
+        type: Schema.Types.Date
+    },
+    verifyDate: {
+        type: Schema.Types.Date
+    },
+    closeDate: {
+        type: Schema.Types.Date
+    },
+    closureReason: {
+        type: Schema.Types.String
+    },
+    closureSubReason: {
+        type: Schema.Types.String
     }
 }, { _id: false });
 
@@ -179,20 +185,7 @@ export const propertyFeatureInfo: Schema = new Schema({
 }, { _id: false });
 
 export const staticStatusInfo: Schema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: MODELS.USERS
-    },
-    version: {
-        type: Schema.Types.Number,
-        default: 1,
-    },
-    status: {
-        type: Schema.Types.String,
-        trim: true,
-        enum: staticStatus,
-        default: 'Pending'
-    },
+
     lastEditDate: {
         type: Schema.Types.Date
     },

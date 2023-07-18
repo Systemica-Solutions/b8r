@@ -1,24 +1,32 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import { propertyBasicInfo, propertyFeatureInfo, propertyOwnerInfo, staticStatusInfo } from './common.model';
+import { staticStatus } from '../constants/global.constants';
 
 const PropertySchema: Schema = new Schema({
-    propertyInfo: {
-        type: propertyBasicInfo,
-        default: null
+    // userId: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: MODELS.USERS
+    // },
+    houseName: {
+        type: Schema.Types.String,
     },
-    ownerInfo: {
-        type: propertyOwnerInfo,
-        default: null
+    societyName: {
+        type: Schema.Types.String,
     },
-    featureInfo: {
-        type: propertyFeatureInfo,
-        default: null
+    pinCode: {
+        type: Schema.Types.String,
     },
-    statusInfo: {
-        type: staticStatusInfo,
-        default: null
-    }
+    status: {
+        type: Schema.Types.String,
+        trim: true,
+        enum: staticStatus,
+        default: 'Pending'
+    },
+    propertyDetails : [{
+        type: Schema.Types.ObjectId,
+        ref: 'PropertyDetails'
+    }]
 }, { timestamps: true });
 
 export default model(MODELS.PROPERTY, PropertySchema);
