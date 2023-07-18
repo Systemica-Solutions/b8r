@@ -54,7 +54,7 @@ app.get("/backend", (req, res) => {
   res.json({ message: "Welcome to B8r Homes Server!!! The world of API " });
 });
 app.get("/", (req, res) => {
-  res.json({message: "Server is up..."});
+  res.json({message: "Welcome to B8r Homes Server!!! The world of API "});
 })
 
 // post('/backend/file', upload.single('file'), (req, res, next) => {
