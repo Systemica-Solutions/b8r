@@ -1,15 +1,14 @@
-dist/
-**/*.icloud
-node_modules/
-node_modules
-.env*
-yarn-error.log
-useful-scripts
-credentials*
-.idea
-deployed-constants
-collections
-assets/geography.json
-logger/logs
-env
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+
+# production
+/build
+
+#environment 
+.env
+
+#build-zip
+/dist
 
