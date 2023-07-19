@@ -66,7 +66,7 @@ const updatePropertyDetails = (id, detailsId, res) => {
 //  Get all properties
 export const getAllPropertyList = async (_: Request, res: Response) => {
     try {
-        const properties = await Property.find().lean();
+        const properties = await Property.find().populate('propertyDetails').lean();
         if (!properties) {
           return failureResponse(res, 404, [], 'Properties not found.');
         }

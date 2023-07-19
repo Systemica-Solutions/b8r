@@ -25,11 +25,16 @@ const UserSchema: Schema = new Schema({
     },
     inviteCode: {
       type: Schema.Types.String,
+      unique: true,
       default: null
     },
     isFieldAgent: {
       type: Schema.Types.Boolean,
       default: false
+    },
+    lastResetPasswordDate: {
+      type: Schema.Types.Date,
+      default: null
     }
 }, { timestamps: true });
 

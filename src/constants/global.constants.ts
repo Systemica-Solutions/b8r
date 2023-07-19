@@ -49,6 +49,7 @@ export enum furnishingType {
 }
 
 export enum staticStatus {
+    'New',
     'Pending',
     'Verified'
 }

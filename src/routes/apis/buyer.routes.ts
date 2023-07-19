@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getAllBuyerList, addBuyer, getBuyerById } from '../../controllers/buyer.controller';
-import { addBuyerValidation } from '../../validation/buyer.validation';
+import { addBuyerValidation, buyertDetailValidation } from '../../validation/buyer.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
 const router = Router();
@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', userAuth, getAllBuyerList);
 
 // Add new buyer
-router.post('/', userAuth,  addBuyerValidation, addBuyer);
+router.post('/', userAuth,  addBuyerValidation, buyertDetailValidation, addBuyer);
 
 // Get buyer by id
 router.get('/:id', userAuth, getBuyerById);
