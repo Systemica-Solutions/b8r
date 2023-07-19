@@ -22,8 +22,9 @@ export const signUpUser = async (req: Request, res: Response) => {
         if (!userExist) {
               const userObj = new User(req.body);
               const userSave = await userObj.save();
-              const authObj = await saveAuthCode(userObj);
-              return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
+              return successResponse(res, 200, { user: userSave }, 'User Signup Successfully.');
+              // const authObj = await saveAuthCode(userObj);
+              // return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
         } else {
             return failureResponse(res, 403, [], 'Phone number already exists');
         }

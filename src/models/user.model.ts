@@ -25,6 +25,7 @@ const UserSchema: Schema = new Schema({
     },
     inviteCode: {
       type: Schema.Types.String,
+      unique: true,
       default: null
     },
     isFieldAgent: {
