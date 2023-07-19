@@ -5,16 +5,19 @@ import { authCodeType } from '../constants/global.constants';
 const AuthCodeSchema: Schema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: MODELS.USERS
+        ref: MODELS.USERS,
+        default: null
     },
     entity: {
         type: Schema.Types.String,
     },
-    authCode: {
+    code: {
         type: Schema.Types.String,
-        unique: true
+        unique: true,
+        index: true,
+        required: true,
     },
-    authCodeType: {
+    codeType: {
         type: Schema.Types.String,     // FL=field-agent, BA=property-agent, DA=other
         enum: authCodeType
     },
@@ -31,6 +34,9 @@ const AuthCodeSchema: Schema = new Schema({
         default: null
     }
 }, { timestamps: true });
+
+AuthCodeSchema.index({ code: 1 }, { unique: true });
+
 
 export default model(MODELS.AUTHCODE, AuthCodeSchema);
 

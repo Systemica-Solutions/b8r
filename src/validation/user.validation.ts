@@ -124,7 +124,31 @@ export const updateUserValidation = async (req, res, next) => {
             value.error.details[0].message ? value.error.details[0].message : 'Bad request'
         );
     } else {
-        // req.body.password = await encrypt(req.body.password);
+        next();
+    }
+};
+
+
+// Add auth-code schema validation
+export const addAuthCodeValidation = async (req, res, next) => {
+    const schema = Joi.object().keys({
+        userId: Joi.string().optional(),
+        entity: Joi.string().optional(),
+        code: Joi.string().required(),
+        codeType: Joi.string().optional(),
+        status: Joi.boolean().optional(),
+        startTime: Joi.date().optional(),
+        endTime: Joi.date().optional(),
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        return failureResponse(
+            res,
+            400,
+            value.error,
+            value.error.details[0].message ? value.error.details[0].message : 'Bad request'
+        );
+    } else {
         next();
     }
 };

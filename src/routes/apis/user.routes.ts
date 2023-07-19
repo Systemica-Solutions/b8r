@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { signUpUser, getAllUsersList, signInUser, forgotPassword, updateUserDetails } from '../../controllers/user.controller';
+import { signUpUser, getAllUsersList, signInUser, forgotPassword,
+    addCustomAuthCode, updateUserDetails } from '../../controllers/user.controller';
 import { signinUserValidation, signupUserValidation,
-    resetPasswordValidation, updateUserValidation } from '../../validation/user.validation';
+    resetPasswordValidation, updateUserValidation, addAuthCodeValidation } from '../../validation/user.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
 const router = Router();
@@ -20,5 +21,8 @@ router.post('/signin', signinUserValidation, signInUser);
 
 // Forgot password
 router.put('/forgot-password', resetPasswordValidation, forgotPassword);
+
+// Add custom authcode
+router.post('/authcode', userAuth, addAuthCodeValidation, addCustomAuthCode);
 
 export default router;

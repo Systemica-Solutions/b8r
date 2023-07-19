@@ -73,8 +73,8 @@ export const propertyDetailValidation = async (req, res, next) => {
         }),
         lockInPeriod: Joi.when(Joi.ref('...propertyInfo.purposeRent'), {
             is: true,
-            then: Joi.number().required(),
-            otherwise: Joi.number().optional(),
+            then: Joi.number().integer().min(1).max(12).required(),
+            otherwise: Joi.number().integer().min(1).max(12).optional(),
         }),
         saleAmount: Joi.when(Joi.ref('...propertyInfo.purposeSale'), {
             is: true,
