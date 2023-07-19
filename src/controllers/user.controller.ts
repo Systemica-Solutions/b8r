@@ -90,7 +90,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const updatedData = req.body;
     User.findOneAndUpdate({  phoneNumber: updatedData.phoneNumber },
-      { $set: { password: updatedData.password,  confirmPassword: updatedData.confirmPassword} },
+      { $set: { password: updatedData.password, lastResetPasswordDate: new Date()} },
       (err, user) => {
         if (err) {
           return failureResponse(res, 500, err, err.message || 'Internal Server Error');
@@ -105,7 +105,29 @@ export const forgotPassword = async (req: Request, res: Response) => {
   }
 };
 
-
+// Update user details
+export const updateUserDetails = async (req: Request, res: Response) => {
+  try {
+    const updatedData = req.body;
+    const dbContact = req.user.user.phoneNumber;
+    if (dbContact === updatedData.phoneNumber) {
+      User.findOneAndUpdate({  phoneNumber: updatedData.phoneNumber },
+        { $set: updatedData }, {new: true}, (error, user) => {
+          if (error) {
+            return failureResponse(res, 500, [error], error.message || 'Internal Server Error');
+          } else if (user) {
+            return successResponse(res, 200, { user }, 'User details updated successfully.');
+          } else {
+            return failureResponse(res, 404, [error], error.message || 'Phone number not found');
+          }
+      });
+    } else {
+      return failureResponse(res, 401, [], 'You are not authorized to update user details');
+    }
+  } catch (error) {
+    return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
+  }
+};
 
 
 

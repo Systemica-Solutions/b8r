@@ -31,6 +31,10 @@ const UserSchema: Schema = new Schema({
     isFieldAgent: {
       type: Schema.Types.Boolean,
       default: false
+    },
+    lastResetPasswordDate: {
+      type: Schema.Types.Date,
+      default: null
     }
 }, { timestamps: true });
 
