@@ -17,10 +17,10 @@ services:
       - REFRESH_SECRET=b8r_home-testing
       - JWT_EXPIRY=3d
       - HOST_URL=
-      - AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-      - AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - AWS_REGION=${{ secrets.AWS_REGION }}
+      - AWS_ACCESS_KEY_ID=AKIAXFTHGIOESPHERSNW
+      - AWS_SECRET_ACCESS_KEY=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
+      - AWS_REGION=ap-south-1
       - S3_BUCKET_URL=
-      - S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+      - S3_BUCKET_NAME=elasticbeanstalk-ap-south-1-493063914377
     ports:
       - "8080:8080"
