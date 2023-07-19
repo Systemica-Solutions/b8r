@@ -62,7 +62,7 @@ const updateBuyerDetails = (id, detailsId, res) => {
 //  Get all buyers
 export const getAllBuyerList = async (_: Request, res: Response) => {
     try {
-        const buyers = await Buyer.find().lean();
+        const buyers = await Buyer.find().populate('buyerDetails').lean();
         if (!buyers) {
           throw { status: 404, message: 'Buyers not found.' };
         }

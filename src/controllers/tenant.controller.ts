@@ -61,7 +61,7 @@ const updateTenantDetails = (id, detailsId, res) => {
 //  Get all tenants
 export const getAllTenantList = async (_: Request, res: Response) => {
     try {
-        const tenants = await Tenant.find().lean();
+        const tenants = await Tenant.find().populate('tenantDetails').lean();
         if (!tenants) {
           throw { status: 404, message: 'Tenants not found.' };
         }
