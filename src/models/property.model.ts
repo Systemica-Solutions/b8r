@@ -16,7 +16,7 @@ const PropertySchema: Schema = new Schema({
         type: Schema.Types.String,
         trim: true,
         enum: staticStatus,
-        default: 'Pending'
+        default: 'New'
     },
     propertyDetails : [{
         type: Schema.Types.ObjectId,
