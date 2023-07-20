@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { successResponse, failureResponse } from '../helpers/api-response.helper';
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
+import AssignedProperty from '../models/assignedProperty.model';
 import { Types } from 'mongoose';
 
 
@@ -88,6 +89,20 @@ export const getPriorityById = async (req: Request, res: Response) => {
       } catch (error) {
         return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
       }
+};
+
+
+// Assign property to Field Agent
+export const assignPropertyToFA = async (req: Request, res: Response) => {
+  try {
+    const dataObj = req.body;
+    dataObj.userId = req.user.user._id;
+    const detailObj =  new AssignedProperty(dataObj);
+    const savedObj: any = await detailObj.save();
+    return successResponse(res, 200, { assigned: savedObj }, 'Property assigned to field agent successfully.');
+  } catch (error) {
+    return failureResponse(res, 500, error, error.message || 'Something went wrong');
+  }
 };
 
 

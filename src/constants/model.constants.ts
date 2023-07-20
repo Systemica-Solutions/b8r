@@ -3,6 +3,7 @@ export const MODELS = {
     AUTHCODE: 'Authcode',
     PROPERTY: 'Property',
     PROPERTYDETAILS: 'PropertyDetails',
+    ASSIGNEDPROPERTY: 'AssignedProperty',
     TENANT: 'Tenant',
     TENANTDETAILS: 'TenantDetails',
     BUYER: 'Buyer',
