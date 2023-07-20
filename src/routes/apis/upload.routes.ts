@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { upload } from '../../services/upload.service';
+// import { upload } from '../../services/upload.service';
 
 import multer from 'multer';
 
