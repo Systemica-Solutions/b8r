@@ -111,20 +111,19 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
       const pendingProperties = [];
       const verifiedProperties = [];
-      const property = await Property.find({
-         $or: [{ status: 'Pending' }, { status: 'Verified' }]}).populate('propertyDetails');
+      const userId = new Types.ObjectId(req.user.user._id);
+      const property = await AssignedProperty.find({fieldAgentId: userId}).populate('propertyId');
       if (!property) {
           return failureResponse(res, 500, [], 'Something went wrong');
-        } else {
-          property.forEach(function(doc) {
-              if (doc.status === 'Pending') {
-                pendingProperties.push(doc);
-              } else if (doc.status === 'Verified') {
-                verifiedProperties.push(doc);
-              }
-            });
+      }
+      property.forEach(function(doc) {
+        if (doc.propertyId.status === 'Pending') {
+          pendingProperties.push(doc);
+        } else if (doc.propertyId.status === 'Verified') {
+          verifiedProperties.push(doc);
         }
-      return successResponse(res, 200, { pendingProperties, verifiedProperties }, 'Property found successfully.');
+      });
+      return successResponse(res, 200, { pending: pendingProperties.length, verified: verifiedProperties.length }, 'Property found successfully.');
     } catch (error) {
       return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
     }
