@@ -2,7 +2,7 @@ version: '3'
 services:
   b8r-api:
     container_name: b8rapi
-    image: urvish91/betterhomes-backend:1.0.4
+    image: urvish91/betterhomes-backend:1.0.5
     build:
       context: .
       dockerfile: Dockerfile
