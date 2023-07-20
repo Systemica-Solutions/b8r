@@ -94,102 +94,22 @@ export const getPriorityById = async (req: Request, res: Response) => {
 // Get property counts in agent dashboard
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
-      // const property = await Property.aggregate([
-      //   {
-      //     $match: {
-      //       status: { $in: ['Verified', 'Pending'] }
-      //     }
-      //   },
-      //   {
-      //     $lookup: {
-      //       from: 'propertyDetails',
-      //       localField: 'propertyDetails',
-      //       foreignField: '_id',
-      //       as: 'populatedPropertyDetails'
-      //     }
-      //   },
-      //   {
-      //     $project: {
-      //       verifiedProperties: {
-      //         $cond: {
-      //           if: { $eq: ['$status', 'Verified'] },
-      //           then: '$populatedPropertyDetails',
-      //           else: []
-      //         }
-      //       },
-      //       pendingProperties: {
-      //         $cond: {
-      //           if: { $eq: ['$status', 'Pending'] },
-      //           then: '$populatedPropertyDetails',
-      //           else: []
-      //         }
-      //       }
-      //     }
-      //   }
-      // ]);
-
-      const property = await Property.aggregate([
-        {
-          $group: {
-            _id: null,
-            pending: {
-              $push: {
-                $cond: {
-                  if: { $eq: ['$status', 'Pending'] },
-                  then: '$$ROOT',
-                  else: null
-                }
-              }
-            },
-            verified: {
-              $push: {
-                $cond: {
-                  if: { $eq: ['$status', 'Verified'] },
-                  then: '$$ROOT',
-                  else: null
-                }
-              }
-            }
-          }
-        },
-        {
-          $project: {
-            pending: {
-              $filter: {
-                input: '$pending',
-                as: 'doc',
-                cond: { $ne: ['$$doc', null] }
-              }
-            },
-            verified: {
-              $filter: {
-                input: '$verified',
-                as: 'doc',
-                cond: { $ne: ['$$doc', null] }
-              }
-            }
-          }
-        }, {
-        $lookup: {
-          from: 'PropertyDetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'files'
-      }
-  },
-  {
-      $unwind: {
-          path: '$files',
-          preserveNullAndEmptyArrays: true
-      }}
-      ]);
-      console.log('====================================');
-      console.log(property);
-      console.log('====================================');
+      const pendingProperties = [];
+      const verifiedProperties = [];
+      const property = await Property.find({
+         $or: [{ status: 'Pending' }, { status: 'Verified' }]}).populate('propertyDetails');
       if (!property) {
-        return failureResponse(res, 404, [], 'Property not found.');
-      }
-      return successResponse(res, 200, { property}, 'Property found successfully.');
+          return failureResponse(res, 500, [], 'Something went wrong');
+        } else {
+          property.forEach(function(doc) {
+              if (doc.status === 'Pending') {
+                pendingProperties.push(doc);
+              } else if (doc.status === 'Verified') {
+                verifiedProperties.push(doc);
+              }
+            });
+        }
+      return successResponse(res, 200, { pendingProperties, verifiedProperties }, 'Property found successfully.');
     } catch (error) {
       return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
     }
