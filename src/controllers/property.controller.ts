@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { successResponse, failureResponse } from '../helpers/api-response.helper';
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
+import AssignedProperty from '../models/assignedProperty.model';
 import { Types } from 'mongoose';
 
 
@@ -91,105 +92,38 @@ export const getPriorityById = async (req: Request, res: Response) => {
 };
 
 
+// Assign property to Field Agent
+export const assignPropertyToFA = async (req: Request, res: Response) => {
+  try {
+    const dataObj = req.body;
+    dataObj.userId = req.user.user._id;
+    const detailObj =  new AssignedProperty(dataObj);
+    const savedObj: any = await detailObj.save();
+    return successResponse(res, 200, { assigned: savedObj }, 'Property assigned to field agent successfully.');
+  } catch (error) {
+    return failureResponse(res, 500, error, error.message || 'Something went wrong');
+  }
+};
+
+
 // Get property counts in agent dashboard
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
-      // const property = await Property.aggregate([
-      //   {
-      //     $match: {
-      //       status: { $in: ['Verified', 'Pending'] }
-      //     }
-      //   },
-      //   {
-      //     $lookup: {
-      //       from: 'propertyDetails',
-      //       localField: 'propertyDetails',
-      //       foreignField: '_id',
-      //       as: 'populatedPropertyDetails'
-      //     }
-      //   },
-      //   {
-      //     $project: {
-      //       verifiedProperties: {
-      //         $cond: {
-      //           if: { $eq: ['$status', 'Verified'] },
-      //           then: '$populatedPropertyDetails',
-      //           else: []
-      //         }
-      //       },
-      //       pendingProperties: {
-      //         $cond: {
-      //           if: { $eq: ['$status', 'Pending'] },
-      //           then: '$populatedPropertyDetails',
-      //           else: []
-      //         }
-      //       }
-      //     }
-      //   }
-      // ]);
-
-      const property = await Property.aggregate([
-        {
-          $group: {
-            _id: null,
-            pending: {
-              $push: {
-                $cond: {
-                  if: { $eq: ['$status', 'Pending'] },
-                  then: '$$ROOT',
-                  else: null
-                }
-              }
-            },
-            verified: {
-              $push: {
-                $cond: {
-                  if: { $eq: ['$status', 'Verified'] },
-                  then: '$$ROOT',
-                  else: null
-                }
-              }
-            }
-          }
-        },
-        {
-          $project: {
-            pending: {
-              $filter: {
-                input: '$pending',
-                as: 'doc',
-                cond: { $ne: ['$$doc', null] }
-              }
-            },
-            verified: {
-              $filter: {
-                input: '$verified',
-                as: 'doc',
-                cond: { $ne: ['$$doc', null] }
-              }
-            }
-          }
-        }, {
-        $lookup: {
-          from: 'PropertyDetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'files'
-      }
-  },
-  {
-      $unwind: {
-          path: '$files',
-          preserveNullAndEmptyArrays: true
-      }}
-      ]);
-      console.log('====================================');
-      console.log(property);
-      console.log('====================================');
+      const pendingProperties = [];
+      const verifiedProperties = [];
+      const userId = new Types.ObjectId(req.user.user._id);
+      const property = await AssignedProperty.find({fieldAgentId: userId}).populate('propertyId');
       if (!property) {
-        return failureResponse(res, 404, [], 'Property not found.');
+          return failureResponse(res, 500, [], 'Something went wrong');
       }
-      return successResponse(res, 200, { property}, 'Property found successfully.');
+      property.forEach(function(doc) {
+        if (doc.propertyId.status === 'Pending') {
+          pendingProperties.push(doc);
+        } else if (doc.propertyId.status === 'Verified') {
+          verifiedProperties.push(doc);
+        }
+      });
+      return successResponse(res, 200, { pending: pendingProperties.length, verified: verifiedProperties.length }, 'Property found successfully.');
     } catch (error) {
       return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
     }
