@@ -53,7 +53,7 @@ export const upload = async (req, res) => {
         const dataObj = {
             photos: imageURL,
             propertyId: reqData.propertyId,
-            fieldAgentId: reqData.fieldAgentId
+            userId: req.user.user._id
         };
         const propertyObj = new PropertyPhotos(dataObj);
         const saveObj = await propertyObj.save();
