@@ -25,6 +25,7 @@ const UserSchema: Schema = new Schema({
     },
     inviteCode: {
       type: Schema.Types.String,
+      required: true,
       unique: true,
       default: null
     },

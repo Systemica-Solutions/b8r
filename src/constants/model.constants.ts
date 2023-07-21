@@ -4,6 +4,7 @@ export const MODELS = {
     PROPERTY: 'Property',
     PROPERTYDETAILS: 'PropertyDetails',
     ASSIGNEDPROPERTY: 'AssignedProperty',
+    PROPERTYPHOTOS: 'PropertyPhotos',
     TENANT: 'Tenant',
     TENANTDETAILS: 'TenantDetails',
     BUYER: 'Buyer',
