@@ -30,7 +30,7 @@ export const uploadPrpertyImages = async (req, res) => {
         ACL: 'public-read',
         Bucket: 'elasticbeanstalk-ap-south-1-493063914377', // Replace with your S3 bucket name
         Body: fileStream,
-        Key: `Property/${userId}/${reqData.propertyId}/raw/${Date.now()}-${file.originalname}`
+        Key: `b8rHomes/${userId}/${reqData.propertyId}/photos/raw/${Date.now()}-${file.originalname}` // remove property & add photos..
       };
       return s3.upload(uploadParams).promise();
     });
