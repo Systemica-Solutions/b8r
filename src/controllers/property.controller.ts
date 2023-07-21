@@ -3,8 +3,7 @@ import { successResponse, failureResponse } from '../helpers/api-response.helper
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
-import mongoose, { Types } from 'mongoose';
-const ObjectId = mongoose.Types.ObjectId;
+import { Types } from 'mongoose';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -138,7 +137,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
 export const getFieldAgentPendingProperty = async (req: Request, res: Response) => {
   try {
     const userId = new Types.ObjectId(req.user.user._id);
-    const property = await AssignedProperty.find({fieldAgentId: userId })
+    const property = await AssignedProperty.find({fieldAgentId: userId }).populate('propertyImageId')
                           .populate({path: 'propertyId', populate: {path: 'propertyDetails'}});
     if (!property) {
       return failureResponse(res, 500, [], 'Something went wrong');

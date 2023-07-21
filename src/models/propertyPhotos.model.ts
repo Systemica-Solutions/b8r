@@ -8,7 +8,8 @@ const PropertyPhotosSchema: Schema = new Schema({
     },
     propertyId : {
         type: Schema.Types.ObjectId,
-        ref: 'Property'
+        ref: 'Property',
+        required: true
     },
     photos : [{
         type: Schema.Types.String
