@@ -15,7 +15,7 @@ const generateJWTToken = (user) =>  {
 //  Sign up the new user details and generate the JWT token for that user
 export const signUpUser = async (req: Request, res: Response) => {
    try {
-        // console.log('req', req.body);
+        console.log('req', req.body);
         let userData: any = {};
         userData = req.body;
         const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
@@ -30,10 +30,11 @@ export const signUpUser = async (req: Request, res: Response) => {
                 const authObj = await saveAuthCode(userSave);
                 if (authObj === 200) {
                    return successResponse(res, 200, { user: userSave }, 'User Signup Successfully.');
-                }
-              else { return failureResponse(res, 500, [authObj], 'Something went wrong'); }
-              // return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
-            }
+                } else {
+                console.log('userDAta', userData);
+                return failureResponse(res, 500, [authObj], 'Something went wrong'); }
+              } else { return failureResponse(res, 500, [], 'Auth code is required.'); }
+                // return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
         } else {
               return failureResponse(res, 403, [], 'Phone number already exists');
           }

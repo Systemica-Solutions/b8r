@@ -81,7 +81,7 @@ export const getAllPropertyList = async (_: Request, res: Response) => {
 // Get property by id
 export const getPriorityById = async (req: Request, res: Response) => {
     try {
-        const property = await Property.findById(req.params.id).lean();
+        const property = await Property.findById(req.params.id).populate('propertyDetails').lean();
         if (!property) {
           return failureResponse(res, 404, [], 'Property not found.');
         }

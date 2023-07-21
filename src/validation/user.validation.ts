@@ -31,7 +31,7 @@ export const signupUserValidation = async (req, res, next) => {
         confirmPassword: Joi.valid(Joi.ref('password'))
             .messages({'any.only': 'Passwords must match.'}).required(),
         phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
-        inviteCode: Joi.any().optional(),
+        inviteCode: Joi.string().required(),
         isFieldAgent: Joi.boolean().optional(),
         lastResetPasswordDate: Joi.date().optional()
     });
