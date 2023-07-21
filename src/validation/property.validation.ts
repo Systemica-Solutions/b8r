@@ -139,6 +139,3 @@ export const addPropertyValidation = async (req, res, next) => {
         next();
     }
 };
-
-
-

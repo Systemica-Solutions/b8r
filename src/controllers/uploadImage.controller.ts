@@ -2,11 +2,11 @@ import aws from 'aws-sdk';
 import fs from 'fs';
 import { failureResponse, successResponse } from '../helpers/api-response.helper';
 import PropertyPhotos from '../models/propertyPhotos.model';
+import AssignedProperty from '../models/assignedProperty.model';
+import { Types } from 'mongoose';
 
-export const upload = async (req, res) => {
-    console.log('====================================');
-    console.log(req.files, req.body);
-    console.log('====================================');
+export const uploadPrpertyImages = async (req, res) => {
+    const userId = req.user.user._id;
     const reqData = req.body;
 
     aws.config.setPromisesDependency(null);
@@ -14,7 +14,7 @@ export const upload = async (req, res) => {
         accessKeyId: 'AKIAXFTHGIOESPHERSNW',
         secretAccessKey: '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',
         region: 'ap-south-1'
-      });
+    });
 
       // AWS configuration
     const s3 = new aws.S3();
@@ -30,7 +30,7 @@ export const upload = async (req, res) => {
         ACL: 'public-read',
         Bucket: 'elasticbeanstalk-ap-south-1-493063914377', // Replace with your S3 bucket name
         Body: fileStream,
-        Key: `Property/${reqData.fieldAgentId}/${reqData.propertyId}/raw/${Date.now()}-${file.originalname}`
+        Key: `Property/${userId}/${reqData.propertyId}/raw/${Date.now()}-${file.originalname}`
       };
       return s3.upload(uploadParams).promise();
     });
@@ -46,23 +46,21 @@ export const upload = async (req, res) => {
     });
 
     if (fileData && fileData.length) {
-        console.log('fileData', fileData);
         // store data in model
         const imageURL = [];
         fileData.forEach(obj => imageURL.push(obj.Location));
         const dataObj = {
             photos: imageURL,
             propertyId: reqData.propertyId,
-            userId: req.user.user._id
+            userId
         };
         const propertyObj = new PropertyPhotos(dataObj);
-        const saveObj = await propertyObj.save();
+        const saveObj: any = await propertyObj.save();
+
+        const imageModelId =  new Types.ObjectId(saveObj.propertyId);
+        // Store property photos id in assign property table
+        const updateObj = await AssignedProperty.findOneAndUpdate({ propertyId: imageModelId },
+            { $set: {propertyImageId: saveObj._id} }, {new: true});
         return successResponse(res, 200, saveObj, 'File uploaded successfully.');
     }
 };
-
-
-
-
-
-
