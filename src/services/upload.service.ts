@@ -16,7 +16,7 @@ export const uploadImages = async (req, res) => {
 
       // AWS configuration
     const s3 = new aws.S3();
- 
+
     if (!req.files || req.files.length === 0) {
         return failureResponse(res, 400, [], 'No files were uploaded.');
     }

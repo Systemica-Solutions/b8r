@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import { getAllPropertyList, addProperty, getPriorityById,
-    assignPropertyToFA, getPropertyCounts } from '../../controllers/property.controller';
+    assignPropertyToFA, getPropertyCounts, getFieldAgentPendingProperty } from '../../controllers/property.controller';
 import { addPropertyValidation, propertyDetailValidation } from '../../validation/property.validation';
-import { userAuth } from '../../middleware/user-auth.middleware';
+import { userAuth, fieldAgentAccess } from '../../middleware/user-auth.middleware';
 
 const router = Router();
 
 // Get properties for field agent
-router.get('/count', userAuth, getPropertyCounts);
+router.get('/count', userAuth, fieldAgentAccess, getPropertyCounts);
+
+// Get pending property for field agent dashboard
+router.get('/pending', userAuth, fieldAgentAccess, getFieldAgentPendingProperty);
 
 // Get all properties
 router.get('/', userAuth, getAllPropertyList);

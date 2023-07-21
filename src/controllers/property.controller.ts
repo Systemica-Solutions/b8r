@@ -3,8 +3,8 @@ import { successResponse, failureResponse } from '../helpers/api-response.helper
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
-import { Types } from 'mongoose';
-
+import mongoose, { Types } from 'mongoose';
+const ObjectId = mongoose.Types.ObjectId;
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -131,4 +131,21 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     } catch (error) {
       return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
     }
+};
+
+
+// Get pending property for field agent dashboard
+export const getFieldAgentPendingProperty = async (req: Request, res: Response) => {
+  try {
+    const userId = new Types.ObjectId(req.user.user._id);
+    const property = await AssignedProperty.find({fieldAgentId: userId })
+                          .populate({path: 'propertyId', populate: {path: 'propertyDetails'}});
+    if (!property) {
+      return failureResponse(res, 500, [], 'Something went wrong');
+    }
+    const pendingList = property.filter((x) => x.propertyId.status === 'Pending');
+    return successResponse(res, 200, { property: pendingList }, 'Pending property list get successfully.');
+  } catch (error) {
+    return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
+  }
 };
