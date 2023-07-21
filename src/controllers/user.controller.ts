@@ -108,7 +108,7 @@ export const signInUser = async (req: Request, res: Response) => {
         const jwtToken = generateJWTToken(userExist);
         return successResponse(res, 200, { user: userExist, jwtToken }, 'User login successfully.');
       } else {
-        return failureResponse(res, 401, [], 'Unauthorized Access');
+        return failureResponse(res, 401, [], 'Invalid password');
       }
     }
   } catch (error) {

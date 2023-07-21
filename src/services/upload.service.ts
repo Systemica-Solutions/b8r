@@ -3,10 +3,8 @@ import fs from 'fs';
 import { failureResponse, successResponse } from '../helpers/api-response.helper';
 import PropertyPhotos from '../models/propertyPhotos.model';
 
-export const upload = async (req, res) => {
-    console.log('====================================');
-    console.log(req.files, req.body);
-    console.log('====================================');
+export const uploadImages = async (req, res) => {
+    const userId = req.user.user._id;
     const reqData = req.body;
 
     aws.config.setPromisesDependency(null);
@@ -14,11 +12,11 @@ export const upload = async (req, res) => {
         accessKeyId: 'AKIAXFTHGIOESPHERSNW',
         secretAccessKey: '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',
         region: 'ap-south-1'
-      });
+    });
 
       // AWS configuration
     const s3 = new aws.S3();
-
+ 
     if (!req.files || req.files.length === 0) {
         return failureResponse(res, 400, [], 'No files were uploaded.');
     }
@@ -53,7 +51,7 @@ export const upload = async (req, res) => {
         const dataObj = {
             photos: imageURL,
             propertyId: reqData.propertyId,
-            userId: req.user.user._id
+            userId
         };
         const propertyObj = new PropertyPhotos(dataObj);
         const saveObj = await propertyObj.save();
