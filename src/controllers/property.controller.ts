@@ -97,9 +97,13 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
   try {
     const dataObj = req.body;
     dataObj.userId = req.user.user._id;
-    const detailObj =  new AssignedProperty(dataObj);
-    const savedObj: any = await detailObj.save();
-    return successResponse(res, 200, { assigned: savedObj }, 'Property assigned to field agent successfully.');
+    const existing = await AssignedProperty.findOne({propertyId: dataObj.propertyId});
+    if (existing) {   return failureResponse(res, 403, [], 'Property already assigned'); }
+    else {
+      const detailObj =  new AssignedProperty(dataObj);
+      const savedObj: any = await detailObj.save();
+      return successResponse(res, 200, { assigned: savedObj }, 'Property assigned to field agent successfully.');
+    }
   } catch (error) {
     return failureResponse(res, 500, error, error.message || 'Something went wrong');
   }
