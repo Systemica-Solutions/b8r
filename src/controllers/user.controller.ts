@@ -117,7 +117,7 @@ export const signInUser = async (req: Request, res: Response) => {
 };
 
 // Forgot and Reset password of user
-export const forgotPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: Request, res: Response) => {
   try {
     const updatedData = req.body;
     User.findOneAndUpdate({  phoneNumber: updatedData.phoneNumber },
