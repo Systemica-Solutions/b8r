@@ -3,6 +3,7 @@ import { getAllPropertyList, addProperty, getPriorityById,
     assignPropertyToFA, getPropertyCounts, getFieldAgentPendingProperty } from '../../controllers/property.controller';
 import { addPropertyValidation, propertyDetailValidation } from '../../validation/property.validation';
 import { userAuth, fieldAgentAccess } from '../../middleware/user-auth.middleware';
+import uploadRoutes from '../apis/upload.routes';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.get('/:id', userAuth, getPriorityById);
 // Assign property to Field Agent
 router.post('/assign', userAuth, assignPropertyToFA);
 
+router.use('/upload', uploadRoutes);
 
 export default router;

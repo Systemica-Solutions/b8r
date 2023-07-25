@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { signUpUser, getAllUsersList, signInUser, forgotPassword,
+import { signUpUser, getAllUsersList, signInUser, resetPassword,
     addCustomAuthCode, updateUserDetails } from '../../controllers/user.controller';
 import { signinUserValidation, signupUserValidation,
     resetPasswordValidation, updateUserValidation, addAuthCodeValidation } from '../../validation/user.validation';
@@ -19,10 +19,10 @@ router.post('/signup', signupUserValidation, signUpUser);
 // Login user
 router.post('/signin', signinUserValidation, signInUser);
 
-// Forgot password
-router.put('/forgot-password', resetPasswordValidation, forgotPassword);
+// Reset password
+router.put('/reset-password', resetPasswordValidation, resetPassword);
 
 // Add custom authcode
-router.post('/authcode', userAuth, addAuthCodeValidation, addCustomAuthCode);
+router.post('/authcode', addAuthCodeValidation, addCustomAuthCode);
 
 export default router;
