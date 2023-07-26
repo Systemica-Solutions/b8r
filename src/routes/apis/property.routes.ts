@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getAllPropertyList, addProperty, getPriorityById,
+import { getAllPropertyList, addProperty, getPriorityById, verifyProperty,
     assignPropertyToFA, getPropertyCounts, getFieldAgentPendingProperty } from '../../controllers/property.controller';
-import { addPropertyValidation, propertyDetailValidation } from '../../validation/property.validation';
+import { addPropertyValidation, propertyDetailValidation, verifyPropertyValidation } from '../../validation/property.validation';
 import { userAuth, fieldAgentAccess } from '../../middleware/user-auth.middleware';
 import uploadRoutes from '../apis/upload.routes';
 
@@ -24,6 +24,9 @@ router.get('/:id', userAuth, getPriorityById);
 
 // Assign property to Field Agent
 router.post('/assign', userAuth, assignPropertyToFA);
+
+// Assign property to Field Agent
+router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
 
 // Upload property images
 router.use('/upload', uploadRoutes);

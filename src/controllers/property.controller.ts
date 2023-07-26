@@ -148,3 +148,20 @@ export const getFieldAgentPendingProperty = async (req: Request, res: Response) 
     return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
   }
 };
+
+
+// Verify property
+export const verifyProperty = async (req: Request, res: Response) => {
+  try {
+      const tempData = req.body;
+      tempData.propertyData.userId = new Types.ObjectId(req.user.user._id);
+      tempData.status = 'Verified';
+      const detailObj =  new PropertyDetail(tempData.propertyData);
+      const savedObj: any = await detailObj.save();
+      const propertyObj = new Property(tempData);
+      const saveObj = await propertyObj.save();
+      updatePropertyDetails(saveObj._id, savedObj._id, res);
+    } catch (error) {
+      return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
+    }
+};
