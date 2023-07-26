@@ -85,9 +85,9 @@ export const getPriorityById = async (req: Request, res: Response) => {
           return failureResponse(res, 404, [], 'Property not found.');
         }
         return successResponse(res, 200, { property}, 'Property found successfully.');
-      } catch (error) {
+    } catch (error) {
         return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
-      }
+    }
 };
 
 
@@ -164,4 +164,26 @@ export const verifyProperty = async (req: Request, res: Response) => {
     } catch (error) {
       return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
     }
+};
+
+
+//   with status
+export const deactivateProperty = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    tempData.deactivateStatus = tempData.deactivateStatus;
+    const id = new Types.ObjectId(tempData.propertyId);
+    Property.findByIdAndUpdate({ _id: id}, { $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' } }, { new: true })
+    .populate('propertyDetails').exec((error, updatedRecord) => {
+        if (error) {
+            console.log('error while update', error);
+            return failureResponse(res, 500, [], error.message || 'Something went wrong');
+        } else {
+            console.log('updatedRecord.......', updatedRecord);
+            return successResponse(res, 200, { property: updatedRecord }, 'Property status updated successfully.');
+         }
+    });
+  } catch (error) {
+    return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
+  }
 };

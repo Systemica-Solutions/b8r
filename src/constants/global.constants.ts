@@ -51,5 +51,13 @@ export enum furnishingType {
 export enum staticStatus {
     'New',
     'Pending',
-    'Verified'
+    'Verified',
+    'Closed'
+}
+
+export enum deactivateReason {
+    'Rented From B8R',
+    'Rented Externally',
+    'Does not need anymore',
+    'Not responding'
 }
