@@ -2,6 +2,14 @@ import { Schema } from 'mongoose';
 import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus } from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema({
+    houseNum: {
+        type: Schema.Types.String,
+        trim: true,
+    },
+    societyType: {
+        type: Schema.Types.String,
+        trim: true,
+    },
     houseType: {
         type: Schema.Types.String,
         trim: true,

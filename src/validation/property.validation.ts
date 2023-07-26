@@ -6,6 +6,8 @@ import { failureResponse } from '../helpers/api-response.helper';
 export const propertyDetailValidation = async (req, res, next) => {
 
     const propertyBasicInfo = Joi.object().keys({
+        houseNum: Joi.string().optional(),
+        societyType: Joi.string().optional(),
         houseType:  Joi.string().valid(...Object.values(houseType)).optional(),
         houseConfig: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
         area: Joi.string().optional(),
