@@ -75,7 +75,7 @@ export const getAllTenantList = async (_: Request, res: Response) => {
 // Get tenant by id
 export const getTenantById = async (req: Request, res: Response) => {
     try {
-        const tenant = await Tenant.findById(req.params.id).lean();
+        const tenant = await Tenant.findById(req.params.id).populate('tenantDetails').lean();
         if (!tenant) {
           return failureResponse(res, 404, [], 'Tenant not found.');
         }

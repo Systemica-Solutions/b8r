@@ -25,6 +25,7 @@ router.get('/:id', userAuth, getPriorityById);
 // Assign property to Field Agent
 router.post('/assign', userAuth, assignPropertyToFA);
 
+// Upload property images
 router.use('/upload', uploadRoutes);
 
 export default router;
