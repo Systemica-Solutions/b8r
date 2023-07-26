@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { EmailValidation } from '../helpers/validation.helper';
-import { furnishingType, houseConfiguration, houseType, staticStatus } from '../constants/global.constants';
+import { staticStatus } from '../constants/global.constants';
 
 const TenantSchema: Schema = new Schema({
       name: {

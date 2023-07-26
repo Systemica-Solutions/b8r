@@ -76,7 +76,7 @@ export const getAllBuyerList = async (_: Request, res: Response) => {
 // Get buyer by id
 export const getBuyerById = async (req: Request, res: Response) => {
     try {
-        const buyer = await Buyer.findById(req.params.id).lean();
+        const buyer = await Buyer.findById(req.params.id).populate('buyerDetails').lean();
         if (!buyer) {
           return failureResponse(res, 404, [], 'Buyer not found.');
         }
