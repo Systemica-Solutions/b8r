@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { staticStatus } from '../constants/global.constants';
+import { deactivateReason, staticStatus } from '../constants/global.constants';
 
 const PropertySchema: Schema = new Schema({
     houseName: {
@@ -27,7 +27,12 @@ const PropertySchema: Schema = new Schema({
     propertyDetails : [{
         type: Schema.Types.ObjectId,
         ref: 'PropertyDetails'
-    }]
+    }],
+    deactivateStatus: {
+        type: Schema.Types.String,
+        trim: true,
+        enum: deactivateReason
+    }
 }, { timestamps: true });
 
 export default model(MODELS.PROPERTY, PropertySchema);
