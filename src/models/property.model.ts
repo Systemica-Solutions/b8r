@@ -18,6 +18,12 @@ const PropertySchema: Schema = new Schema({
         enum: staticStatus,
         default: 'New'
     },
+    tourLink3D: {
+        type: Schema.Types.String,
+    },
+    images: [{
+        type: Schema.Types.String,
+    }],
     propertyDetails : [{
         type: Schema.Types.ObjectId,
         ref: 'PropertyDetails'

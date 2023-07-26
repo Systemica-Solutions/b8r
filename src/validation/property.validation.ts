@@ -127,7 +127,34 @@ export const addPropertyValidation = async (req, res, next) => {
         pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
         status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
         propertyData: Joi.any().optional(),
-        propertyDetails: Joi.array().items(Joi.string()).optional()
+        propertyDetails: Joi.array().items(Joi.string()).optional(),
+        images: Joi.array().items(Joi.string()).required(),
+        tourLink3D: Joi.string().required()
+    });
+    const value = schema.validate(req.body);
+    if (value.error) {
+        return failureResponse(
+            res,
+            400,
+            value.error,
+            value.error.details[0].message ? value.error.details[0].message : 'Bad request'
+        );
+    } else {
+        next();
+    }
+};
+
+
+export const verifyPropertyValidation = async (req, res, next) => {
+    const schema = Joi.object().keys({
+        houseName: Joi.string().optional(),
+        societyName: Joi.string().optional(),
+        pinCode: Joi.string().pattern(/^[0-9]{6}$/).optional(),
+        status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
+        propertyData: Joi.any().optional(),
+        propertyDetails: Joi.array().items(Joi.string()).optional(),
+        images: Joi.array().items(Joi.string()).required(),
+        tourLink3D: Joi.string().required()
     });
     const value = schema.validate(req.body);
     if (value.error) {
