@@ -1,6 +1,6 @@
 import Joi from '@hapi/joi';
 import { failureResponse } from '../helpers/api-response.helper';
-import { furnishingType, houseConfiguration, houseType, staticStatus } from '../constants/global.constants';
+import { furnishingType, houseConfiguration, houseType, staticStatus, tenantStatus } from '../constants/global.constants';
 
 // Check validations while add tenant
 export const tenantDetailValidation = async (req, res, next) => {
@@ -50,6 +50,7 @@ export const addTenantValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
         phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
         status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
+        deactivateStatus:  Joi.string().valid(...Object.values(tenantStatus)).optional(),
         tenantDetails: Joi.array().items(Joi.string()).optional(),
         tenantData: Joi.any().optional()
     });

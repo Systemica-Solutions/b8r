@@ -28,8 +28,8 @@ router.post('/assign', userAuth, assignPropertyToFA);
 // Assign property to Field Agent
 router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
 
-// Deactive property with updated status
-router.put('/deactivate', userAuth, deactivateProperty);
+// // Deactive property with updated status
+// router.put('/deactivate', userAuth, deactivateProperty);
 
 // Upload property images
 router.use('/upload', uploadRoutes);

@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { deactivateReason, staticStatus } from '../constants/global.constants';
+import { tenantStatus, staticStatus } from '../constants/global.constants';
 
 const PropertySchema: Schema = new Schema({
     houseName: {
@@ -31,7 +31,7 @@ const PropertySchema: Schema = new Schema({
     deactivateStatus: {
         type: Schema.Types.String,
         trim: true,
-        enum: deactivateReason
+        enum: tenantStatus
     }
     // reason , sub-reason, deactive-date
 }, { timestamps: true });

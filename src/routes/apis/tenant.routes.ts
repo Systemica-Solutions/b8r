@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllTenantList, addTenant, getTenantById } from '../../controllers/tenant.controller';
+import { getAllTenantList, addTenant, getTenantById, changeTenantStatus } from '../../controllers/tenant.controller';
 import { addTenantValidation, tenantDetailValidation } from '../../validation/tenant.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
@@ -14,5 +14,7 @@ router.post('/', userAuth,  addTenantValidation, tenantDetailValidation, addTena
 // Get tenant by id
 router.get('/:id', userAuth, getTenantById);
 
+// Change status of tenant
+router.put('/change-status', userAuth, changeTenantStatus);
 
 export default router;

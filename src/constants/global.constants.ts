@@ -55,7 +55,7 @@ export enum staticStatus {
     'Closed'
 }
 
-export enum deactivateReason {
+export enum tenantStatus {
     'Rented From B8R',
     'Rented Externally',
     'Does not need anymore',

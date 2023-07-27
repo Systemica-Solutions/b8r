@@ -84,3 +84,24 @@ export const getTenantById = async (req: Request, res: Response) => {
         return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
       }
 };
+
+// Change status of tenant
+export const changeTenantStatus = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    tempData.deactivateStatus = tempData.deactivateStatus;
+    const id = new Types.ObjectId(tempData.tenantId);
+    Tenant.findByIdAndUpdate({ _id: id}, { $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' } }, { new: true })
+    .populate('tenantDetails').exec((error, updatedRecord) => {
+        if (error) {
+            console.log('error while update', error);
+            return failureResponse(res, 500, [], error.message || 'Something went wrong');
+        } else {
+            console.log('updatedRecord.......', updatedRecord);
+            return successResponse(res, 200, { tenant: updatedRecord }, 'Tenant status updated successfully.');
+        }
+    });
+  } catch (error) {
+    return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');
+  }
+};

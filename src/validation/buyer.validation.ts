@@ -32,7 +32,7 @@ export const buyertDetailValidation = async (req, res, next) => {
 
 export const addBuyerValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
-        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),        
+        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
         status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
         buyerDetails: Joi.array().items(Joi.string()).optional(),
         buyerData: Joi.any().optional()
