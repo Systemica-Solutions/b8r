@@ -1,23 +1,21 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   addBoard,
   getBoardByAgentId,
-//   editBoard,
-} from "../../controllers/board.controller";
-import {
-  addBoardValidation,
-//   editBoardValidation,
-} from "../../validation/board.validation";
-import { userAuth } from "../../middleware/user-auth.middleware";
+  editBoard,
+} from '../../controllers/board.controller';
+import { boardValidation } from '../../validation/board.validation';
+import { userAuth } from '../../middleware/user-auth.middleware';
 
 const router = Router();
 
 // Add new board
-router.post("/", userAuth, addBoardValidation, addBoard);
+router.post('/', userAuth, boardValidation, addBoard);
 
-// router.put("/", userAuth, editBoardValidation, editBoard);
+// Edit board
+router.put('/:id', userAuth, boardValidation, editBoard);
 
 // Get board by property agent id
-router.get("/:id", userAuth, getBoardByAgentId);
+router.get('/:id', userAuth, getBoardByAgentId);
 
 export default router;

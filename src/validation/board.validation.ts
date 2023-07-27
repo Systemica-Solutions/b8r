@@ -1,8 +1,9 @@
-import Joi from "@hapi/joi";
-import { failureResponse } from "../helpers/api-response.helper";
-import { staticStatus } from "../constants/global.constants";
+import Joi from '@hapi/joi';
+import { failureResponse } from '../helpers/api-response.helper';
+import { staticStatus } from '../constants/global.constants';
 
-export const addBoardValidation = async (req, res, next) => {
+// add/edit board schema validation
+export const boardValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     tenantId: Joi.string().required(),
     propertyId: Joi.array().items(Joi.string()).optional(),
@@ -19,7 +20,7 @@ export const addBoardValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();

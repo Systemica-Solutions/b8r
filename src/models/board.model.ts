@@ -17,11 +17,11 @@ const BoardSchema: Schema = new Schema(
         ref: MODELS.PROPERTY,
       },
     ],
-    key: {
-      type: Schema.Types.String,
+    key: {                                // this key will use in future for link generation  
+      type: Schema.Types.String,          
     },
     status: {
-      type: Schema.Types.Boolean, // Active/Inactive
+      type: Schema.Types.Boolean,         // Active/Inactive
       default: false,
     },
   },
