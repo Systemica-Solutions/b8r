@@ -61,3 +61,9 @@ export enum tenantStatus {
     'Does not need anymore',
     'Not responding'
 }
+
+export enum propertyStatus {
+    'Rented of B8R',
+    'Delist / Owner Denied',
+    'Rented Outside'
+}

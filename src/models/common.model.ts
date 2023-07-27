@@ -190,3 +190,25 @@ export const propertyFeatureInfo: Schema = new Schema({
         type: Schema.Types.Number
     }
 }, { _id: false });
+
+export const propertyCloseListingInfo: Schema = new Schema({
+    name: {
+        type: Schema.Types.String
+    },
+    phoneNumber: {
+        type: Schema.Types.String,
+        required: true
+    },
+    rentAmount: {
+        type: Schema.Types.Number,
+    },
+    agreementFor: {
+        type: Schema.Types.Number,
+    },
+    tenancyStartDate: {
+        type: Schema.Types.Date,
+    },
+    feedback: {
+        type: Schema.Types.String,
+    }
+}, { _id: false });

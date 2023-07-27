@@ -167,21 +167,21 @@ export const verifyProperty = async (req: Request, res: Response) => {
 };
 
 
-//   with status
-export const deactivateProperty = async (req: Request, res: Response) => {
+// Edit property status with close listing property
+export const closeListingProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.deactivateStatus = tempData.deactivateStatus;
     const id = new Types.ObjectId(tempData.propertyId);
-    Property.findByIdAndUpdate({ _id: id}, { $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' } }, { new: true })
-    .populate('propertyDetails').exec((error, updatedRecord) => {
+    Property.findByIdAndUpdate({ _id: id}, { $set: { closeListingStatus: tempData.closeListingStatus,
+                                closeListingDetails: tempData.closeListingDetails } }, { new: true })
+                                .populate('propertyDetails').exec((error, updatedRecord) => {
         if (error) {
             console.log('error while update', error);
             return failureResponse(res, 500, [], error.message || 'Something went wrong');
         } else {
             console.log('updatedRecord.......', updatedRecord);
             return successResponse(res, 200, { property: updatedRecord }, 'Property status updated successfully.');
-         }
+        }
     });
   } catch (error) {
     return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong');

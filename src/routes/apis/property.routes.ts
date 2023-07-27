@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllPropertyList, addProperty, getPriorityById, verifyProperty, deactivateProperty,
+import { getAllPropertyList, addProperty, getPriorityById, verifyProperty, closeListingProperty,
     assignPropertyToFA, getPropertyCounts, getFieldAgentPendingProperty } from '../../controllers/property.controller';
 import { addPropertyValidation, propertyDetailValidation, verifyPropertyValidation } from '../../validation/property.validation';
 import { userAuth, fieldAgentAccess } from '../../middleware/user-auth.middleware';
@@ -28,8 +28,8 @@ router.post('/assign', userAuth, assignPropertyToFA);
 // Assign property to Field Agent
 router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
 
-// // Deactive property with updated status
-// router.put('/deactivate', userAuth, deactivateProperty);
+// Edit property status with close listing property
+router.put('/close-listing', userAuth, closeListingProperty);
 
 // Upload property images
 router.use('/upload', uploadRoutes);

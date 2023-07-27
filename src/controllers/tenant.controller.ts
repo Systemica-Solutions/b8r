@@ -89,7 +89,6 @@ export const getTenantById = async (req: Request, res: Response) => {
 export const changeTenantStatus = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.deactivateStatus = tempData.deactivateStatus;
     const id = new Types.ObjectId(tempData.tenantId);
     Tenant.findByIdAndUpdate({ _id: id}, { $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' } }, { new: true })
     .populate('tenantDetails').exec((error, updatedRecord) => {

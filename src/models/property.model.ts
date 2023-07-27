@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { tenantStatus, staticStatus } from '../constants/global.constants';
+import { staticStatus, propertyStatus } from '../constants/global.constants';
+import { propertyCloseListingInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema({
     houseName: {
@@ -18,22 +19,25 @@ const PropertySchema: Schema = new Schema({
         enum: staticStatus,
         default: 'New'
     },
-    tourLink3D: {
+    propertyDetails : [{
+        type: Schema.Types.ObjectId,
+        ref: 'PropertyDetails'
+    }],
+    tourLink3D: {                     // tourLink3D and images needs for verify property
         type: Schema.Types.String,
     },
     images: [{
         type: Schema.Types.String,
     }],
-    propertyDetails : [{
-        type: Schema.Types.ObjectId,
-        ref: 'PropertyDetails'
-    }],
-    deactivateStatus: {
+    closeListingStatus: {             // deactive property with close listing
         type: Schema.Types.String,
         trim: true,
-        enum: tenantStatus
+        enum: propertyStatus
+    },
+    closeListingDetails: {
+        type: propertyCloseListingInfo,
+        default: null
     }
-    // reason , sub-reason, deactive-date
 }, { timestamps: true });
 
 export default model(MODELS.PROPERTY, PropertySchema);

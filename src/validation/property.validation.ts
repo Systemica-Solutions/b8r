@@ -1,5 +1,5 @@
 import Joi from '@hapi/joi';
-import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus } from '../constants/global.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus, propertyStatus } from '../constants/global.constants';
 import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
@@ -121,6 +121,15 @@ export const propertyDetailValidation = async (req, res, next) => {
 };
 
 export const addPropertyValidation = async (req, res, next) => {
+    const closeListingData = Joi.object().keys({
+        name: Joi.string().optional(),
+        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
+        rentAmount: Joi.number().optional(),
+        agreementFor: Joi.number().integer().min(1).max(12).optional(),
+        tenancyStartDate: Joi.date().optional(),
+        feedback: Joi.string().optional(),
+    });
+
     const schema = Joi.object().keys({
         houseName: Joi.string().optional(),
         societyName: Joi.string().optional(),
@@ -129,7 +138,9 @@ export const addPropertyValidation = async (req, res, next) => {
         propertyData: Joi.any().optional(),
         propertyDetails: Joi.array().items(Joi.string()).optional(),
         images: Joi.array().items(Joi.string()).required(),
-        tourLink3D: Joi.string().required()
+        tourLink3D: Joi.string().required(),
+        closeListingStatus: Joi.string().valid(...Object.keys(propertyStatus)).optional(),
+        closeListingDetails: closeListingData.optional(),
     });
     const value = schema.validate(req.body);
     if (value.error) {
