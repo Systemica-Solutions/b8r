@@ -1,11 +1,11 @@
-import Joi from "@hapi/joi";
-import { failureResponse } from "../helpers/api-response.helper";
+import Joi from '@hapi/joi';
+import { failureResponse } from '../helpers/api-response.helper';
 import {
   furnishingType,
   houseConfiguration,
   houseType,
   staticStatus,
-} from "../constants/global.constants";
+} from '../constants/global.constants';
 
 // Check validations while add buyer
 export const buyertDetailValidation = async (req, res, next) => {
@@ -36,7 +36,7 @@ export const buyertDetailValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();
@@ -62,7 +62,7 @@ export const addBuyerValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();

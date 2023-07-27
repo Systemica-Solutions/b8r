@@ -1,5 +1,5 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
 
 const BoardSchema: Schema = new Schema(
   {

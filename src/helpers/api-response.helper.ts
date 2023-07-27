@@ -2,7 +2,7 @@ export const successResponse = (
   res,
   status,
   data = {},
-  message = "",
+  message = '',
   meta = {}
 ) => {
   res.status(status).json({
@@ -18,7 +18,7 @@ export const failureResponse = (
   res,
   status,
   errors = [],
-  message = "Something went wrong !",
+  message = 'Something went wrong !',
   data = {}
 ) => {
   res.status(status).json({

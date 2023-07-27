@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
-import { authCodeType } from "../constants/global.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
+import { authCodeType } from '../constants/global.constants';
 
 const AuthCodeSchema: Schema = new Schema(
   {

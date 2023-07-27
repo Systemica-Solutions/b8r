@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   successResponse,
   failureResponse,
-} from "../helpers/api-response.helper";
-import Buyer from "../models/buyer.model";
-import BuyerDetail from "../models/buyerDetail.model";
-import { Types } from "mongoose";
+} from '../helpers/api-response.helper';
+import Buyer from '../models/buyer.model';
+import BuyerDetail from '../models/buyerDetail.model';
+import { Types } from 'mongoose';
 
 // Add new buyer
 export const addBuyer = async (req: Request, res: Response) => {
@@ -23,14 +23,14 @@ export const addBuyer = async (req: Request, res: Response) => {
         { status: tempData.status },
       ],
     })
-      .populate("buyerDetails")
+      .populate('buyerDetails')
       .exec(async (error: any, buyerExist: any) => {
         if (error) {
           return failureResponse(
             res,
             error.status || 500,
             error,
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else if (buyerExist && buyerExist.length) {
           const buyerObj = buyerExist[0].buyerDetails.filter((x) =>
@@ -41,7 +41,7 @@ export const addBuyer = async (req: Request, res: Response) => {
               res,
               403,
               [],
-              "Buyer already exist with this value"
+              'Buyer already exist with this value'
             );
           } else {
             tempData.buyerData.version = buyerExist[0].buyerDetails.length + 1;
@@ -62,7 +62,7 @@ export const addBuyer = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -75,23 +75,23 @@ const updateBuyerDetails = (id, detailsId, res) => {
     { $push: { buyerDetails: detailId } },
     { new: true }
   )
-    .populate("buyerDetails")
+    .populate('buyerDetails')
     .exec((error, updatedRecord) => {
       if (error) {
-        console.log("error while update", error);
+        console.log('error while update', error);
         return failureResponse(
           res,
           500,
           [],
-          error.message || "Something went wrong"
+          error.message || 'Something went wrong'
         );
       } else {
-        console.log("updatedRecord.......", updatedRecord);
+        console.log('updatedRecord.......', updatedRecord);
         return successResponse(
           res,
           200,
           { buyer: updatedRecord },
-          "New buyer added successfully."
+          'New buyer added successfully.'
         );
       }
     });
@@ -100,17 +100,17 @@ const updateBuyerDetails = (id, detailsId, res) => {
 //  Get all buyers
 export const getAllBuyerList = async (_: Request, res: Response) => {
   try {
-    const buyers = await Buyer.find().populate("buyerDetails").lean();
+    const buyers = await Buyer.find().populate('buyerDetails').lean();
     if (!buyers) {
-      throw { status: 404, message: "Buyers not found." };
+      throw { status: 404, message: 'Buyers not found.' };
     }
-    return successResponse(res, 200, { buyers }, "Buyers found successfully.");
+    return successResponse(res, 200, { buyers }, 'Buyers found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -119,18 +119,18 @@ export const getAllBuyerList = async (_: Request, res: Response) => {
 export const getBuyerById = async (req: Request, res: Response) => {
   try {
     const buyer = await Buyer.findById(req.params.id)
-      .populate("buyerDetails")
+      .populate('buyerDetails')
       .lean();
     if (!buyer) {
-      return failureResponse(res, 404, [], "Buyer not found.");
+      return failureResponse(res, 404, [], 'Buyer not found.');
     }
-    return successResponse(res, 200, { buyer }, "Buyer found successfully.");
+    return successResponse(res, 200, { buyer }, 'Buyer found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };

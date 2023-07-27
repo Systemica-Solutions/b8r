@@ -1,12 +1,12 @@
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import {
   successResponse,
   failureResponse,
-} from "../helpers/api-response.helper";
-import User from "../models/user.model";
-import Authcode from "../models/authcode.model";
-import { encrypt, decrypt } from "../services/crypto.service";
+} from '../helpers/api-response.helper';
+import User from '../models/user.model';
+import Authcode from '../models/authcode.model';
+import { encrypt, decrypt } from '../services/crypto.service';
 
 /**
  * Generate JWT token using firebase token and user details
@@ -20,7 +20,7 @@ const generateJWTToken = (user) => {
 //  Sign up the new user details and generate the JWT token for that user
 export const signUpUser = async (req: Request, res: Response) => {
   try {
-    console.log("req", req.body);
+    console.log('req', req.body);
     let userData: any = {};
     userData = req.body;
     const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
@@ -28,7 +28,7 @@ export const signUpUser = async (req: Request, res: Response) => {
       if (userData.inviteCode) {
         const iCode = await checkInviteCode(userData);
         if (iCode === 400 || iCode === 403) {
-          return failureResponse(res, 400, [], "Invalid invitation code");
+          return failureResponse(res, 400, [], 'Invalid invitation code');
         }
         const userObj = new User(req.body);
         const userSave = await userObj.save();
@@ -38,25 +38,25 @@ export const signUpUser = async (req: Request, res: Response) => {
             res,
             200,
             { user: userSave },
-            "User Signup Successfully."
+            'User Signup Successfully.'
           );
         } else {
-          console.log("userDAta", userData);
-          return failureResponse(res, 500, [authObj], "Something went wrong");
+          console.log('userDAta', userData);
+          return failureResponse(res, 500, [authObj], 'Something went wrong');
         }
       } else {
-        return failureResponse(res, 500, [], "Auth code is required.");
+        return failureResponse(res, 500, [], 'Auth code is required.');
       }
       // return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
     } else {
-      return failureResponse(res, 403, [], "Phone number already exists");
+      return failureResponse(res, 403, [], 'Phone number already exists');
     }
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -112,15 +112,15 @@ export const getAllUsersList = async (_: Request, res: Response) => {
   try {
     const users = await User.find().lean();
     if (!users) {
-      throw { status: 404, message: "Users not found." };
+      throw { status: 404, message: 'Users not found.' };
     }
-    return successResponse(res, 200, { users }, "Users found successfully.");
+    return successResponse(res, 200, { users }, 'Users found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -131,7 +131,7 @@ export const signInUser = async (req: Request, res: Response) => {
     const userData = req.body;
     const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
     if (!userExist) {
-      return failureResponse(res, 404, [], "User not found!");
+      return failureResponse(res, 404, [], 'User not found!');
     } else {
       const dbPassword = await decrypt(userData.password, userExist.password);
       if (dbPassword) {
@@ -140,10 +140,10 @@ export const signInUser = async (req: Request, res: Response) => {
           res,
           200,
           { user: userExist, jwtToken },
-          "User login successfully."
+          'User login successfully.'
         );
       } else {
-        return failureResponse(res, 401, [], "Invalid password");
+        return failureResponse(res, 401, [], 'Invalid password');
       }
     }
   } catch (error) {
@@ -151,7 +151,7 @@ export const signInUser = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -174,21 +174,21 @@ export const resetPassword = async (req: Request, res: Response) => {
             res,
             500,
             err,
-            err.message || "Internal Server Error"
+            err.message || 'Internal Server Error'
           );
         } else if (user) {
           return successResponse(
             res,
             200,
             { user },
-            "Password updated successfully."
+            'Password updated successfully.'
           );
         } else {
           return failureResponse(
             res,
             404,
             err,
-            err.message || "Phone number not found"
+            err.message || 'Phone number not found'
           );
         }
       }
@@ -198,7 +198,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -219,21 +219,21 @@ export const updateUserDetails = async (req: Request, res: Response) => {
               res,
               500,
               [error],
-              error.message || "Internal Server Error"
+              error.message || 'Internal Server Error'
             );
           } else if (user) {
             return successResponse(
               res,
               200,
               { user },
-              "User details updated successfully."
+              'User details updated successfully.'
             );
           } else {
             return failureResponse(
               res,
               404,
               [error],
-              error.message || "Phone number not found"
+              error.message || 'Phone number not found'
             );
           }
         }
@@ -243,7 +243,7 @@ export const updateUserDetails = async (req: Request, res: Response) => {
         res,
         401,
         [],
-        "You are not authorized to update user details"
+        'You are not authorized to update user details'
       );
     }
   } catch (error) {
@@ -251,7 +251,7 @@ export const updateUserDetails = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -261,25 +261,25 @@ export const addCustomAuthCode = async (req: Request, res: Response) => {
   try {
     const authData = req.body;
     authData.codeType =
-      authData.code.substring(0, 2) === "FL"
-        ? "Field Agent"
-        : authData.code.substring(0, 2) === "BA"
-        ? "Property Agent"
-        : "Other";
+      authData.code.substring(0, 2) === 'FL'
+        ? 'Field Agent'
+        : authData.code.substring(0, 2) === 'BA'
+        ? 'Property Agent'
+        : 'Other';
     const authObj = new Authcode(authData);
     const saveObj = await authObj.save();
     return successResponse(
       res,
       200,
       { authCode: saveObj },
-      "New authcode added successfully."
+      'New authcode added successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };

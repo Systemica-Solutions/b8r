@@ -1,11 +1,11 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
 import {
   houseConfiguration,
   houseType,
   furnishingType,
-} from "../constants/global.constants";
-import { EmailValidation } from "../helpers/validation.helper";
+} from '../constants/global.constants';
+import { EmailValidation } from '../helpers/validation.helper';
 
 const TenantDetailSchema: Schema = new Schema(
   {
@@ -19,7 +19,7 @@ const TenantDetailSchema: Schema = new Schema(
     },
     email: {
       type: Schema.Types.String,
-      validate: [EmailValidation, "Please fill a valid email address"],
+      validate: [EmailValidation, 'Please fill a valid email address'],
       required: true,
     },
     name: {

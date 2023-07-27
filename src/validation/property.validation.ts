@@ -1,4 +1,4 @@
-import Joi from "@hapi/joi";
+import Joi from '@hapi/joi';
 import {
   houseType,
   houseConfiguration,
@@ -9,8 +9,8 @@ import {
   furnishingType,
   staticStatus,
   propertyStatus,
-} from "../constants/global.constants";
-import { failureResponse } from "../helpers/api-response.helper";
+} from '../constants/global.constants';
+import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
 export const propertyDetailValidation = async (req, res, next) => {
@@ -83,42 +83,42 @@ export const propertyDetailValidation = async (req, res, next) => {
     nonVeg: Joi.boolean().optional(),
     constructionYear: Joi.string().optional(),
     availableFrom: Joi.string().optional(),
-    rentAmount: Joi.when(Joi.ref("...propertyInfo.purposeRent"), {
+    rentAmount: Joi.when(Joi.ref('...propertyInfo.purposeRent'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
     }),
-    rentDeposit: Joi.when(Joi.ref("...propertyInfo.purposeRent"), {
+    rentDeposit: Joi.when(Joi.ref('...propertyInfo.purposeRent'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
     }),
-    rentMaintenance: Joi.when(Joi.ref("...propertyInfo.purposeRent"), {
+    rentMaintenance: Joi.when(Joi.ref('...propertyInfo.purposeRent'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
     }),
-    lockInPeriod: Joi.when(Joi.ref("...propertyInfo.purposeRent"), {
+    lockInPeriod: Joi.when(Joi.ref('...propertyInfo.purposeRent'), {
       is: true,
       then: Joi.number().integer().min(1).max(12).required(),
       otherwise: Joi.number().integer().min(1).max(12).optional(),
     }),
-    saleAmount: Joi.when(Joi.ref("...propertyInfo.purposeSale"), {
+    saleAmount: Joi.when(Joi.ref('...propertyInfo.purposeSale'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
     }),
-    saleDeposit: Joi.when(Joi.ref("...propertyInfo.purposeSale"), {
+    saleDeposit: Joi.when(Joi.ref('...propertyInfo.purposeSale'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
     }),
-    saleMaintenance: Joi.when(Joi.ref("...propertyInfo.purposeSale"), {
+    saleMaintenance: Joi.when(Joi.ref('...propertyInfo.purposeSale'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
     }),
-    moveInFrom: Joi.when(Joi.ref("...propertyInfo.purposeSale"), {
+    moveInFrom: Joi.when(Joi.ref('...propertyInfo.purposeSale'), {
       is: true,
       then: Joi.number().required(),
       otherwise: Joi.number().optional(),
@@ -140,7 +140,7 @@ export const propertyDetailValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();
@@ -185,7 +185,7 @@ export const addPropertyValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();
@@ -215,7 +215,7 @@ export const verifyPropertyValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();

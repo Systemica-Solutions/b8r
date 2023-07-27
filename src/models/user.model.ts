@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
-import { EmailValidation } from "../helpers/validation.helper";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
+import { EmailValidation } from '../helpers/validation.helper';
 
 const UserSchema: Schema = new Schema(
   {
@@ -13,7 +13,7 @@ const UserSchema: Schema = new Schema(
     email: {
       type: Schema.Types.String,
       required: true,
-      validate: [EmailValidation, "Please fill a valid email address"],
+      validate: [EmailValidation, 'Please fill a valid email address'],
     },
     password: {
       type: Schema.Types.String,

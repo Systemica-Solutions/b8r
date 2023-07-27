@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema } from 'mongoose';
 import {
   houseType,
   houseConfiguration,
@@ -8,7 +8,7 @@ import {
   houseHelpRoom,
   furnishingType,
   staticStatus,
-} from "../constants/global.constants";
+} from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema(
   {

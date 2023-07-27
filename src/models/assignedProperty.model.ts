@@ -1,23 +1,23 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
 
 const AssignedPropertySchema: Schema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
     },
     fieldAgentId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
     },
     propertyId: {
       type: Schema.Types.ObjectId,
-      ref: "Property",
+      ref: 'Property',
     },
     propertyImageId: {
       type: Schema.Types.ObjectId,
-      ref: "PropertyPhotos",
+      ref: 'PropertyPhotos',
     },
   },
   { timestamps: true }

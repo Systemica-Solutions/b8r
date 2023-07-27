@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   successResponse,
   failureResponse,
-} from "../helpers/api-response.helper";
-import Tenant from "../models/tenant.model";
-import TenantDetail from "../models/tenantDetail.model";
-import { Types } from "mongoose";
+} from '../helpers/api-response.helper';
+import Tenant from '../models/tenant.model';
+import TenantDetail from '../models/tenantDetail.model';
+import { Types } from 'mongoose';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -23,14 +23,14 @@ export const addTenant = async (req: Request, res: Response) => {
         { status: tempData.status },
       ],
     })
-      .populate("tenantDetails")
+      .populate('tenantDetails')
       .exec(async (error: any, tenantExist: any) => {
         if (error) {
           return failureResponse(
             res,
             error.status || 500,
             error,
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else if (tenantExist && tenantExist.length) {
           const tenantObj = tenantExist[0].tenantDetails.filter((x) =>
@@ -41,7 +41,7 @@ export const addTenant = async (req: Request, res: Response) => {
               res,
               403,
               [],
-              "Tenant already exist with this value"
+              'Tenant already exist with this value'
             );
           } else {
             tempData.tenantData.version =
@@ -63,7 +63,7 @@ export const addTenant = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -76,23 +76,23 @@ const updateTenantDetails = (id, detailsId, res) => {
     { $push: { tenantDetails: detailId } },
     { new: true }
   )
-    .populate("tenantDetails")
+    .populate('tenantDetails')
     .exec((error, updatedRecord) => {
       if (error) {
-        console.log("error while update", error);
+        console.log('error while update', error);
         return failureResponse(
           res,
           500,
           [],
-          error.message || "Something went wrong"
+          error.message || 'Something went wrong'
         );
       } else {
-        console.log("updatedRecord.......", updatedRecord);
+        console.log('updatedRecord.......', updatedRecord);
         return successResponse(
           res,
           200,
           { tenant: updatedRecord },
-          "New tenant added successfully."
+          'New tenant added successfully.'
         );
       }
     });
@@ -101,22 +101,22 @@ const updateTenantDetails = (id, detailsId, res) => {
 //  Get all tenants
 export const getAllTenantList = async (_: Request, res: Response) => {
   try {
-    const tenants = await Tenant.find().populate("tenantDetails").lean();
+    const tenants = await Tenant.find().populate('tenantDetails').lean();
     if (!tenants) {
-      throw { status: 404, message: "Tenants not found." };
+      throw { status: 404, message: 'Tenants not found.' };
     }
     return successResponse(
       res,
       200,
       { tenants },
-      "Tenants found successfully."
+      'Tenants found successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -125,18 +125,18 @@ export const getAllTenantList = async (_: Request, res: Response) => {
 export const getTenantById = async (req: Request, res: Response) => {
   try {
     const tenant = await Tenant.findById(req.params.id)
-      .populate("tenantDetails")
+      .populate('tenantDetails')
       .lean();
     if (!tenant) {
-      return failureResponse(res, 404, [], "Tenant not found.");
+      return failureResponse(res, 404, [], 'Tenant not found.');
     }
-    return successResponse(res, 200, { tenant }, "Tenant found successfully.");
+    return successResponse(res, 200, { tenant }, 'Tenant found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -149,27 +149,27 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
     Tenant.findByIdAndUpdate(
       { _id: id },
       {
-        $set: { deactivateStatus: tempData.deactivateStatus, status: "Closed" },
+        $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' },
       },
       { new: true }
     )
-      .populate("tenantDetails")
+      .populate('tenantDetails')
       .exec((error, updatedRecord) => {
         if (error) {
-          console.log("error while update", error);
+          console.log('error while update', error);
           return failureResponse(
             res,
             500,
             [],
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else {
-          console.log("updatedRecord.......", updatedRecord);
+          console.log('updatedRecord.......', updatedRecord);
           return successResponse(
             res,
             200,
             { tenant: updatedRecord },
-            "Tenant status updated successfully."
+            'Tenant status updated successfully.'
           );
         }
       });
@@ -178,7 +178,7 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };

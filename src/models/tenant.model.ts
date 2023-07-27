@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
-import { tenantStatus, staticStatus } from "../constants/global.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
+import { tenantStatus, staticStatus } from '../constants/global.constants';
 
 const TenantSchema: Schema = new Schema(
   {
@@ -12,12 +12,12 @@ const TenantSchema: Schema = new Schema(
       type: Schema.Types.String,
       trim: true,
       enum: staticStatus,
-      default: "Pending",
+      default: 'Pending',
     },
     tenantDetails: [
       {
         type: Schema.Types.ObjectId,
-        ref: "TenantDetails",
+        ref: 'TenantDetails',
       },
     ],
     deactivateStatus: {

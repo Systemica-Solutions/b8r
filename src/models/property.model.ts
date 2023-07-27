@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
-import { staticStatus, propertyStatus } from "../constants/global.constants";
-import { propertyCloseListingInfo } from "./common.model";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
+import { staticStatus, propertyStatus } from '../constants/global.constants';
+import { propertyCloseListingInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema(
   {
@@ -18,12 +18,12 @@ const PropertySchema: Schema = new Schema(
       type: Schema.Types.String,
       trim: true,
       enum: staticStatus,
-      default: "New",
+      default: 'New',
     },
     propertyDetails: [
       {
         type: Schema.Types.ObjectId,
-        ref: "PropertyDetails",
+        ref: 'PropertyDetails',
       },
     ],
     tourLink3D: {

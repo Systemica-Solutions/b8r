@@ -1,11 +1,11 @@
-import dotenv from "dotenv";
-import path from "path";
+import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV,
-  API_PREFIX: process.env.API_PREFIX || "/api",
+  API_PREFIX: process.env.API_PREFIX || '/api',
   APP_KEY: process.env.APP_KEY,
   PORT: process.env.PORT,
   DB_URI: process.env.DB_URI,

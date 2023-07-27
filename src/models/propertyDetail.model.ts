@@ -1,10 +1,10 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
 import {
   propertyBasicInfo,
   propertyFeatureInfo,
   propertyOwnerInfo,
-} from "./common.model";
+} from './common.model';
 
 const PropertyDetailSchema: Schema = new Schema(
   {

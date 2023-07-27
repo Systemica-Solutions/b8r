@@ -1,15 +1,15 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
 
 const PropertyPhotosSchema: Schema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
     },
     propertyId: {
       type: Schema.Types.ObjectId,
-      ref: "Property",
+      ref: 'Property',
       required: true,
     },
     photos: [

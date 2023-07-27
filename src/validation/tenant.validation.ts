@@ -1,12 +1,12 @@
-import Joi from "@hapi/joi";
-import { failureResponse } from "../helpers/api-response.helper";
+import Joi from '@hapi/joi';
+import { failureResponse } from '../helpers/api-response.helper';
 import {
   furnishingType,
   houseConfiguration,
   houseType,
   staticStatus,
   tenantStatus,
-} from "../constants/global.constants";
+} from '../constants/global.constants';
 
 // Check validations while add tenant
 export const tenantDetailValidation = async (req, res, next) => {
@@ -53,7 +53,7 @@ export const tenantDetailValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();
@@ -82,7 +82,7 @@ export const addTenantValidation = async (req, res, next) => {
       value.error,
       value.error.details[0].message
         ? value.error.details[0].message
-        : "Bad request"
+        : 'Bad request'
     );
   } else {
     next();

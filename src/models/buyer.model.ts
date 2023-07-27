@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
-import { MODELS } from "../constants/model.constants";
-import { staticStatus } from "../constants/global.constants";
+import { Schema, model } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
+import { staticStatus } from '../constants/global.constants';
 
 const BuyerSchema: Schema = new Schema(
   {
@@ -12,12 +12,12 @@ const BuyerSchema: Schema = new Schema(
       type: Schema.Types.String,
       trim: true,
       enum: staticStatus,
-      default: "Pending",
+      default: 'Pending',
     },
     buyerDetails: [
       {
         type: Schema.Types.ObjectId,
-        ref: "BuyerDetails",
+        ref: 'BuyerDetails',
       },
     ],
   },
