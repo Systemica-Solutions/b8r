@@ -9,9 +9,9 @@ const BuyerDetailSchema: Schema = new Schema({
         validate: [EmailValidation, 'Please fill a valid email address'],
         required: true
     },
-    phoneNumber: {
-      type: Schema.Types.String,
-      required: true
+    name: {
+        type: Schema.Types.String,
+        required: true
     },
     panNumber: {
         type: Schema.Types.String,

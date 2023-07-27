@@ -7,7 +7,7 @@ export const tenantDetailValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
         userId: Joi.string().optional(),
         email: Joi.string().email().required(),
-        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
+        name: Joi.string().required(),
         stayDuration: Joi.string().optional(),
         numberOfMonth: Joi.number().integer().min(1).max(12).optional(),
         houseConfiguration: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
@@ -48,7 +48,7 @@ export const tenantDetailValidation = async (req, res, next) => {
 
 export const addTenantValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
-        name: Joi.string().required(),
+        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
         status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
         tenantDetails: Joi.array().items(Joi.string()).optional(),
         tenantData: Joi.any().optional()

@@ -11,10 +11,10 @@ export const addTenant = async (req: Request, res: Response) => {
       tempData.tenantData.userId = new Types.ObjectId(req.user.user._id);
 
       //  Check version of tenant based on below conditions while add new tenant
-      //   1. If same user try to enter again same value for tenantName & status
+      //   1. If same user try to enter again same value for phoneNumber & status
       //         it should return as already exist tenant with this values
-      //   2. If another user try to add tenant and it matches with tenantName & status then increment it's version
-      Tenant.find({ $and: [{ name: tempData.name }, { status: tempData.status }]}).populate('tenantDetails')
+      //   2. If another user try to add tenant and it matches with phoneNumber & status then increment it's version
+      Tenant.find({ $and: [{ phoneNumber: tempData.phoneNumber }, { status: tempData.status }]}).populate('tenantDetails')
         .exec(async (error: any, tenantExist: any) => {
           if (error) { return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong'); }
           else if (tenantExist && tenantExist.length) {

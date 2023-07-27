@@ -3,7 +3,7 @@ import { MODELS } from '../constants/model.constants';
 import { staticStatus } from '../constants/global.constants';
 
 const TenantSchema: Schema = new Schema({
-      name: {
+      phoneNumber: {
         type: Schema.Types.String,
         required: true
       },

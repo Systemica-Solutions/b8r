@@ -6,7 +6,7 @@ import { furnishingType, houseConfiguration, houseType, staticStatus } from '../
 export const buyertDetailValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
         email: Joi.string().email().required(),
-        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
+        name: Joi.string().required(),
         panNumber: Joi.string().required(),
         houseConfiguration: Joi.string().valid(...Object.values(houseConfiguration)).optional(),
         houseType: Joi.string().valid(...Object.values(houseType)).optional(),
@@ -32,7 +32,7 @@ export const buyertDetailValidation = async (req, res, next) => {
 
 export const addBuyerValidation = async (req, res, next) => {
     const schema = Joi.object().keys({
-        name: Joi.string().required(),
+        phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),        
         status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
         buyerDetails: Joi.array().items(Joi.string()).optional(),
         buyerData: Joi.any().optional()

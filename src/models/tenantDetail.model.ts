@@ -17,7 +17,7 @@ const TenantDetailSchema: Schema = new Schema({
         validate: [EmailValidation, 'Please fill a valid email address'],
         required: true
     },
-    phoneNumber: {
+    name: {
       type: Schema.Types.String,
       required: true
     },

@@ -3,9 +3,9 @@ import { MODELS } from '../constants/model.constants';
 import { staticStatus } from '../constants/global.constants';
 
 const BuyerSchema: Schema = new Schema({
-    name: {
-      type: Schema.Types.String,
-      required: true
+    phoneNumber: {
+        type: Schema.Types.String,
+        required: true
     },
     status: {
         type: Schema.Types.String,

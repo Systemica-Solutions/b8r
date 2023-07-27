@@ -11,10 +11,10 @@ export const addBuyer = async (req: Request, res: Response) => {
         tempData.buyerData.userId = new Types.ObjectId(req.user.user._id);
 
         //  Check version of buyer based on below conditions while add new buyer
-        //   1. If same user try to enter again same value for buyerName & status
+        //   1. If same user try to enter again same value for phoneNumber & status
         //         it should return as already exist buyer with this values
-        //   2. If another user try to add buyer and it matches with buyerName & status then increment it's version
-        Buyer.find({ $and: [{ name: tempData.name }, { status: tempData.status }]}).populate('buyerDetails')
+        //   2. If another user try to add buyer and it matches with phoneNumber & status then increment it's version
+        Buyer.find({ $and: [{ phoneNumber: tempData.phoneNumber }, { status: tempData.status }]}).populate('buyerDetails')
         .exec(async (error: any, buyerExist: any) => {
           if (error) { return failureResponse(res, error.status || 500, error, error.message || 'Something went wrong'); }
           else if (buyerExist && buyerExist.length) {
