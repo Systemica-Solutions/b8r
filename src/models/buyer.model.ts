@@ -2,21 +2,26 @@ import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import { staticStatus } from '../constants/global.constants';
 
-const BuyerSchema: Schema = new Schema({
-    name: {
+const BuyerSchema: Schema = new Schema(
+  {
+    phoneNumber: {
       type: Schema.Types.String,
-      required: true
+      required: true,
     },
     status: {
-        type: Schema.Types.String,
-        trim: true,
-        enum: staticStatus,
-        default: 'Pending'
+      type: Schema.Types.String,
+      trim: true,
+      enum: staticStatus,
+      default: 'Pending',
     },
-    buyerDetails : [{
+    buyerDetails: [
+      {
         type: Schema.Types.ObjectId,
-        ref: 'BuyerDetails'
-    }]
-}, { timestamps: true });
+        ref: 'BuyerDetails',
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 export default model(MODELS.BUYER, BuyerSchema);
