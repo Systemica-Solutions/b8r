@@ -33,6 +33,7 @@ const PropertySchema: Schema = new Schema({
         trim: true,
         enum: deactivateReason
     }
+    // reason , sub-reason, deactive-date
 }, { timestamps: true });
 
 export default model(MODELS.PROPERTY, PropertySchema);

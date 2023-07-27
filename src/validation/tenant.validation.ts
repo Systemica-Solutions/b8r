@@ -26,7 +26,7 @@ export const tenantDetailValidation = async (req, res, next) => {
         bikeParking: Joi.boolean().optional(),
         ac: Joi.boolean().optional(),
         nonVeg: Joi.boolean().optional(),
-        bathoroom: Joi.boolean().optional(),
+        bathroom: Joi.boolean().optional(),
         onBoard: Joi.boolean().optional(),
         deactivateDate: Joi.date().optional(),
         deactivateReason: Joi.string().optional(),

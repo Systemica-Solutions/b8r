@@ -92,7 +92,7 @@ const TenantDetailSchema: Schema = new Schema({
       type: Schema.Types.Boolean,
       default: false
     },
-    bathoroom: {
+    bathroom: {
       type: Schema.Types.Boolean,
       default: false
     },
