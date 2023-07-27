@@ -1,25 +1,30 @@
-import { Schema, model } from 'mongoose';
-import { MODELS } from '../constants/model.constants';
-import { houseConfiguration, houseType, furnishingType } from '../constants/global.constants';
-import { EmailValidation } from '../helpers/validation.helper';
+import { Schema, model } from "mongoose";
+import { MODELS } from "../constants/model.constants";
+import {
+  houseConfiguration,
+  houseType,
+  furnishingType,
+} from "../constants/global.constants";
+import { EmailValidation } from "../helpers/validation.helper";
 
-const TenantDetailSchema: Schema = new Schema({
+const TenantDetailSchema: Schema = new Schema(
+  {
     version: {
-        type: Schema.Types.Number,
-        default: 1,
+      type: Schema.Types.Number,
+      default: 1,
     },
     userId: {
-        type: Schema.Types.ObjectId,
-        ref: MODELS.USERS
+      type: Schema.Types.ObjectId,
+      ref: MODELS.USERS,
     },
     email: {
-        type: Schema.Types.String,
-        validate: [EmailValidation, 'Please fill a valid email address'],
-        required: true
+      type: Schema.Types.String,
+      validate: [EmailValidation, "Please fill a valid email address"],
+      required: true,
     },
     name: {
       type: Schema.Types.String,
-      required: true
+      required: true,
     },
     stayDuration: {
       type: Schema.Types.String,
@@ -50,58 +55,58 @@ const TenantDetailSchema: Schema = new Schema({
     },
     rent: {
       type: Schema.Types.Number,
-      default: false
+      default: false,
     },
     gatedSecurity: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     powerBackup: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     groceryStore: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     swimmingPool: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     gym: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     clubHouse: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     carParking: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     bikeParking: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     ac: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     nonVeg: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     bathroom: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     onBoard: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     deactivateDate: {
-      type: Schema.Types.Date
+      type: Schema.Types.Date,
     },
     deactivateReason: {
       type: Schema.Types.String,
@@ -109,6 +114,8 @@ const TenantDetailSchema: Schema = new Schema({
     deactivateSubReason: {
       type: Schema.Types.String,
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 export default model(MODELS.TENANTDETAILS, TenantDetailSchema);

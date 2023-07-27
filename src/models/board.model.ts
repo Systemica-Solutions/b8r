@@ -1,28 +1,31 @@
-import { Schema, model } from 'mongoose';
-import { MODELS } from '../constants/model.constants';
+import { Schema, model } from "mongoose";
+import { MODELS } from "../constants/model.constants";
 
-const BoardSchema: Schema = new Schema({
+const BoardSchema: Schema = new Schema(
+  {
     userId: {
-        type: Schema.Types.ObjectId,
-        ref: MODELS.USERS
+      type: Schema.Types.ObjectId,
+      ref: MODELS.USERS,
     },
-    tenantId : {
-        type: Schema.Types.ObjectId,
-        ref: MODELS.TENANT
+    tenantId: {
+      type: Schema.Types.ObjectId,
+      ref: MODELS.TENANT,
     },
-    propertyId : [{
+    propertyId: [
+      {
         type: Schema.Types.ObjectId,
-        ref: MODELS.PROPERTY
-    }],
+        ref: MODELS.PROPERTY,
+      },
+    ],
     key: {
-        type: Schema.Types.String,
+      type: Schema.Types.String,
     },
     status: {
-      type: Schema.Types.Boolean,       // Active/Inactive
-      default: false
-    }
-}, { timestamps: true });
-
+      type: Schema.Types.Boolean, // Active/Inactive
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
 export default model(MODELS.BOARD, BoardSchema);
-

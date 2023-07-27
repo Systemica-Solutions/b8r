@@ -1,8 +1,9 @@
-import { Schema, model } from 'mongoose';
-import { MODELS } from '../constants/model.constants';
-import { EmailValidation } from '../helpers/validation.helper';
+import { Schema, model } from "mongoose";
+import { MODELS } from "../constants/model.constants";
+import { EmailValidation } from "../helpers/validation.helper";
 
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema = new Schema(
+  {
     name: {
       type: Schema.Types.String,
       trim: true,
@@ -10,33 +11,35 @@ const UserSchema: Schema = new Schema({
       maxlength: 200,
     },
     email: {
-        type: Schema.Types.String,
-        required: true,
-        validate: [EmailValidation, 'Please fill a valid email address']
+      type: Schema.Types.String,
+      required: true,
+      validate: [EmailValidation, "Please fill a valid email address"],
     },
     password: {
       type: Schema.Types.String,
-      required: true
+      required: true,
     },
     phoneNumber: {
       type: Schema.Types.String,
       required: true,
-      unique: true
+      unique: true,
     },
     inviteCode: {
       type: Schema.Types.String,
       required: true,
       unique: true,
-      default: null
+      default: null,
     },
     isFieldAgent: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     lastResetPasswordDate: {
       type: Schema.Types.Date,
-      default: null
-    }
-}, { timestamps: true });
+      default: null,
+    },
+  },
+  { timestamps: true }
+);
 
 export default model(MODELS.USERS, UserSchema);
