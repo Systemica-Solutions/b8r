@@ -1,5 +1,6 @@
 import Joi from '@hapi/joi';
-import { houseType, houseConfiguration, carParking, bikeParking, parkingType, houseHelpRoom, furnishingType, staticStatus, propertyStatus } from '../constants/global.constants';
+import { houseType, houseConfiguration, carParking, bikeParking, parkingType,
+        houseHelpRoom, furnishingType, staticStatus, propertyStatus } from '../constants/global.constants';
 import { failureResponse } from '../helpers/api-response.helper';
 
 // Check validations while add property
@@ -137,8 +138,8 @@ export const addPropertyValidation = async (req, res, next) => {
         status: Joi.string().valid(...Object.keys(staticStatus)).optional(),
         propertyData: Joi.any().optional(),
         propertyDetails: Joi.array().items(Joi.string()).optional(),
-        images: Joi.array().items(Joi.string()).required(),
-        tourLink3D: Joi.string().required(),
+        images: Joi.array().items(Joi.string()).optional(),
+        tourLink3D: Joi.string().optional(),
         closeListingStatus: Joi.string().valid(...Object.keys(propertyStatus)).optional(),
         closeListingDetails: closeListingData.optional(),
     });

@@ -8,5 +8,6 @@ export const MODELS = {
     TENANT: 'Tenant',
     TENANTDETAILS: 'TenantDetails',
     BUYER: 'Buyer',
-    BUYERDETAILS: 'BuyerDetails'
+    BUYERDETAILS: 'BuyerDetails',
+    BOARD: 'Board'
 };
