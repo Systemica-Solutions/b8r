@@ -188,7 +188,7 @@ export const resetPassword = async (req: Request, res: Response) => {
             res,
             404,
             err,
-            err.message || 'Phone number not found'
+            'Phone number not found'
           );
         }
       }
