@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose';
+import { MODELS } from '../constants/model.constants';
 import {
   houseType,
   houseConfiguration,
@@ -6,8 +7,7 @@ import {
   bikeParking,
   parkingType,
   houseHelpRoom,
-  furnishingType,
-  staticStatus,
+  furnishingType
 } from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema(
@@ -233,3 +233,18 @@ export const propertyCloseListingInfo: Schema = new Schema(
   },
   { _id: false }
 );
+
+export const sharedPropertyInfo: Schema = new Schema({
+  tenantId: {
+    type: Schema.Types.ObjectId,
+    ref: MODELS.TENANT,
+  },
+  viewedAt: {
+    type: Schema.Types.Date,
+    default: null
+  },
+  isShortlisted: {
+    type: Schema.Types.Boolean,
+    default: false
+  }
+}, { timestamps: true });
