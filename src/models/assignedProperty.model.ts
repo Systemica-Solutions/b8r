@@ -10,10 +10,12 @@ const AssignedPropertySchema: Schema = new Schema(
     fieldAgentId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     propertyId: {
       type: Schema.Types.ObjectId,
       ref: 'Property',
+      required: true,
     },
     propertyImageId: {
       type: Schema.Types.ObjectId,

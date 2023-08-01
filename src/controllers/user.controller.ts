@@ -75,7 +75,12 @@ const checkInviteCode = async (data: any) => {
       }
     }
   } catch (error) {
-    return error;
+    return failureResponse(
+      [],
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
   }
 };
 
@@ -93,7 +98,13 @@ const saveAuthCode = async (data: any) => {
       return 200;
     }
   } catch (error) {
-    return error;
+    return failureResponse(
+      [],
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+    // return error;
   }
   // const authRegistery = {
   //   userId : userObj._id,
@@ -184,12 +195,7 @@ export const resetPassword = async (req: Request, res: Response) => {
             'Password updated successfully.'
           );
         } else {
-          return failureResponse(
-            res,
-            404,
-            err,
-            'Phone number not found'
-          );
+          return failureResponse(res, 404, err, 'Phone number not found');
         }
       }
     );
@@ -263,7 +269,7 @@ export const addCustomAuthCode = async (req: Request, res: Response) => {
     authData.codeType =
       authData.code.substring(0, 2) === 'FL'
         ? 'Field Agent'
-        : authData.code.substring(0, 2) === 'BA'
+        : authData.code.substring(0, 2) === 'PA'
         ? 'Property Agent'
         : 'Other';
     const authObj = new Authcode(authData);
