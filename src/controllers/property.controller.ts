@@ -22,8 +22,7 @@ export const addProperty = async (req: Request, res: Response) => {
       $and: [
         { houseName: tempData.houseName },
         { societyName: tempData.societyName },
-        { pinCode: tempData.pinCode },
-        { status: tempData.status },
+        { pinCode: tempData.pinCode }
       ],
     })
       .populate('propertyDetails')

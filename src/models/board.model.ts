@@ -25,6 +25,10 @@ const BoardSchema: Schema = new Schema(
       type: Schema.Types.Boolean, // Active/Inactive
       default: false,
     },
+    lastVisitedDate: {
+      type: Schema.Types.Date,
+      default: null,
+    }
   },
   { timestamps: true }
 );
