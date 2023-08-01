@@ -45,12 +45,12 @@ const PropertySchema: Schema = new Schema(
       type: propertyCloseListingInfo,
       default: null,
     },
-    // sharedProperty :  [
-    //   {
-    //     type: sharedPropertyInfo,
-    //     default: null,
-    //   }
-    // ]
+    sharedProperty :  [
+      {
+        type: sharedPropertyInfo,
+        default: null,
+      }
+    ]
   },
   { timestamps: true }
 );

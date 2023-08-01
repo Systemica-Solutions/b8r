@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import {
   houseType,
@@ -248,3 +248,5 @@ export const sharedPropertyInfo: Schema = new Schema({
     default: false
   }
 }, { timestamps: true });
+
+export default model(MODELS.SHAREDPROPERTY, sharedPropertyInfo);
