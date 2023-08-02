@@ -162,7 +162,7 @@ export const updateUserValidation = async (req, res, next) => {
 // Add auth-code schema validation
 export const addAuthCodeValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
-    userId: Joi.string().optional(),
+    propertyAgentId: Joi.string().optional(),
     entity: Joi.string().optional(),
     code: Joi.string().required(),
     codeType: Joi.string().optional(),

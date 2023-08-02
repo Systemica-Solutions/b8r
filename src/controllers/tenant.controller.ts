@@ -12,7 +12,7 @@ import { generateJWTToken } from '../services/crypto.service';
 export const addTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.tenantData.userId = new Types.ObjectId(req.user.user._id);
+    tempData.tenantData.propertyAgentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of tenant based on below conditions while add new tenant
     //   1. If same user try to enter again same value for phoneNumber & status
@@ -35,7 +35,7 @@ export const addTenant = async (req: Request, res: Response) => {
           );
         } else if (tenantExist && tenantExist.length) {
           const tenantObj = tenantExist[0].tenantDetails.filter((x) =>
-            x.userId.equals(tempData.tenantData.userId)
+            x.propertyAgentId.equals(tempData.tenantData.propertyAgentId)
           );
           if (tenantObj && tenantObj.length) {
             return failureResponse(
