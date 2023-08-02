@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   addBoard,
   getBoardByAgentId,
-  editLastVisitDateBoard,
+  updateLastVisitDateBoard,
   addPropertyInBoard,
   finalizeBoard
 } from '../../controllers/board.controller';
@@ -14,8 +14,8 @@ const router = Router();
 // Add new board
 router.post('/', userAuth, boardValidation, addBoard);
 
-// Edit board
-router.put('/:id', userAuth, boardValidation, editLastVisitDateBoard);
+// Update last visited date of board
+router.put('/:id', userAuth, updateLastVisitDateBoard);
 
 // Get board by tenant agent id
 router.get('/:id', getBoardByAgentId);

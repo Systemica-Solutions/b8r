@@ -1,13 +1,13 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   successResponse,
   failureResponse,
-} from "../helpers/api-response.helper";
-import Board from "../models/board.model";
-import Property from "../models/property.model";
-import SharedProperty from "../models/common.model";
-import { Types } from "mongoose";
-import { generateRandomKey } from "../services/crypto.service";
+} from '../helpers/api-response.helper';
+import Board from '../models/board.model';
+import Property from '../models/property.model';
+import SharedProperty from '../models/common.model';
+import { Types } from 'mongoose';
+import { generateRandomKey } from '../services/crypto.service';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
@@ -17,20 +17,20 @@ export const addBoard = async (req: Request, res: Response) => {
     tempData.key = await generateRandomKey(12);
     const detailObj: any = new Board(tempData);
     const savedRecord: any = await detailObj.save();
-    await savedRecord.populate("propertyId");
-    await savedRecord.populate("tenantId");
+    await savedRecord.populate('propertyId');
+    await savedRecord.populate('tenantId');
     return successResponse(
       res,
       200,
       { board: savedRecord },
-      "New board created successfully."
+      'New board created successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -39,45 +39,44 @@ export const addBoard = async (req: Request, res: Response) => {
 export const getBoardByAgentId = async (req: Request, res: Response) => {
   try {
     const boards = await Board.findOne({ tenantId: req.params.id })
-      .populate("tenantId propertyId")
+      .populate('tenantId propertyId')
       .lean();
     if (!boards) {
-      return failureResponse(res, 404, [], "Board not found.");
+      return failureResponse(res, 404, [], 'Board not found.');
     }
-    return successResponse(res, 200, { boards }, "Board found successfully.");
+    return successResponse(res, 200, { boards }, 'Board found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
 
-// Edit board
-export const editLastVisitDateBoard = async (req: Request, res: Response) => {
+// Update last visited date of board
+export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   try {
-    const boardData = req.body;
-    const boards = await Board.findByIdAndUpdate(
-      req.params.id,
+    const boards = await Board.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.user.user._id },
       {
-        $set: boardData,
+        $set: { lastVisitedDate: Date.now() },
       },
       { new: true }
     )
-      .populate("tenantId propertyId")
+      .populate('tenantId propertyId')
       .lean();
     if (!boards) {
-      return failureResponse(res, 404, [], "Board not found.");
+      return failureResponse(res, 404, [], 'Board not found.');
     }
-    return successResponse(res, 200, { boards }, "Board updated successfully.");
+    return successResponse(res, 200, { boards }, 'Board updated successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -93,7 +92,7 @@ const updateBoardTable = (id, data) => {
         error,
         500,
         [],
-        error.message || "Something went wrong"
+        error.message || 'Something went wrong'
       );
     } else {
       return await updatedRecord;
@@ -109,6 +108,7 @@ const updateSharedPropertyTable = async (data) => {
   return await detailObj.save();
 };
 
+// Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
   Promise.all([
     updateBoardTable(req.params.id, req.body),
@@ -126,14 +126,14 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
               res,
               500,
               [],
-              err.message || "Something went wrong"
+              err.message || 'Something went wrong'
             );
           } else {
             return successResponse(
               res,
               200,
               {},
-              "Property added to board successfully."
+              'Property added to board successfully.'
             );
           }
         });
@@ -144,7 +144,7 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
         res,
         500,
         error,
-        error.message || "Something went wrong"
+        error.message || 'Something went wrong'
       );
     });
 };
@@ -159,23 +159,23 @@ export const finalizeBoard = async (req: Request, res: Response) => {
       },
       { new: true }
     )
-      .populate("tenantId propertyId")
+      .populate('tenantId propertyId')
       .lean();
     if (!boards) {
-      return failureResponse(res, 404, [], "Board not found.");
+      return failureResponse(res, 404, [], 'Board not found.');
     }
     return successResponse(
       res,
       200,
       { boards },
-      "Board finalize successfully."
+      'Board finalize successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
