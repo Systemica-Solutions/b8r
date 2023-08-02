@@ -82,7 +82,7 @@ export const propertyDetailValidation = async (req, res, next) => {
     ac: Joi.boolean().optional(),
     nonVeg: Joi.boolean().optional(),
     constructionYear: Joi.string().optional(),
-    availableFrom: Joi.string().optional(),
+    availableFrom: Joi.date().iso().optional(),
     rentAmount: Joi.when(Joi.ref('...propertyInfo.purposeRent'), {
       is: true,
       then: Joi.number().required(),
@@ -125,12 +125,35 @@ export const propertyDetailValidation = async (req, res, next) => {
     }),
   });
 
+  const verifyBasicInfo = Joi.object().keys({
+    liftLobby: Joi.boolean().optional(),
+    entryDoor: Joi.boolean().optional(),
+    homeEntry: Joi.boolean().optional(),
+    livingRoom: Joi.boolean().optional(),
+    tvArea: Joi.boolean().optional(),
+    kitchen: Joi.boolean().optional(),
+    utilityArea: Joi.boolean().optional(),
+    backyard: Joi.boolean().optional(),
+    commonWashroom: Joi.boolean().optional(),
+    livingRoomBalcony: Joi.boolean().optional(),
+    mainGate: Joi.boolean().optional(),
+    clubHouse: Joi.boolean().optional(),
+    groceryStore: Joi.boolean().optional(),
+    swimmingPool: Joi.boolean().optional(),
+    gym: Joi.boolean().optional(),
+    parking: Joi.boolean().optional(),
+    feature1: Joi.string().optional(),
+    feature2: Joi.string().optional(),
+    feature3: Joi.string().optional(),
+  });
+
   const schema = Joi.object().keys({
     version: Joi.number().optional(),
     userId: Joi.string().optional(),
     propertyInfo: propertyBasicInfo.required(),
     ownerInfo: ownerBasicInfo.required(),
     featureInfo: featureBasicInfo.required(),
+    verifyInfo: verifyBasicInfo.optional()
   });
   const value = schema.validate(req.body.propertyData);
   if (value.error) {
