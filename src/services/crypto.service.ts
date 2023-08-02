@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 // Password encryption
 export const encrypt = (value) => {
@@ -20,4 +21,13 @@ export const generateRandomKey = (length) => {
     tempString += characters.charAt(randomIndex);
   }
   return tempString;
+};
+
+/**
+ * Generate JWT token using user details
+ */
+export const generateJWTToken = (user) => {
+  return jwt.sign(user.toJSON(), process.env.SECRET, {
+    expiresIn: process.env.JWT_EXPIRY,
+  });
 };

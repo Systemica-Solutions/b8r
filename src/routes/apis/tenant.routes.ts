@@ -4,6 +4,7 @@ import {
   addTenant,
   getTenantById,
   changeTenantStatus,
+  tenantLogin
 } from '../../controllers/tenant.controller';
 import {
   addTenantValidation,
@@ -30,5 +31,8 @@ router.get('/:id', userAuth, getTenantById);
 
 // Change status of tenant
 router.put('/change-status', userAuth, changeTenantStatus);
+
+// Login tenant by phoneNumber
+router.post('/login', tenantLogin);
 
 export default router;

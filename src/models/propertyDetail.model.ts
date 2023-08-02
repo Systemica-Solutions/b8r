@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import {
+  propertyApproveInfo,
   propertyBasicInfo,
   propertyFeatureInfo,
   propertyOwnerInfo,
@@ -19,6 +20,10 @@ const PropertyDetailSchema: Schema = new Schema(
     featureInfo: {
       type: propertyFeatureInfo,
       default: null,
+    },
+    approveInfo: {
+      type: propertyApproveInfo,
+      default: null
     },
     version: {
       type: Schema.Types.Number,

@@ -209,6 +209,85 @@ export const propertyFeatureInfo: Schema = new Schema(
   { _id: false }
 );
 
+export const propertyApproveInfo: Schema = new Schema(
+  {
+    liftLobby: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    entryDoor: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    homeEntry: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    livingRoom: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    tvArea: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    kitchen: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    utilityArea: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    backyard: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    commonWashroom: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    livingRoomBalcony: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    mainGate: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    clubHouse: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    groceryStore: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    swimmingPool: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    gym: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    parking: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
+    feature1: {
+      type: Schema.Types.String
+    },
+    feature2: {
+      type: Schema.Types.String
+    },
+    feature3: {
+      type: Schema.Types.String
+    }
+  },
+  { _id: false }
+);
+
 export const propertyCloseListingInfo: Schema = new Schema(
   {
     name: {

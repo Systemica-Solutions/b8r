@@ -35,7 +35,7 @@ export const addBoard = async (req: Request, res: Response) => {
   }
 };
 
-// Get all bords by property agent id
+// Get all bords by tenant agent id
 export const getBoardByAgentId = async (req: Request, res: Response) => {
   try {
     const boards = await Board.findOne({ tenantId: req.params.id })
@@ -55,14 +55,13 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
   }
 };
 
-// Edit board
-export const editBoard = async (req: Request, res: Response) => {
+// Update last visited date of board
+export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   try {
-    const boardData = req.body;
-    const boards = await Board.findByIdAndUpdate(
-      req.params.id,
+    const boards = await Board.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.user.user._id },
       {
-        $set: boardData,
+        $set: { lastVisitedDate: Date.now() },
       },
       { new: true }
     )
@@ -89,6 +88,12 @@ const updateBoardTable = (id, data) => {
     { new: true }
   ).exec(async (error, updatedRecord) => {
     if (error) {
+      return failureResponse(
+        error,
+        500,
+        [],
+        error.message || 'Something went wrong'
+      );
     } else {
       return await updatedRecord;
     }
@@ -103,6 +108,7 @@ const updateSharedPropertyTable = async (data) => {
   return await detailObj.save();
 };
 
+// Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
   Promise.all([
     updateBoardTable(req.params.id, req.body),
@@ -141,4 +147,35 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
         error.message || 'Something went wrong'
       );
     });
+};
+
+// Finalize board by property agent
+export const finalizeBoard = async (req: Request, res: Response) => {
+  try {
+    const boards = await Board.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: { status: true },
+      },
+      { new: true }
+    )
+      .populate('tenantId propertyId')
+      .lean();
+    if (!boards) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(
+      res,
+      200,
+      { boards },
+      'Board finalize successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
 };

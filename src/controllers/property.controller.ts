@@ -15,14 +15,14 @@ export const addProperty = async (req: Request, res: Response) => {
     tempData.propertyData.userId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of property based on below conditions while add new property
-    //   1. If same user try to enter again same value for houseName, societyName, pinCode & status then
+    //   1. If same user try to enter again same value for houseName, societyName, pinCode then
     //         it should return as already exist property with this values
-    //   2. If another user try to add property and it matches with houseName, societyName, pinCode & status then increment it's version
+    //   2. If another user try to add property and it matches with houseName, societyName, pinCode then increment it's version
     Property.find({
       $and: [
         { houseName: tempData.houseName },
         { societyName: tempData.societyName },
-        { pinCode: tempData.pinCode }
+        { pinCode: tempData.pinCode },
       ],
     })
       .populate('propertyDetails')
@@ -124,7 +124,7 @@ export const getAllPropertyList = async (_: Request, res: Response) => {
 };
 
 // Get property by id
-export const getPriorityById = async (req: Request, res: Response) => {
+export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id)
       .populate('propertyDetails')
@@ -254,11 +254,36 @@ export const verifyProperty = async (req: Request, res: Response) => {
     const tempData = req.body;
     tempData.propertyData.userId = new Types.ObjectId(req.user.user._id);
     tempData.status = 'Verified';
-    const detailObj = new PropertyDetail(tempData.propertyData);
-    const savedObj: any = await detailObj.save();
-    const propertyObj = new Property(tempData);
-    const saveObj = await propertyObj.save();
-    updatePropertyDetails(saveObj._id, savedObj._id, res);
+    Property.find({
+      $and: [
+        { houseName: tempData.houseName },
+        { societyName: tempData.societyName },
+        { pinCode: tempData.pinCode },
+      ],
+    })
+      .populate('propertyDetails')
+      .exec(async (error: any, propertyExist: any) => {
+        if (error) {
+          return failureResponse(
+            res,
+            error.status || 500,
+            error,
+            error.message || 'Something went wrong'
+          );
+        } else if (propertyExist && propertyExist.length) {
+          tempData.propertyData.version =
+            propertyExist[0].propertyDetails.length + 1;
+          const detailObj = new PropertyDetail(tempData.propertyData);
+          const savedObj: any = await detailObj.save();
+          updatePropertyDetails(propertyExist[0]._id, savedObj._id, res);
+        } else {
+          const detailObj = new PropertyDetail(tempData.propertyData);
+          const savedObj: any = await detailObj.save();
+          const propertyObj = new Property(tempData);
+          const saveObj = await propertyObj.save();
+          updatePropertyDetails(saveObj._id, savedObj._id, res);
+        }
+      });
   } catch (error) {
     return failureResponse(
       res,

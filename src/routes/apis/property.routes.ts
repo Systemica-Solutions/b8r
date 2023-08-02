@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   getAllPropertyList,
   addProperty,
-  getPriorityById,
+  getPropertyById,
   verifyProperty,
   closeListingProperty,
   assignPropertyToFA,
@@ -46,7 +46,7 @@ router.post(
 );
 
 // Get property by id
-router.get('/:id', userAuth, getPriorityById);
+router.get('/:id', userAuth, getPropertyById);
 
 // Assign property to Field Agent
 router.post('/assign', userAuth, assignPropertyToFA);
