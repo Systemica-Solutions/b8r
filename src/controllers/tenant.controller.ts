@@ -6,6 +6,7 @@ import {
 import Tenant from '../models/tenant.model';
 import TenantDetail from '../models/tenantDetail.model';
 import { Types } from 'mongoose';
+import { generateJWTToken } from '../services/crypto.service';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -173,6 +174,35 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
           );
         }
       });
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Tenant login by phoneNumber
+export const tenantLogin = async (req: Request, res: Response) => {
+  try {
+    const tenant = await Tenant.findOne({ phoneNumber: req.body.phoneNumber });
+    if (!tenant) {
+      return failureResponse(
+        res,
+        404,
+        [],
+        'Tenant not registered with this phone number.'
+      );
+    }
+    const jwtToken = generateJWTToken(tenant);
+    return successResponse(
+      res,
+      200,
+      { tenant, jwtToken },
+      'Tenant login successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,

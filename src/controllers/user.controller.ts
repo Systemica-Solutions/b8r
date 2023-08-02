@@ -1,21 +1,11 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import {
   successResponse,
   failureResponse,
 } from '../helpers/api-response.helper';
 import User from '../models/user.model';
 import Authcode from '../models/authcode.model';
-import { encrypt, decrypt } from '../services/crypto.service';
-
-/**
- * Generate JWT token using firebase token and user details
- */
-const generateJWTToken = (user) => {
-  return jwt.sign(user.toJSON(), process.env.SECRET, {
-    expiresIn: process.env.JWT_EXPIRY,
-  });
-};
+import { encrypt, decrypt, generateJWTToken } from '../services/crypto.service';
 
 //  Sign up the new user details and generate the JWT token for that user
 export const signUpUser = async (req: Request, res: Response) => {

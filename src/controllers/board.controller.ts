@@ -164,7 +164,12 @@ export const finalizeBoard = async (req: Request, res: Response) => {
     if (!boards) {
       return failureResponse(res, 404, [], "Board not found.");
     }
-    return successResponse(res, 200, { boards }, "Board finalize successfully.");
+    return successResponse(
+      res,
+      200,
+      { boards },
+      "Board finalize successfully."
+    );
   } catch (error) {
     return failureResponse(
       res,
