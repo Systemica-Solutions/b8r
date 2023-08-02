@@ -35,7 +35,7 @@ export const addBoard = async (req: Request, res: Response) => {
   }
 };
 
-// Get all bords by property agent id
+// Get all bords by tenant agent id
 export const getBoardByAgentId = async (req: Request, res: Response) => {
   try {
     const boards = await Board.findOne({ tenantId: req.params.id })
@@ -56,7 +56,7 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
 };
 
 // Edit board
-export const editBoard = async (req: Request, res: Response) => {
+export const editLastVisitDateBoard = async (req: Request, res: Response) => {
   try {
     const boardData = req.body;
     const boards = await Board.findByIdAndUpdate(
@@ -89,6 +89,12 @@ const updateBoardTable = (id, data) => {
     { new: true }
   ).exec(async (error, updatedRecord) => {
     if (error) {
+      return failureResponse(
+        error,
+        500,
+        [],
+        error.message || 'Something went wrong'
+      );
     } else {
       return await updatedRecord;
     }
