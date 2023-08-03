@@ -4,9 +4,12 @@ import {
   getBoardByAgentId,
   updateLastVisitDateBoard,
   addPropertyInBoard,
-  finalizeBoard
+  finalizeBoard,
 } from '../../controllers/board.controller';
-import { boardValidation } from '../../validation/board.validation';
+import {
+  boardValidation,
+  addProeprtyInboardValidation,
+} from '../../validation/board.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
 const router = Router();
@@ -21,9 +24,14 @@ router.put('/:id', userAuth, updateLastVisitDateBoard);
 router.get('/:id', getBoardByAgentId);
 
 // Add property to board
-router.put('/property/:id', userAuth, addPropertyInBoard);
+router.put(
+  '/property/:id',
+  userAuth,
+  addProeprtyInboardValidation,
+  addPropertyInBoard
+);
 
 // Finalize board
-router.put('/finalize/:id', userAuth, finalizeBoard);
+router.get('/finalize/:id', userAuth, finalizeBoard);
 
 export default router;

@@ -58,6 +58,9 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
 // Update last visited date of board
 export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   try {
+    console.log('====================================');
+    console.log(req.user, req.params.id);
+    console.log('====================================');
     const boards = await Board.findOneAndUpdate(
       { _id: req.params.id, tenantId: req.user.user._id },
       {
@@ -87,6 +90,9 @@ const updateBoardTable = (id, data) => {
     { $addToSet: { propertyId: data.propertyId } },
     { new: true }
   ).exec(async (error, updatedRecord) => {
+    console.log('====================================');
+    console.log(error, updatedRecord);
+    console.log('====================================');
     if (error) {
       return failureResponse(
         error,
@@ -95,7 +101,17 @@ const updateBoardTable = (id, data) => {
         error.message || 'Something went wrong'
       );
     } else {
+      if (updatedRecord) {
       return await updatedRecord;
+      }
+      else {
+      return failureResponse(
+        {},
+        401,
+        [],
+        'Board not found'
+      );
+      }
     }
   });
 };
