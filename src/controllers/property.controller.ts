@@ -12,7 +12,9 @@ import { Types } from 'mongoose';
 export const addProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.userId = new Types.ObjectId(req.user.user._id);
+    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+      req.user.user._id
+    );
 
     //  Check version of property based on below conditions while add new property
     //   1. If same user try to enter again same value for houseName, societyName, pinCode then
@@ -36,7 +38,7 @@ export const addProperty = async (req: Request, res: Response) => {
           );
         } else if (propertyExist && propertyExist.length) {
           const userProperty = propertyExist[0].propertyDetails.filter((x) =>
-            x.userId.equals(tempData.propertyData.userId)
+            x.propertyAgentId.equals(tempData.propertyData.propertyAgentId)
           );
           if (userProperty && userProperty.length) {
             return failureResponse(
@@ -152,7 +154,7 @@ export const getPropertyById = async (req: Request, res: Response) => {
 export const assignPropertyToFA = async (req: Request, res: Response) => {
   try {
     const dataObj = req.body;
-    dataObj.userId = req.user.user._id;
+    dataObj.propertyAgentId = req.user.user._id;
     const existing = await AssignedProperty.findOne({
       propertyId: dataObj.propertyId,
     });
@@ -183,9 +185,9 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const pendingProperties = [];
     const verifiedProperties = [];
-    const userId = new Types.ObjectId(req.user.user._id);
+    const propertyAgentId = new Types.ObjectId(req.user.user._id);
     const property = await AssignedProperty.find({
-      fieldAgentId: userId,
+      fieldAgentId: propertyAgentId,
     }).populate('propertyId');
     if (!property) {
       return failureResponse(res, 500, [], 'Something went wrong');
@@ -222,8 +224,10 @@ export const getFieldAgentPendingProperty = async (
   res: Response
 ) => {
   try {
-    const userId = new Types.ObjectId(req.user.user._id);
-    const property = await AssignedProperty.find({ fieldAgentId: userId })
+    const propertyAgentId = new Types.ObjectId(req.user.user._id);
+    const property = await AssignedProperty.find({
+      fieldAgentId: propertyAgentId,
+    })
       .populate('propertyImageId')
       .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
     if (!property) {
@@ -252,7 +256,9 @@ export const getFieldAgentPendingProperty = async (
 export const verifyProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.userId = new Types.ObjectId(req.user.user._id);
+    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+      req.user.user._id
+    );
     tempData.status = 'Verified';
     Property.find({
       $and: [
@@ -337,4 +343,10 @@ export const closeListingProperty = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
+};
+
+// Short-listed shared property
+export const shortlistedProperty = async (req: Request, res: Response) => {
+  try {
+  } catch (error) {}
 };

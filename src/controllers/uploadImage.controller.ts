@@ -9,7 +9,7 @@ import AssignedProperty from '../models/assignedProperty.model';
 import { Types } from 'mongoose';
 
 export const uploadPrpertyImages = async (req, res) => {
-  const userId = req.user.user._id;
+  const propertyAgentId = req.user.user._id;
   const reqData = req.body;
 
   aws.config.setPromisesDependency(null);
@@ -33,7 +33,7 @@ export const uploadPrpertyImages = async (req, res) => {
       ACL: 'public-read',
       Bucket: 'elasticbeanstalk-ap-south-1-493063914377', // Replace with your S3 bucket name
       Body: fileStream,
-      Key: `b8rHomes/${userId}/${reqData.propertyId}/photos/raw/${Date.now()}-${
+      Key: `b8rHomes/${propertyAgentId}/${reqData.propertyId}/photos/raw/${Date.now()}-${
         file.originalname
       }`, // remove property & add photos..
     };
@@ -64,7 +64,7 @@ export const uploadPrpertyImages = async (req, res) => {
     const dataObj = {
       photos: imageURL,
       propertyId: reqData.propertyId,
-      userId,
+      propertyAgentId,
     };
     const propertyObj = new PropertyPhotos(dataObj);
     const saveObj: any = await propertyObj.save();

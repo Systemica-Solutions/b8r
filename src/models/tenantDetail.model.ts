@@ -13,7 +13,7 @@ const TenantDetailSchema: Schema = new Schema(
       type: Schema.Types.Number,
       default: 1,
     },
-    userId: {
+    propertyAgentId: {
       type: Schema.Types.ObjectId,
       ref: MODELS.USERS,
     },

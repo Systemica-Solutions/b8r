@@ -3,7 +3,7 @@ import { MODELS } from '../constants/model.constants';
 
 const BoardSchema: Schema = new Schema(
   {
-    userId: {
+    propertyAgentId: {
       type: Schema.Types.ObjectId,
       ref: MODELS.USERS,
     },

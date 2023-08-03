@@ -5,9 +5,10 @@ export enum authCodeType {
 }
 
 export enum houseType {
-  'Gated Society',
-  'Gated Apartment',
-  'Individual House',
+  'Flat (in Gated Society)',
+  'Individual House(in Gated Society)',
+  'Individual Builder Floor',
+  'Standalone Individual House',
 }
 
 export enum houseConfiguration {
@@ -55,7 +56,14 @@ export enum staticStatus {
 }
 
 export enum tenantStatus {
-  'Rented From B8R',
+  'WaitingForProperty',
+  'Shared',
+  'CurrentlyViewing',
+  'Shortlisted',
+  'Deactivate'
+}
+
+export enum tenantDeactivationReason {
   'Rented Externally',
   'Does not need anymore',
   'Not responding',

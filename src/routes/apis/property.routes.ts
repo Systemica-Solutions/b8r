@@ -8,6 +8,7 @@ import {
   assignPropertyToFA,
   getPropertyCounts,
   getFieldAgentPendingProperty,
+  shortlistedProperty,
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -56,6 +57,9 @@ router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
 
 // Edit property status with close listing property
 router.put('/close-listing', userAuth, closeListingProperty);
+
+// Short-listed shared property
+router.put('/short-listed', shortlistedProperty);
 
 // Upload property images
 router.use('/upload', uploadRoutes);

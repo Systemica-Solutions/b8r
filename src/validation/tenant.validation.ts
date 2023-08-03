@@ -4,14 +4,14 @@ import {
   furnishingType,
   houseConfiguration,
   houseType,
-  staticStatus,
   tenantStatus,
+  tenantDeactivationReason,
 } from '../constants/global.constants';
 
 // Check validations while add tenant
 export const tenantDetailValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
-    userId: Joi.string().optional(),
+    propertyAgentId: Joi.string().optional(),
     email: Joi.string().email().required(),
     name: Joi.string().required(),
     stayDuration: Joi.string().optional(),
@@ -66,10 +66,10 @@ export const addTenantValidation = async (req, res, next) => {
       .pattern(/^[0-9]{10}$/)
       .required(),
     status: Joi.string()
-      .valid(...Object.keys(staticStatus))
+      .valid(...Object.keys(tenantStatus))
       .optional(),
     deactivateStatus: Joi.string()
-      .valid(...Object.values(tenantStatus))
+      .valid(...Object.values(tenantDeactivationReason))
       .optional(),
     tenantDetails: Joi.array().items(Joi.string()).optional(),
     tenantData: Joi.any().optional(),

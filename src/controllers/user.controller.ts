@@ -58,7 +58,7 @@ const checkInviteCode = async (data: any) => {
     if (!authcodeExist) {
       return 400;
     } else {
-      if (authcodeExist && authcodeExist.userId !== null) {
+      if (authcodeExist && authcodeExist.propertyAgentId !== null) {
         return 403;
       } else {
         return authcodeExist.code;
@@ -79,7 +79,7 @@ const saveAuthCode = async (data: any) => {
   try {
     const obj = await Authcode.findOneAndUpdate(
       { code: data.inviteCode },
-      { $set: { userId: data._id } },
+      { $set: { propertyAgentId: data._id } },
       { new: true }
     );
     if (!obj) {
@@ -97,7 +97,7 @@ const saveAuthCode = async (data: any) => {
     // return error;
   }
   // const authRegistery = {
-  //   userId : userObj._id,
+  //   propertyAgentId : userObj._id,
   //   entity: userObj.name,
   //   authCode: userObj.authCode,
   //   authCodeType: userObj.authCode.substring(0, 2) === 'FL' ? 'Field Agent' :

@@ -4,7 +4,7 @@ import { authCodeType } from '../constants/global.constants';
 
 const AuthCodeSchema: Schema = new Schema(
   {
-    userId: {
+    propertyAgentId: {
       type: Schema.Types.ObjectId,
       ref: MODELS.USERS,
       default: null,

@@ -11,7 +11,7 @@ import { Types } from 'mongoose';
 export const addBuyer = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.buyerData.userId = new Types.ObjectId(req.user.user._id);
+    tempData.buyerData.propertyAgentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of buyer based on below conditions while add new buyer
     //   1. If same user try to enter again same value for phoneNumber & status
@@ -34,7 +34,7 @@ export const addBuyer = async (req: Request, res: Response) => {
           );
         } else if (buyerExist && buyerExist.length) {
           const buyerObj = buyerExist[0].buyerDetails.filter((x) =>
-            x.userId.equals(tempData.buyerData.userId)
+            x.propertyAgentId.equals(tempData.buyerData.propertyAgentId)
           );
           if (buyerObj && buyerObj.length) {
             return failureResponse(
