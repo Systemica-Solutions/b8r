@@ -1,18 +1,20 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   successResponse,
   failureResponse,
-} from "../helpers/api-response.helper";
-import Property from "../models/property.model";
-import PropertyDetail from "../models/propertyDetail.model";
-import AssignedProperty from "../models/assignedProperty.model";
-import { Types } from "mongoose";
+} from '../helpers/api-response.helper';
+import Property from '../models/property.model';
+import PropertyDetail from '../models/propertyDetail.model';
+import AssignedProperty from '../models/assignedProperty.model';
+import { Types } from 'mongoose';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(req.user.user._id);
+    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+      req.user.user._id
+    );
 
     //  Check version of property based on below conditions while add new property
     //   1. If same user try to enter again same value for houseName, societyName, pinCode then
@@ -25,14 +27,14 @@ export const addProperty = async (req: Request, res: Response) => {
         { pinCode: tempData.pinCode },
       ],
     })
-      .populate("propertyDetails")
+      .populate('propertyDetails')
       .exec(async (error: any, propertyExist: any) => {
         if (error) {
           return failureResponse(
             res,
             error.status || 500,
             error,
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else if (propertyExist && propertyExist.length) {
           const userProperty = propertyExist[0].propertyDetails.filter((x) =>
@@ -43,7 +45,7 @@ export const addProperty = async (req: Request, res: Response) => {
               res,
               403,
               [],
-              "Property already exist with this value"
+              'Property already exist with this value'
             );
           } else {
             tempData.propertyData.version =
@@ -65,7 +67,7 @@ export const addProperty = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -78,23 +80,23 @@ const updatePropertyDetails = (id, detailsId, res) => {
     { $push: { propertyDetails: detailId } },
     { new: true }
   )
-    .populate("propertyDetails")
+    .populate('propertyDetails')
     .exec((error, updatedRecord) => {
       if (error) {
-        console.log("error while update", error);
+        console.log('error while update', error);
         return failureResponse(
           res,
           500,
           [],
-          error.message || "Something went wrong"
+          error.message || 'Something went wrong'
         );
       } else {
-        console.log("updatedRecord.......", updatedRecord);
+        console.log('updatedRecord.......', updatedRecord);
         return successResponse(
           res,
           200,
           { property: updatedRecord },
-          "New property added successfully."
+          'New property added successfully.'
         );
       }
     });
@@ -103,22 +105,22 @@ const updatePropertyDetails = (id, detailsId, res) => {
 //  Get all properties
 export const getAllPropertyList = async (_: Request, res: Response) => {
   try {
-    const properties = await Property.find().populate("propertyDetails").lean();
+    const properties = await Property.find().populate('propertyDetails').lean();
     if (!properties) {
-      return failureResponse(res, 404, [], "Properties not found.");
+      return failureResponse(res, 404, [], 'Properties not found.');
     }
     return successResponse(
       res,
       200,
       { properties },
-      "Properties found successfully."
+      'Properties found successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -127,23 +129,23 @@ export const getAllPropertyList = async (_: Request, res: Response) => {
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id)
-      .populate("propertyDetails")
+      .populate('propertyDetails')
       .lean();
     if (!property) {
-      return failureResponse(res, 404, [], "Property not found.");
+      return failureResponse(res, 404, [], 'Property not found.');
     }
     return successResponse(
       res,
       200,
       { property },
-      "Property found successfully."
+      'Property found successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -157,7 +159,7 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
       propertyId: dataObj.propertyId,
     });
     if (existing) {
-      return failureResponse(res, 403, [], "Property already assigned");
+      return failureResponse(res, 403, [], 'Property already assigned');
     } else {
       const detailObj = new AssignedProperty(dataObj);
       const savedObj: any = await detailObj.save();
@@ -165,7 +167,7 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
         res,
         200,
         { assigned: savedObj },
-        "Property assigned to field agent successfully."
+        'Property assigned to field agent successfully.'
       );
     }
   } catch (error) {
@@ -173,7 +175,7 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
       res,
       500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -186,14 +188,14 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     const propertyAgentId = new Types.ObjectId(req.user.user._id);
     const property = await AssignedProperty.find({
       fieldAgentId: propertyAgentId,
-    }).populate("propertyId");
+    }).populate('propertyId');
     if (!property) {
-      return failureResponse(res, 500, [], "Something went wrong");
+      return failureResponse(res, 500, [], 'Something went wrong');
     }
-    property.forEach(function (doc) {
-      if (doc.propertyId.status === "Pending") {
+    property.forEach(function(doc) {
+      if (doc.propertyId.status === 'Pending') {
         pendingProperties.push(doc);
-      } else if (doc.propertyId.status === "Verified") {
+      } else if (doc.propertyId.status === 'Verified') {
         verifiedProperties.push(doc);
       }
     });
@@ -204,14 +206,14 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         pending: pendingProperties.length,
         verified: verifiedProperties.length,
       },
-      "Property found successfully."
+      'Property found successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -223,27 +225,29 @@ export const getFieldAgentPendingProperty = async (
 ) => {
   try {
     const propertyAgentId = new Types.ObjectId(req.user.user._id);
-    const property = await AssignedProperty.find({ fieldAgentId: propertyAgentId })
-      .populate("propertyImageId")
-      .populate({ path: "propertyId", populate: { path: "propertyDetails" } });
+    const property = await AssignedProperty.find({
+      fieldAgentId: propertyAgentId,
+    })
+      .populate('propertyImageId')
+      .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
     if (!property) {
-      return failureResponse(res, 500, [], "Something went wrong");
+      return failureResponse(res, 500, [], 'Something went wrong');
     }
     const pendingList = property.filter(
-      (x) => x.propertyId.status === "Pending"
+      (x) => x.propertyId.status === 'Pending'
     );
     return successResponse(
       res,
       200,
       { property: pendingList },
-      "Pending property list get successfully."
+      'Pending property list get successfully.'
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -252,8 +256,10 @@ export const getFieldAgentPendingProperty = async (
 export const verifyProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(req.user.user._id);
-    tempData.status = "Verified";
+    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+      req.user.user._id
+    );
+    tempData.status = 'Verified';
     Property.find({
       $and: [
         { houseName: tempData.houseName },
@@ -261,14 +267,14 @@ export const verifyProperty = async (req: Request, res: Response) => {
         { pinCode: tempData.pinCode },
       ],
     })
-      .populate("propertyDetails")
+      .populate('propertyDetails')
       .exec(async (error: any, propertyExist: any) => {
         if (error) {
           return failureResponse(
             res,
             error.status || 500,
             error,
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else if (propertyExist && propertyExist.length) {
           tempData.propertyData.version =
@@ -289,7 +295,7 @@ export const verifyProperty = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -309,23 +315,23 @@ export const closeListingProperty = async (req: Request, res: Response) => {
       },
       { new: true }
     )
-      .populate("propertyDetails")
+      .populate('propertyDetails')
       .exec((error, updatedRecord) => {
         if (error) {
-          console.log("error while update", error);
+          console.log('error while update', error);
           return failureResponse(
             res,
             500,
             [],
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else {
-          console.log("updatedRecord.......", updatedRecord);
+          console.log('updatedRecord.......', updatedRecord);
           return successResponse(
             res,
             200,
             { property: updatedRecord },
-            "Property status updated successfully."
+            'Property status updated successfully.'
           );
         }
       });
@@ -334,7 +340,7 @@ export const closeListingProperty = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };

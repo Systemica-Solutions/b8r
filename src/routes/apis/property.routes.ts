@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   getAllPropertyList,
   addProperty,
@@ -9,37 +9,37 @@ import {
   getPropertyCounts,
   getFieldAgentPendingProperty,
   shortlistedProperty,
-} from "../../controllers/property.controller";
+} from '../../controllers/property.controller';
 import {
   addPropertyValidation,
   propertyDetailValidation,
   verifyPropertyValidation,
-} from "../../validation/property.validation";
+} from '../../validation/property.validation';
 import {
   userAuth,
   fieldAgentAccess,
-} from "../../middleware/user-auth.middleware";
-import uploadRoutes from "../apis/upload.routes";
+} from '../../middleware/user-auth.middleware';
+import uploadRoutes from '../apis/upload.routes';
 
 const router = Router();
 
 // Get properties for field agent
-router.get("/count", userAuth, fieldAgentAccess, getPropertyCounts);
+router.get('/count', userAuth, fieldAgentAccess, getPropertyCounts);
 
 // Get pending property for field agent dashboard
 router.get(
-  "/pending",
+  '/pending',
   userAuth,
   fieldAgentAccess,
   getFieldAgentPendingProperty
 );
 
 // Get all properties
-router.get("/", userAuth, getAllPropertyList);
+router.get('/', userAuth, getAllPropertyList);
 
 // Add new property
 router.post(
-  "/",
+  '/',
   userAuth,
   addPropertyValidation,
   propertyDetailValidation,
@@ -47,21 +47,21 @@ router.post(
 );
 
 // Get property by id
-router.get("/:id", userAuth, getPropertyById);
+router.get('/:id', userAuth, getPropertyById);
 
 // Assign property to Field Agent
-router.post("/assign", userAuth, assignPropertyToFA);
+router.post('/assign', userAuth, assignPropertyToFA);
 
 // Assign property to Field Agent
-router.post("/verify", userAuth, verifyPropertyValidation, verifyProperty);
+router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
 
 // Edit property status with close listing property
-router.put("/close-listing", userAuth, closeListingProperty);
+router.put('/close-listing', userAuth, closeListingProperty);
 
 // Short-listed shared property
-router.put("/short-listed", shortlistedProperty);
+router.put('/short-listed', shortlistedProperty);
 
 // Upload property images
-router.use("/upload", uploadRoutes);
+router.use('/upload', uploadRoutes);
 
 export default router;
