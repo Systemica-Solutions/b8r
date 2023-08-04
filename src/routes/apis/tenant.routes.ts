@@ -9,6 +9,7 @@ import {
 import {
   addTenantValidation,
   tenantDetailValidation,
+  tenantStatusValidation
 } from '../../validation/tenant.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
@@ -30,7 +31,7 @@ router.post(
 router.get('/:id', userAuth, getTenantById);
 
 // Change status of tenant
-router.put('/change-status', userAuth, changeTenantStatus);
+router.put('/change-status', userAuth, tenantStatusValidation, changeTenantStatus);
 
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);

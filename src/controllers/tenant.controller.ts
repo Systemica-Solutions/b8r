@@ -150,7 +150,7 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
     Tenant.findByIdAndUpdate(
       { _id: id },
       {
-        $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' },
+        $set: { deactivateStatus: tempData.deactivateStatus, status: 'Deactivate' },
       },
       { new: true }
     )
