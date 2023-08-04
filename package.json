@@ -30,6 +30,7 @@
     "http-errors": "~1.6.3",
     "isomorphic-fetch": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
+    "mime": "^3.0.0",
     "moment": "^2.29.2",
     "moment-timezone": "^0.5.34",
     "mongoose": "^6.1.7",
