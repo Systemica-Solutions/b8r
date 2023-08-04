@@ -84,36 +84,12 @@ export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   }
 };
 
-const updateBoardTable = (id, data) => {
-  Board.findByIdAndUpdate(
+const updateBoardTable = async (id, data) => {
+  return await Board.findByIdAndUpdate(
     id,
     { $addToSet: { propertyId: data.propertyId } },
     { new: true }
-  ).exec(async (error, updatedRecord) => {
-    console.log('====================================');
-    console.log(error, updatedRecord);
-    console.log('====================================');
-    if (error) {
-      return failureResponse(
-        error,
-        500,
-        [],
-        error.message || 'Something went wrong'
-      );
-    } else {
-      if (updatedRecord) {
-      return await updatedRecord;
-      }
-      else {
-      return failureResponse(
-        {},
-        401,
-        [],
-        'Board not found'
-      );
-      }
-    }
-  });
+  );
 };
 
 const updateSharedPropertyTable = async (data) => {
@@ -126,17 +102,28 @@ const updateSharedPropertyTable = async (data) => {
 
 // Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
+  // const response = await updateBoardTable(req.params.id, req.body);
+  // console.log('response====================================');
+  // console.log(response);
+  // console.log('====================================');
+  // return;
   Promise.all([
     updateBoardTable(req.params.id, req.body),
     updateSharedPropertyTable(req.body),
   ])
     .then((response: any) => {
+      console.log('response====================================');
+      console.log(response);
+      console.log('====================================');
       if (response && response.length) {
         Property.findByIdAndUpdate(
           req.body.propertyId,
-          { $addToSet: { sharedProperty: response[1]._id } },
+          { $push: { sharedProperty: response[1]._id } },
           { new: true }
         ).exec((err, updatedValue) => {
+          console.log('updatedValue====================================');
+          console.log(updatedValue);
+          console.log('====================================');
           if (err) {
             return failureResponse(
               res,
@@ -148,7 +135,7 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
             return successResponse(
               res,
               200,
-              {},
+              { board: updatedValue },
               'Property added to board successfully.'
             );
           }

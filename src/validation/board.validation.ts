@@ -32,7 +32,7 @@ export const boardValidation = async (req, res, next) => {
 export const addProeprtyInboardValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     tenantId: Joi.string().required(),
-    propertyId: Joi.array().items(Joi.string()).optional()
+    propertyId: Joi.string().required(),
   });
   const value = schema.validate(req.body);
   if (value.error) {
