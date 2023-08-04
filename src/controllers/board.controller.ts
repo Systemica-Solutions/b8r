@@ -82,10 +82,11 @@ const updateSharedPropertyTable = async (data) => {
 
 // Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
-  Promise.all([
-    updateBoardTable(req.params.id, req.body),
-    updateSharedPropertyTable(req.body),
-  ])
+  // Promise.all([
+  //   updateBoardTable(req.params.id, req.body),
+  //   // updateSharedPropertyTable(req.body),
+  // ])
+  updateBoardTable(req.params.id, req.body)
     .then((response: any) => {
       if (response && response.length) {
         Property.findByIdAndUpdate(
@@ -136,7 +137,8 @@ export const finalizeBoard = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    const update = updateSharedDate(board);
+    const update = updateSharedPropertyTable(board);
+    // const update = updateSharedDate(board);
     return successResponse(res, 200, { board }, 'Board finalize successfully.');
   } catch (error) {
     return failureResponse(
@@ -148,6 +150,26 @@ export const finalizeBoard = async (req: Request, res: Response) => {
   }
 };
 
+// Share board by property agent
+export const shareBoard = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findById(      req.params.id   )
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const update = updateSharedDate(board);
+    return successResponse(res, 200, { board }, 'Board finalize successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
 const updateSharedDate = async (data) => {
   try {
     if (data && data.propertyId && data.propertyId.length) {

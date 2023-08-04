@@ -4,6 +4,7 @@ import {
   updateLastVisitDateBoard,
   addPropertyInBoard,
   finalizeBoard,
+  shareBoard
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -29,5 +30,8 @@ router.put(
 
 // Finalize board
 router.get('/finalize/:id', userAuth, finalizeBoard);
+
+// Finalize board
+router.put('/share/:id', userAuth, shareBoard);
 
 export default router;

@@ -154,7 +154,7 @@ export const getPropertyById = async (req: Request, res: Response) => {
 export const assignPropertyToFA = async (req: Request, res: Response) => {
   try {
     const dataObj = req.body;
-    dataObj.propertyAgentId = req.user.user._id;
+    // dataObj.propertyAgentId = req.user.user._id;
     const existing = await AssignedProperty.findOne({
       propertyId: dataObj.propertyId,
     });

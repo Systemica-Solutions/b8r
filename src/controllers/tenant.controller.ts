@@ -8,6 +8,7 @@ import TenantDetail from '../models/tenantDetail.model';
 import Board from '../models/board.model';
 import { Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
+import { getS3ImagesByPropertyId } from './uploadImage.controller';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -217,12 +218,16 @@ export const tenantLogin = async (req: Request, res: Response) => {
 // Get bords by tenant agent id
 export const getBoardByAgentId = async (req: Request, res: Response) => {
   try {
-   const boards = await Board.findOne({ _id: req.params.id, tenantId: req.user.user._id })
+   const board = await Board.findOne({ _id: req.params.id, tenantId: req.user.user._id })
       .populate('tenantId propertyId');
-   if (!boards) {
+   if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-   return successResponse(res, 200, { boards }, 'Board found successfully.');
+   const images = await getS3ImagesByPropertyId(board);
+   console.log('images====================================');
+   console.log(images);
+   console.log('====================================');
+  //  return successResponse(res, 200, { boards }, 'Board found successfully.');
   } catch (error) {
     return failureResponse(
       res,
