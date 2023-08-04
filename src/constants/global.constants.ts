@@ -12,16 +12,17 @@ export enum houseType {
 }
 
 export enum houseConfiguration {
-  '2BHK',
-  '3BHK',
-  '4BHK',
+  'Studio',
+  '1 BHK',
+  '2 BHK',
+  '3 BHK',
+  '4 BHK',
 }
 
 export enum carParking {
   '1 Car',
   '2 Cars',
   '3 Cars',
-  'Owned Garage',
   'No Car Parking',
 }
 
@@ -43,9 +44,9 @@ export enum houseHelpRoom {
 }
 
 export enum furnishingType {
-  'Unfurnished',
+  'Un-furnished',
   'Semi-furnished',
-  'Fully-furnished',
+  'Full-furnished'
 }
 
 export enum staticStatus {

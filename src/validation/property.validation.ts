@@ -74,8 +74,8 @@ export const propertyDetailValidation = async (req, res, next) => {
     houseHelpRoom: Joi.string()
       .valid(...Object.keys(houseHelpRoom))
       .optional(),
-    bathrooms: Joi.number().integer().min(0).max(10).optional(),
-    balconies: Joi.number().integer().min(0).max(10).optional(),
+    bathrooms: Joi.number().integer().min(1).max(10).optional(),
+    balconies: Joi.number().integer().min(1).max(10).optional(),
     furnishingType: Joi.string()
       .valid(...Object.keys(furnishingType))
       .optional(),

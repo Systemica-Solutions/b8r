@@ -218,11 +218,11 @@ export const tenantLogin = async (req: Request, res: Response) => {
 export const getBoardByAgentId = async (req: Request, res: Response) => {
   try {
    const boards = await Board.findOne({ _id: req.params.id, tenantId: req.user.user._id })
-      .populate('tenantId propertyId')
-    if (!boards) {
+      .populate('tenantId propertyId');
+   if (!boards) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    return successResponse(res, 200, { boards }, 'Board found successfully.');
+   return successResponse(res, 200, { boards }, 'Board found successfully.');
   } catch (error) {
     return failureResponse(
       res,
