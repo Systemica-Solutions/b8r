@@ -35,26 +35,6 @@ export const addBoard = async (req: Request, res: Response) => {
   }
 };
 
-// Get all bords by tenant agent id
-export const getBoardByAgentId = async (req: Request, res: Response) => {
-  try {
-    const boards = await Board.findOne({ tenantId: req.params.id })
-      .populate('tenantId propertyId')
-      .lean();
-    if (!boards) {
-      return failureResponse(res, 404, [], 'Board not found.');
-    }
-    return successResponse(res, 200, { boards }, 'Board found successfully.');
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
 // Update last visited date of board
 export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   try {
@@ -102,28 +82,17 @@ const updateSharedPropertyTable = async (data) => {
 
 // Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
-  // const response = await updateBoardTable(req.params.id, req.body);
-  // console.log('response====================================');
-  // console.log(response);
-  // console.log('====================================');
-  // return;
   Promise.all([
     updateBoardTable(req.params.id, req.body),
     updateSharedPropertyTable(req.body),
   ])
     .then((response: any) => {
-      console.log('response====================================');
-      console.log(response);
-      console.log('====================================');
       if (response && response.length) {
         Property.findByIdAndUpdate(
           req.body.propertyId,
           { $push: { sharedProperty: response[1]._id } },
           { new: true }
         ).exec((err, updatedValue) => {
-          console.log('updatedValue====================================');
-          console.log(updatedValue);
-          console.log('====================================');
           if (err) {
             return failureResponse(
               res,

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   addBoard,
-  getBoardByAgentId,
   updateLastVisitDateBoard,
   addPropertyInBoard,
   finalizeBoard,
@@ -19,9 +18,6 @@ router.post('/', userAuth, boardValidation, addBoard);
 
 // Update last visited date of board
 router.put('/:id', userAuth, updateLastVisitDateBoard);
-
-// Get board by tenant agent id
-router.get('/:id', getBoardByAgentId);
 
 // Add property to board
 router.put(

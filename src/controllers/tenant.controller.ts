@@ -5,6 +5,7 @@ import {
 } from '../helpers/api-response.helper';
 import Tenant from '../models/tenant.model';
 import TenantDetail from '../models/tenantDetail.model';
+import Board from '../models/board.model';
 import { Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
 
@@ -203,6 +204,25 @@ export const tenantLogin = async (req: Request, res: Response) => {
       { tenant, jwtToken },
       'Tenant login successfully.'
     );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get bords by tenant agent id
+export const getBoardByAgentId = async (req: Request, res: Response) => {
+  try {
+   const boards = await Board.findOne({ _id: req.params.id, tenantId: req.user.user._id })
+      .populate('tenantId propertyId')
+    if (!boards) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { boards }, 'Board found successfully.');
   } catch (error) {
     return failureResponse(
       res,

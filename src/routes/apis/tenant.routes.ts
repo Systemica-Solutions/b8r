@@ -4,7 +4,8 @@ import {
   addTenant,
   getTenantById,
   changeTenantStatus,
-  tenantLogin
+  tenantLogin,
+  getBoardByAgentId
 } from '../../controllers/tenant.controller';
 import {
   addTenantValidation,
@@ -29,6 +30,9 @@ router.post(
 
 // Get tenant by id
 router.get('/:id', userAuth, getTenantById);
+
+// Get board by tenant agent id
+router.get('/board/:id', userAuth, getBoardByAgentId);
 
 // Change status of tenant
 router.put('/change-status', userAuth, tenantStatusValidation, changeTenantStatus);
