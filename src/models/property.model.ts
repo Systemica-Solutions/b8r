@@ -47,9 +47,9 @@ const PropertySchema: Schema = new Schema(
     },
     sharedProperty :  [
       {
-        type: sharedPropertyInfo,
-        default: null,
-      }
+        type: Schema.Types.ObjectId,
+        ref: 'SharedProperty',
+      },
     ]
   },
   { timestamps: true }

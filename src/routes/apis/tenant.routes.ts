@@ -4,11 +4,13 @@ import {
   addTenant,
   getTenantById,
   changeTenantStatus,
-  tenantLogin
+  tenantLogin,
+  getBoardByAgentId
 } from '../../controllers/tenant.controller';
 import {
   addTenantValidation,
   tenantDetailValidation,
+  tenantStatusValidation
 } from '../../validation/tenant.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
@@ -29,8 +31,11 @@ router.post(
 // Get tenant by id
 router.get('/:id', userAuth, getTenantById);
 
+// Get board by tenant agent id
+router.get('/board/:id', userAuth, getBoardByAgentId);
+
 // Change status of tenant
-router.put('/change-status', userAuth, changeTenantStatus);
+router.put('/change-status', userAuth, tenantStatusValidation, changeTenantStatus);
 
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);

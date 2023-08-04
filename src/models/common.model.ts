@@ -325,6 +325,14 @@ export const sharedPropertyInfo: Schema = new Schema({
   isShortlisted: {
     type: Schema.Types.Boolean,
     default: false
+  },
+  shortListedDate: {
+    type: Schema.Types.Date,
+    default: null
+  },
+  sharedDate : {
+    type: Schema.Types.Date,
+    default: null
   }
 }, { timestamps: true });
 

@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import {
   addBoard,
-  getBoardByAgentId,
   updateLastVisitDateBoard,
   addPropertyInBoard,
   finalizeBoard,
+  shareBoard
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -20,9 +20,6 @@ router.post('/', userAuth, boardValidation, addBoard);
 // Update last visited date of board
 router.put('/:id', userAuth, updateLastVisitDateBoard);
 
-// Get board by tenant agent id
-router.get('/:id', getBoardByAgentId);
-
 // Add property to board
 router.put(
   '/property/:id',
@@ -33,5 +30,8 @@ router.put(
 
 // Finalize board
 router.get('/finalize/:id', userAuth, finalizeBoard);
+
+// Finalize board
+router.put('/share/:id', userAuth, shareBoard);
 
 export default router;

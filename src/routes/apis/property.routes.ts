@@ -14,6 +14,7 @@ import {
   addPropertyValidation,
   propertyDetailValidation,
   verifyPropertyValidation,
+  closeListingValidation,
 } from '../../validation/property.validation';
 import {
   userAuth,
@@ -56,7 +57,7 @@ router.post('/assign', userAuth, assignPropertyToFA);
 router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
 
 // Edit property status with close listing property
-router.put('/close-listing', userAuth, closeListingProperty);
+router.put('/close-listing', userAuth, closeListingValidation, closeListingProperty);
 
 // Short-listed shared property
 router.put('/short-listed', shortlistedProperty);

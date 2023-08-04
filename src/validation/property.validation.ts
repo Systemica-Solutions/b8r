@@ -74,8 +74,8 @@ export const propertyDetailValidation = async (req, res, next) => {
     houseHelpRoom: Joi.string()
       .valid(...Object.keys(houseHelpRoom))
       .optional(),
-    bathrooms: Joi.number().integer().min(0).max(10).optional(),
-    balconies: Joi.number().integer().min(0).max(10).optional(),
+    bathrooms: Joi.number().integer().min(1).max(10).optional(),
+    balconies: Joi.number().integer().min(1).max(10).optional(),
     furnishingType: Joi.string()
       .valid(...Object.keys(furnishingType))
       .optional(),
@@ -153,7 +153,7 @@ export const propertyDetailValidation = async (req, res, next) => {
     propertyInfo: propertyBasicInfo.required(),
     ownerInfo: ownerBasicInfo.required(),
     featureInfo: featureBasicInfo.required(),
-    verifyInfo: verifyBasicInfo.optional()
+    verifyInfo: verifyBasicInfo.optional(),
   });
   const value = schema.validate(req.body.propertyData);
   if (value.error) {
@@ -215,6 +215,7 @@ export const addPropertyValidation = async (req, res, next) => {
   }
 };
 
+// Verify property validations
 export const verifyPropertyValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     houseName: Joi.string().optional(),
@@ -229,6 +230,39 @@ export const verifyPropertyValidation = async (req, res, next) => {
     propertyDetails: Joi.array().items(Joi.string()).optional(),
     images: Joi.array().items(Joi.string()).required(),
     tourLink3D: Joi.string().required(),
+  });
+  const value = schema.validate(req.body);
+  if (value.error) {
+    return failureResponse(
+      res,
+      400,
+      value.error,
+      value.error.details[0].message
+        ? value.error.details[0].message
+        : 'Bad request'
+    );
+  } else {
+    next();
+  }
+};
+
+// Close-listing status validation
+export const closeListingValidation = async (req, res, next) => {
+  const schema = Joi.object().keys({
+    propertyId: Joi.string().required(),
+    closeListingStatus: Joi.string()
+      .valid(...Object.keys(propertyStatus))
+      .required(),
+    closeListingDetails: Joi.object().keys({
+      name: Joi.string().optional(),
+      phoneNumber: Joi.string()
+        .pattern(/^[0-9]{10}$/)
+        .required(),
+      rentAmount: Joi.number().optional(),
+      agreementFor: Joi.string().optional(),
+      tenancyStartDate: Joi.date().iso().optional(),
+      feedback: Joi.string().optional(),
+    }),
   });
   const value = schema.validate(req.body);
   if (value.error) {

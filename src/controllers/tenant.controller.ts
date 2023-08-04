@@ -5,8 +5,10 @@ import {
 } from '../helpers/api-response.helper';
 import Tenant from '../models/tenant.model';
 import TenantDetail from '../models/tenantDetail.model';
+import Board from '../models/board.model';
 import { Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
+import { getS3ImagesByPropertyId } from './uploadImage.controller';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -150,7 +152,7 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
     Tenant.findByIdAndUpdate(
       { _id: id },
       {
-        $set: { deactivateStatus: tempData.deactivateStatus, status: 'Closed' },
+        $set: { deactivateStatus: tempData.deactivateStatus, status: 'Deactivate' },
       },
       { new: true }
     )
@@ -203,6 +205,29 @@ export const tenantLogin = async (req: Request, res: Response) => {
       { tenant, jwtToken },
       'Tenant login successfully.'
     );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get bords by tenant agent id
+export const getBoardByAgentId = async (req: Request, res: Response) => {
+  try {
+   const board = await Board.findOne({ _id: req.params.id, tenantId: req.user.user._id })
+      .populate('tenantId propertyId');
+   if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+   const images = await getS3ImagesByPropertyId(board);
+   console.log('images====================================');
+   console.log(images);
+   console.log('====================================');
+  //  return successResponse(res, 200, { boards }, 'Board found successfully.');
   } catch (error) {
     return failureResponse(
       res,

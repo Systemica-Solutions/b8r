@@ -88,3 +88,26 @@ export const addTenantValidation = async (req, res, next) => {
     next();
   }
 };
+
+// Tenant deactivate status
+export const tenantStatusValidation = async (req, res, next) => {
+  const schema = Joi.object().keys({
+    deactivateStatus: Joi.string()
+      .valid(...Object.values(tenantDeactivationReason))
+      .required(),
+    tenantId: Joi.string().required(),
+  });
+  const value = schema.validate(req.body);
+  if (value.error) {
+    return failureResponse(
+      res,
+      400,
+      value.error,
+      value.error.details[0].message
+        ? value.error.details[0].message
+        : 'Bad request'
+    );
+  } else {
+    next();
+  }
+};

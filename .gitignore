@@ -9,6 +9,8 @@
 #environment 
 .env
 
-#build-zip
+# build-zip
 /dist
 
+# files
+/temp
