@@ -64,62 +64,22 @@ export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   }
 };
 
-const updateBoardTable = async (id, data) => {
-  return await Board.findByIdAndUpdate(
-    id,
-    { $addToSet: { propertyId: data.propertyId } },
-    { new: true }
-  );
-};
-
-const updateSharedPropertyTable = async (data) => {
-  const obj = {
-    tenantId: data.tenantId,
-  };
-  const detailObj: any = new SharedProperty(obj);
-  return await detailObj.save();
-};
-
 // Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
-  // Promise.all([
-  //   updateBoardTable(req.params.id, req.body),
-  //   // updateSharedPropertyTable(req.body),
-  // ])
-  updateBoardTable(req.params.id, req.body)
-    .then((response: any) => {
-      if (response && response.length) {
-        Property.findByIdAndUpdate(
-          req.body.propertyId,
-          { $push: { sharedProperty: response[1]._id } },
-          { new: true }
-        ).exec((err, updatedValue) => {
-          if (err) {
-            return failureResponse(
-              res,
-              500,
-              [],
-              err.message || 'Something went wrong'
-            );
-          } else {
-            return successResponse(
-              res,
-              200,
-              { board: updatedValue },
-              'Property added to board successfully.'
-            );
-          }
-        });
-      }
-    })
-    .catch((error) => {
-      return failureResponse(
-        res,
-        500,
-        error,
-        error.message || 'Something went wrong'
-      );
-    });
+  const board = await Board.findByIdAndUpdate(
+    req.params.id,
+    { $addToSet: { propertyId: req.body.propertyId } },
+    { new: true }
+  );
+  if (!board) {
+    return failureResponse(res, 404, [], 'Board not found.');
+  }
+  return successResponse(
+    res,
+    200,
+    { board },
+    'Property added to board successfully.'
+  );
 };
 
 // Finalize board by property agent
@@ -150,10 +110,33 @@ export const finalizeBoard = async (req: Request, res: Response) => {
   }
 };
 
+const updateSharedPropertyTable = async (data) => {
+  console.log('data while update', data);
+  await Promise.all(
+    data.propertyId.map(async (singleProperty) => {
+      const obj = {
+        tenantId: data.tenantId,
+      };
+      const detailObj: any = new SharedProperty(obj);
+      const savedObj = await detailObj.save();
+      Property.findByIdAndUpdate(
+        singleProperty._id,
+        { $push: { sharedProperty: savedObj._id } },
+        { new: true }
+      ).exec((err, updatedValue) => {
+        if (err) {
+          return failureResponse(err, 404, [], 'Board not found.');
+        }
+        return updatedValue;
+      });
+    })
+  );
+};
+
 // Share board by property agent
 export const shareBoard = async (req: Request, res: Response) => {
   try {
-    const board = await Board.findById(      req.params.id   )
+    const board = await Board.findById(req.params.id)
       .populate('tenantId propertyId')
       .lean();
     if (!board) {
