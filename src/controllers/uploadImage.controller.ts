@@ -193,14 +193,13 @@ function imageRankingSort(a, b) {
   return 0;
 }
 
-// Rename s3 images and move those in final folder
-export const renameS3Images = async (data) => {
+// Get s3 images and move those in final folder
+export const getS3Images = async (data) => {
   const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
 
   const fileData = await Promise.all(
     data.propertyId.map(async (property) => {
       console.log('property', property);
-      property = property.toObject();
       const uploadParams = await AssignedProperty.findOne({
         propertyId: property._id,
       });
@@ -211,15 +210,39 @@ export const renameS3Images = async (data) => {
         uploadParams.propertyId,
         'raw'
       );
-      // copy images to final folder with rename
+      console.log('images', images);
       images.map(async (img) => {
+        property.images.push({
+          link: prefix.concat(img.Key),
+          name: img.Key.split('/').pop(),
+        });
+      });
+      return { propertyId: uploadParams.propertyId, images: property.images };
+    })
+  );
+  console.log(
+    'final sortImages ===================>',
+    JSON.stringify(fileData)
+  );
+  return fileData;
+};
+
+// Get s3 images and move those in final folder
+export const copyAndRenameS3Images = async (data) => {
+  const fileData = await Promise.all(
+    data.map(async (property) => {
+      console.log('property', property);
+      const uploadParams = await AssignedProperty.findOne({
+        propertyId: property.propertyId,
+      });
+
+      // copy images to final folder with rename
+      property.images.map(async (img) => {
         const params = {
           ACL: 'public-read',
           Bucket: bucketName,
-          CopySource: `${bucketName}/${img.Key}`,
-          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${
-            uploadParams.propertyId
-          }-testing.png`
+          CopySource: img.link,
+          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}-${img.revisedName}`,
         };
 
         s3.copyObject(params, (err, updated) => {
@@ -232,6 +255,5 @@ export const renameS3Images = async (data) => {
       });
     })
   );
-  console.log('final sortImages====================================', fileData);
-  // return fileData;
+  return fileData;
 };

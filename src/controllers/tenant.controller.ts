@@ -8,7 +8,7 @@ import TenantDetail from '../models/tenantDetail.model';
 import Board from '../models/board.model';
 import { Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
-import { getS3ImagesByPropertyId, renameS3Images } from './uploadImage.controller';
+import { getS3ImagesByPropertyId } from './uploadImage.controller';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {

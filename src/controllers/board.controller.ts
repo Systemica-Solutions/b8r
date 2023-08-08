@@ -8,6 +8,7 @@ import Property from '../models/property.model';
 import SharedProperty from '../models/common.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
+import { copyAndRenameS3Images, getS3Images } from './uploadImage.controller';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
@@ -229,7 +230,12 @@ export const shortlistDate = async (req: Request, res: Response) => {
     }
     const update = updateShortlistDate(board, propertyId, tenantId);
     console.log('updated shortlisted', update);
-    return successResponse(res, 200, { board }, 'Property shortlisted successfully.');
+    return successResponse(
+      res,
+      200,
+      { board },
+      'Property shortlisted successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
@@ -239,7 +245,7 @@ export const shortlistDate = async (req: Request, res: Response) => {
     );
   }
 };
-const  updateShortlistDate = async (data, propertyId, tenantId) => {
+const updateShortlistDate = async (data, propertyId, tenantId) => {
   try {
     // console.log('data', data, propertyId, tenantId);
     return await Promise.all(
@@ -262,6 +268,61 @@ const  updateShortlistDate = async (data, propertyId, tenantId) => {
   } catch (error) {
     return failureResponse(
       {},
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get board images from s3 for renaming file-name
+export const getBoardImagesFromS3 = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const file = await getS3Images(board);
+    return successResponse(
+      res,
+      200,
+      { file },
+      'S3 images data get successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get board images from s3 for renaming file-name
+export const renameAndCopyBoardImagesOfS3 = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const file = await copyAndRenameS3Images(req.body.data);
+    return successResponse(
+      res,
+      200,
+      {},
+      'Images has been renamed and copied successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
       error.status || 500,
       error,
       error.message || 'Something went wrong'

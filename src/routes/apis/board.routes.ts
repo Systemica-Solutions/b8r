@@ -5,7 +5,9 @@ import {
   finalizeBoard,
   shareBoard,
   updatePropertyViewAtDate,
-  shortlistDate
+  shortlistDate,
+  getBoardImagesFromS3,
+  renameAndCopyBoardImagesOfS3
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -37,5 +39,11 @@ router.get('/finalize/:id', userAuth, finalizeBoard);
 
 // Share board
 router.put('/share/:id', userAuth, shareBoard);
+
+// Get s3 images of property
+router.get('/s3-img/:id', getBoardImagesFromS3);
+
+// Rename and copy s3 files to files folder
+router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
 
 export default router;
