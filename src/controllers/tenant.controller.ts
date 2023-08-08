@@ -247,7 +247,7 @@ export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
     const boards = await Board.findOneAndUpdate(
       { _id: req.params.id, tenantId: req.user.user._id },
       {
-        $set: { lastVisitedDate: Date.now() },
+        $set: { lastVisitedAt: Date.now() },
       },
       { new: true }
     )
