@@ -149,53 +149,111 @@ async function getNumberOfImagesInBucket(bucket, faId, propId, status) {
   }
 }
 
-
-//pending all property images get // 6 images get by priority
+// pending all property images get // 6 images get by priority
 export const getS3ImagesByPropertyId = async (data) => {
-  const fileData = await Promise.all(data.propertyId.map(async (property) => {
-    const uploadParams =   await AssignedProperty.findOne({
-      propertyId: property._id,
-    });
-    return data.images = await getNumberOfImagesInBucket(
-      bucketName,
-      uploadParams.fieldAgentId,
-      uploadParams.propertyId,
-      'final'
-    );
-  }));
-  // const fileData = await Promise.all(promises);
-  console.log('fileData====================================');
-  console.log(fileData);
-  console.log('====================================');
-  // .then((result) => {
-  //   console.log('====================================');
-  //   console.log(result);
-  //   console.log('====================================');
-  //   // Clean up temporary files
-  //   // req.files.forEach((file) => fs.unlinkSync(file.path));
-  //   return result;
-  //   // return successResponse(res, 200, data, 'File uploaded successfully.');
-  // })
-  // .catch((error) => {
-  //   return failureResponse(
-  //     error,
-  //     error.status || 500,
-  //     error,
-  //     error.message || 'Something went wrong'
-  //   );
-  // });
+  const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
 
-  // console.log('fileData====================================');
-  // console.log(fileData);
-  // console.log('====================================');
+  const fileData = await Promise.all(
+    data.propertyId.map(async (property) => {
+      property = property.toObject();
+      const uploadParams = await AssignedProperty.findOne({
+        propertyId: property._id,
+      });
+      let images: any = [];
+      images = await getNumberOfImagesInBucket(
+        bucketName,
+        uploadParams.fieldAgentId,
+        uploadParams.propertyId,
+        'final'
+      );
+      const dummyImages = images.sort(imageRankingSort);
+      console.log('images ', images, dummyImages.slice(0, 6));
 
-  // const prop = await AssignedProperty.findOne({
-  //   propertyId: data.propertyId[0]._id,
-  // });
-  // return getNumberOfImagesInBucket(
-  //   bucketName,
-  //   prop.fieldAgentId,
-  //   prop.propertyId,
-  //   'final'
-  // );
+      images.slice(0, 6).map(async (img) => {
+        property.images.push(prefix.concat(img.Key));
+      });
+
+      return property;
+    })
+  );
+  console.log('final sortImages====================================', fileData);
+  return fileData;
+};
+
+function imageRankingSort(a, b) {
+  const regex = /(\d+)\.PNG$/; // Regular expression to match the digits before ".PNG"
+  const aMatch = a.Key.match(regex);
+  const bMatch = b.Key.match(regex);
+  if (aMatch && bMatch) {
+    const aNumber = parseInt(aMatch[1], 10);
+    const bNumber = parseInt(bMatch[1], 10);
+    return aNumber - bNumber;
+  }
+  // If matching digits aren't found, maintain the original order
+  return 0;
+}
+
+// Get s3 images and move those in final folder
+export const getS3Images = async (data) => {
+  const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
+
+  const fileData = await Promise.all(
+    data.propertyId.map(async (property) => {
+      console.log('property', property);
+      const uploadParams = await AssignedProperty.findOne({
+        propertyId: property._id,
+      });
+      let images: any = [];
+      images = await getNumberOfImagesInBucket(
+        bucketName,
+        uploadParams.fieldAgentId,
+        uploadParams.propertyId,
+        'raw'
+      );
+      console.log('images', images);
+      images.map(async (img) => {
+        property.images.push({
+          link: prefix.concat(img.Key),
+          name: img.Key.split('/').pop(),
+        });
+      });
+      return { propertyId: uploadParams.propertyId, images: property.images };
+    })
+  );
+  console.log(
+    'final sortImages ===================>',
+    JSON.stringify(fileData)
+  );
+  return fileData;
+};
+
+// Get s3 images and move those in final folder
+export const copyAndRenameS3Images = async (data) => {
+  const fileData = await Promise.all(
+    data.map(async (property) => {
+      console.log('property', property);
+      const uploadParams = await AssignedProperty.findOne({
+        propertyId: property.propertyId,
+      });
+
+      // copy images to final folder with rename
+      property.images.map(async (img) => {
+        const params = {
+          ACL: 'public-read',
+          Bucket: bucketName,
+          CopySource: img.link,
+          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}-${img.revisedName}`,
+        };
+
+        s3.copyObject(params, (err, updated) => {
+          if (err) {
+            console.error('Error copying object:', err);
+          } else {
+            console.log('data after copy', updated);
+          }
+        });
+      });
+    })
+  );
+  return fileData;
 };

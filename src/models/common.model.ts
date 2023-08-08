@@ -326,11 +326,11 @@ export const sharedPropertyInfo: Schema = new Schema({
     type: Schema.Types.Boolean,
     default: false
   },
-  shortListedDate: {
+  shortListedAt: {
     type: Schema.Types.Date,
     default: null
   },
-  sharedDate : {
+  sharedAt : {
     type: Schema.Types.Date,
     default: null
   }

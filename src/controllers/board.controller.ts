@@ -8,6 +8,7 @@ import Property from '../models/property.model';
 import SharedProperty from '../models/common.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
+import { copyAndRenameS3Images, getS3Images } from './uploadImage.controller';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
@@ -35,25 +36,44 @@ export const addBoard = async (req: Request, res: Response) => {
   }
 };
 
-// Update last visited date of board
-export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
+// Add property in board by property agent
+export const addPropertyInBoard = async (req: Request, res: Response) => {
+  const board = await Board.findByIdAndUpdate(
+    req.params.id,
+    { $addToSet: { propertyId: req.body.propertyId } },
+    { new: true }
+  );
+  if (!board) {
+    return failureResponse(res, 404, [], 'Board not found.');
+  }
+  return successResponse(
+    res,
+    200,
+    { board },
+    'Property added to board successfully.'
+  );
+};
+
+// Update viewedAt Date while view property
+export const updatePropertyViewAtDate = async (req: Request, res: Response) => {
   try {
-    console.log('====================================');
-    console.log(req.user, req.params.id);
-    console.log('====================================');
-    const boards = await Board.findOneAndUpdate(
-      { _id: req.params.id, tenantId: req.user.user._id },
-      {
-        $set: { lastVisitedDate: Date.now() },
-      },
-      { new: true }
-    )
+    console.log('req.pparams', req.params, req.user, req.body);
+    const propertyId = req.body.propertyId;
+    const tenantId = req.user.user._id;
+    const board = await Board.findById(req.params.id)
       .populate('tenantId propertyId')
       .lean();
-    if (!boards) {
+    if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    return successResponse(res, 200, { boards }, 'Board updated successfully.');
+    const update = updateViewedAtDate(board, propertyId, tenantId);
+    console.log('updated record', update);
+    return successResponse(
+      res,
+      200,
+      { board },
+      'Property viewed date added successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
@@ -64,62 +84,35 @@ export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
   }
 };
 
-const updateBoardTable = async (id, data) => {
-  return await Board.findByIdAndUpdate(
-    id,
-    { $addToSet: { propertyId: data.propertyId } },
-    { new: true }
-  );
-};
-
-const updateSharedPropertyTable = async (data) => {
-  const obj = {
-    tenantId: data.tenantId,
-  };
-  const detailObj: any = new SharedProperty(obj);
-  return await detailObj.save();
-};
-
-// Add property in board by property agent
-export const addPropertyInBoard = async (req: Request, res: Response) => {
-  // Promise.all([
-  //   updateBoardTable(req.params.id, req.body),
-  //   // updateSharedPropertyTable(req.body),
-  // ])
-  updateBoardTable(req.params.id, req.body)
-    .then((response: any) => {
-      if (response && response.length) {
-        Property.findByIdAndUpdate(
-          req.body.propertyId,
-          { $push: { sharedProperty: response[1]._id } },
-          { new: true }
-        ).exec((err, updatedValue) => {
-          if (err) {
-            return failureResponse(
-              res,
-              500,
-              [],
-              err.message || 'Something went wrong'
-            );
-          } else {
-            return successResponse(
-              res,
-              200,
-              { board: updatedValue },
-              'Property added to board successfully.'
+const updateViewedAtDate = async (data, propertyId, tenantId) => {
+  try {
+    if (data && data.propertyId && data.propertyId.length) {
+      return await Promise.all(
+        data.propertyId.map(async (singleProperty) => {
+          if (
+            singleProperty._id === propertyId &&
+            singleProperty.sharedProperty &&
+            singleProperty.sharedProperty.length
+          ) {
+            return await SharedProperty.updateMany(
+              {
+                tenantId,
+                _id: { $in: singleProperty.sharedProperty },
+              },
+              { $set: { viewedAt: Date.now() } }
             );
           }
-        });
-      }
-    })
-    .catch((error) => {
-      return failureResponse(
-        res,
-        500,
-        error,
-        error.message || 'Something went wrong'
+        })
       );
-    });
+    }
+  } catch (error) {
+    return failureResponse(
+      {},
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
 };
 
 // Finalize board by property agent
@@ -150,10 +143,33 @@ export const finalizeBoard = async (req: Request, res: Response) => {
   }
 };
 
+const updateSharedPropertyTable = async (data) => {
+  console.log('data while update', data);
+  await Promise.all(
+    data.propertyId.map(async (singleProperty) => {
+      const obj = {
+        tenantId: data.tenantId,
+      };
+      const detailObj: any = new SharedProperty(obj);
+      const savedObj = await detailObj.save();
+      Property.findByIdAndUpdate(
+        singleProperty._id,
+        { $push: { sharedProperty: savedObj._id } },
+        { new: true }
+      ).exec((err, updatedValue) => {
+        if (err) {
+          return failureResponse(err, 404, [], 'Board not found.');
+        }
+        return updatedValue;
+      });
+    })
+  );
+};
+
 // Share board by property agent
 export const shareBoard = async (req: Request, res: Response) => {
   try {
-    const board = await Board.findById(      req.params.id   )
+    const board = await Board.findById(req.params.id)
       .populate('tenantId propertyId')
       .lean();
     if (!board) {
@@ -170,6 +186,7 @@ export const shareBoard = async (req: Request, res: Response) => {
     );
   }
 };
+
 const updateSharedDate = async (data) => {
   try {
     if (data && data.propertyId && data.propertyId.length) {
@@ -184,7 +201,7 @@ const updateSharedDate = async (data) => {
                 tenantId: data.tenantId._id,
                 _id: { $in: singleProperty.sharedProperty },
               },
-              { $set: { sharedDate: data.updatedAt } }
+              { $set: { sharedAt: data.updatedAt } }
             );
           }
         })
@@ -193,6 +210,119 @@ const updateSharedDate = async (data) => {
   } catch (error) {
     return failureResponse(
       {},
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Add date while shortlist property
+export const shortlistDate = async (req: Request, res: Response) => {
+  try {
+    const propertyId = req.body.propertyId;
+    const tenantId = req.user.user._id;
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const update = updateShortlistDate(board, propertyId, tenantId);
+    console.log('updated shortlisted', update);
+    return successResponse(
+      res,
+      200,
+      { board },
+      'Property shortlisted successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+const updateShortlistDate = async (data, propertyId, tenantId) => {
+  try {
+    // console.log('data', data, propertyId, tenantId);
+    return await Promise.all(
+      data.propertyId.map(async (singleProperty) => {
+        if (
+          singleProperty._id == propertyId &&
+          singleProperty.sharedProperty &&
+          singleProperty.sharedProperty.length
+        ) {
+          return await SharedProperty.updateMany(
+            {
+              tenantId,
+              _id: { $in: singleProperty.sharedProperty },
+            },
+            { $set: { shortListedAt: Date.now(), isShortlisted: true } }
+          );
+        }
+      })
+    );
+  } catch (error) {
+    return failureResponse(
+      {},
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get board images from s3 for renaming file-name
+export const getBoardImagesFromS3 = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const file = await getS3Images(board);
+    return successResponse(
+      res,
+      200,
+      { file },
+      'S3 images data get successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get board images from s3 for renaming file-name
+export const renameAndCopyBoardImagesOfS3 = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const file = await copyAndRenameS3Images(req.body.data);
+    return successResponse(
+      res,
+      200,
+      {},
+      'Images has been renamed and copied successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
       error.status || 500,
       error,
       error.message || 'Something went wrong'

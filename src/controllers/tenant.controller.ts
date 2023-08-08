@@ -152,7 +152,10 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
     Tenant.findByIdAndUpdate(
       { _id: id },
       {
-        $set: { deactivateStatus: tempData.deactivateStatus, status: 'Deactivate' },
+        $set: {
+          deactivateStatus: tempData.deactivateStatus,
+          status: 'Deactivate',
+        },
       },
       { new: true }
     )
@@ -218,16 +221,42 @@ export const tenantLogin = async (req: Request, res: Response) => {
 // Get bords by tenant agent id
 export const getBoardByAgentId = async (req: Request, res: Response) => {
   try {
-   const board = await Board.findOne({ _id: req.params.id, tenantId: req.user.user._id })
-      .populate('tenantId propertyId');
-   if (!board) {
+    const board = await Board.findOne({
+      _id: req.params.id,
+      tenantId: req.user.user._id,
+    }).populate('tenantId propertyId');
+    if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-   const images = await getS3ImagesByPropertyId(board);
-   console.log('images====================================');
-   console.log(images);
-   console.log('====================================');
-  //  return successResponse(res, 200, { boards }, 'Board found successfully.');
+    const data = await getS3ImagesByPropertyId(board);
+    return successResponse(res, 200, { board: data }, 'Board found successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+
+// Update last visited date of board
+export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
+  try {
+    const boards = await Board.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.user.user._id },
+      {
+        $set: { lastVisitedAt: Date.now() },
+      },
+      { new: true }
+    )
+      .populate('tenantId propertyId')
+      .lean();
+    if (!boards) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { boards }, 'Board updated successfully.');
   } catch (error) {
     return failureResponse(
       res,

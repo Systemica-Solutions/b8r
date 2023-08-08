@@ -25,7 +25,7 @@ const BoardSchema: Schema = new Schema(
       type: Schema.Types.Boolean, // Active/Inactive
       default: false,
     },
-    lastVisitedDate: {
+    lastVisitedAt: {
       type: Schema.Types.Date,
       default: null,
     }
