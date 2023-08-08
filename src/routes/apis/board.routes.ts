@@ -3,7 +3,8 @@ import {
   addBoard,
   addPropertyInBoard,
   finalizeBoard,
-  shareBoard
+  shareBoard,
+  updatePropertyViewAtDate
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -23,6 +24,9 @@ router.put(
   addProeprtyInboardValidation,
   addPropertyInBoard
 );
+
+// View property date
+router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
 
 // Finalize board
 router.get('/finalize/:id', userAuth, finalizeBoard);

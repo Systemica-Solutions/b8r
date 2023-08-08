@@ -53,6 +53,67 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
   );
 };
 
+// Update viewedAt Date while view property
+export const updatePropertyViewAtDate = async (req: Request, res: Response) => {
+  try {
+    console.log('req.pparams', req.params, req.user, req.body);
+    const propertyId = req.body.propertyId;
+    const tenantId = req.user.user._id;
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const update = updateViewedAtDate(board, propertyId, tenantId);
+    console.log('updated record', update);
+    return successResponse(
+      res,
+      200,
+      { board },
+      'Property viewed date added successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+const updateViewedAtDate = async (data, propertyId, tenantId) => {
+  try {
+    if (data && data.propertyId && data.propertyId.length) {
+      return await Promise.all(
+        data.propertyId.map(async (singleProperty) => {
+          if (
+            singleProperty._id == propertyId &&
+            singleProperty.sharedProperty &&
+            singleProperty.sharedProperty.length
+          ) {
+            return await SharedProperty.updateMany(
+              {
+                tenantId,
+                _id: { $in: singleProperty.sharedProperty },
+              },
+              { $set: { viewedAt: Date.now() } }
+            );
+          }
+        })
+      );
+    }
+  } catch (error) {
+    return failureResponse(
+      {},
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Finalize board by property agent
 export const finalizeBoard = async (req: Request, res: Response) => {
   try {
@@ -124,6 +185,7 @@ export const shareBoard = async (req: Request, res: Response) => {
     );
   }
 };
+
 const updateSharedDate = async (data) => {
   try {
     if (data && data.propertyId && data.propertyId.length) {
