@@ -4,7 +4,8 @@ import {
   addPropertyInBoard,
   finalizeBoard,
   shareBoard,
-  updatePropertyViewAtDate
+  updatePropertyViewAtDate,
+  shortlistDate
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -27,6 +28,9 @@ router.put(
 
 // View property date
 router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
+
+// Add date while shortlist property
+router.put('/shortlist/:id', userAuth, shortlistDate);
 
 // Finalize board
 router.get('/finalize/:id', userAuth, finalizeBoard);

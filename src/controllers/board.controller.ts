@@ -89,7 +89,7 @@ const updateViewedAtDate = async (data, propertyId, tenantId) => {
       return await Promise.all(
         data.propertyId.map(async (singleProperty) => {
           if (
-            singleProperty._id == propertyId &&
+            singleProperty._id === propertyId &&
             singleProperty.sharedProperty &&
             singleProperty.sharedProperty.length
           ) {
@@ -206,6 +206,59 @@ const updateSharedDate = async (data) => {
         })
       );
     }
+  } catch (error) {
+    return failureResponse(
+      {},
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Add date while shortlist property
+export const shortlistDate = async (req: Request, res: Response) => {
+  try {
+    const propertyId = req.body.propertyId;
+    const tenantId = req.user.user._id;
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const update = updateShortlistDate(board, propertyId, tenantId);
+    console.log('updated shortlisted', update);
+    return successResponse(res, 200, { board }, 'Property shortlisted successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+const  updateShortlistDate = async (data, propertyId, tenantId) => {
+  try {
+    // console.log('data', data, propertyId, tenantId);
+    return await Promise.all(
+      data.propertyId.map(async (singleProperty) => {
+        if (
+          singleProperty._id == propertyId &&
+          singleProperty.sharedProperty &&
+          singleProperty.sharedProperty.length
+        ) {
+          return await SharedProperty.updateMany(
+            {
+              tenantId,
+              _id: { $in: singleProperty.sharedProperty },
+            },
+            { $set: { shortListedAt: Date.now(), isShortlisted: true } }
+          );
+        }
+      })
+    );
   } catch (error) {
     return failureResponse(
       {},
