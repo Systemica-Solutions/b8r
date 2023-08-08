@@ -185,8 +185,8 @@ function imageRankingSort(a, b) {
   const aMatch = a.Key.match(regex);
   const bMatch = b.Key.match(regex);
   if (aMatch && bMatch) {
-    const aNumber = parseInt(aMatch[1]);
-    const bNumber = parseInt(bMatch[1]);
+    const aNumber = parseInt(aMatch[1], 10);
+    const bNumber = parseInt(bMatch[1], 10);
     return aNumber - bNumber;
   }
   // If matching digits aren't found, maintain the original order
@@ -222,15 +222,14 @@ export const renameS3Images = async (data) => {
           }-testing.png`
         };
 
-        s3.copyObject(params, (err, data) => {
+        s3.copyObject(params, (err, updated) => {
           if (err) {
             console.error('Error copying object:', err);
           } else {
-            console.log('data after copy', data);
-           
+            console.log('data after copy', updated);
           }
         });
-      });      
+      });
     })
   );
   console.log('final sortImages====================================', fileData);

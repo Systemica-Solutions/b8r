@@ -41,7 +41,7 @@ router.put('/change-status', userAuth, tenantStatusValidation, changeTenantStatu
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);
 
-// Update last visited date of board
-router.put('/:id', userAuth, updateLastVisitDateBoard);
+// Update last visited date of board by board-id
+router.put('/board/:id', userAuth, updateLastVisitDateBoard);
 
 export default router;

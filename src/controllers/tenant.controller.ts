@@ -243,7 +243,7 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
 
 // Update last visited date of board
 export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
-  try {   
+  try {
     const boards = await Board.findOneAndUpdate(
       { _id: req.params.id, tenantId: req.user.user._id },
       {
