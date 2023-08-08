@@ -138,7 +138,7 @@ const updateSharedDate = async (data) => {
                 tenantId: data.tenantId._id,
                 _id: { $in: singleProperty.sharedProperty },
               },
-              { $set: { sharedDate: data.updatedAt } }
+              { $set: { sharedAt: data.updatedAt } }
             );
           }
         })
