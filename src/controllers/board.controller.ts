@@ -35,35 +35,6 @@ export const addBoard = async (req: Request, res: Response) => {
   }
 };
 
-// Update last visited date of board
-export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
-  try {
-    console.log('====================================');
-    console.log(req.user, req.params.id);
-    console.log('====================================');
-    const boards = await Board.findOneAndUpdate(
-      { _id: req.params.id, tenantId: req.user.user._id },
-      {
-        $set: { lastVisitedDate: Date.now() },
-      },
-      { new: true }
-    )
-      .populate('tenantId propertyId')
-      .lean();
-    if (!boards) {
-      return failureResponse(res, 404, [], 'Board not found.');
-    }
-    return successResponse(res, 200, { boards }, 'Board updated successfully.');
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
 // Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
   const board = await Board.findByIdAndUpdate(

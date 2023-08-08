@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   addBoard,
-  updateLastVisitDateBoard,
   addPropertyInBoard,
   finalizeBoard,
   shareBoard
@@ -17,9 +16,6 @@ const router = Router();
 // Add new board
 router.post('/', userAuth, boardValidation, addBoard);
 
-// Update last visited date of board
-router.put('/:id', userAuth, updateLastVisitDateBoard);
-
 // Add property to board
 router.put(
   '/property/:id',
@@ -31,7 +27,7 @@ router.put(
 // Finalize board
 router.get('/finalize/:id', userAuth, finalizeBoard);
 
-// Finalize board
+// Share board
 router.put('/share/:id', userAuth, shareBoard);
 
 export default router;

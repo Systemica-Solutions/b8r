@@ -5,7 +5,8 @@ import {
   getTenantById,
   changeTenantStatus,
   tenantLogin,
-  getBoardByAgentId
+  getBoardByAgentId,
+  updateLastVisitDateBoard
 } from '../../controllers/tenant.controller';
 import {
   addTenantValidation,
@@ -39,5 +40,8 @@ router.put('/change-status', userAuth, tenantStatusValidation, changeTenantStatu
 
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);
+
+// Update last visited date of board
+router.put('/:id', userAuth, updateLastVisitDateBoard);
 
 export default router;

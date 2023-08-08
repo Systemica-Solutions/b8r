@@ -193,35 +193,46 @@ function imageRankingSort(a, b) {
   return 0;
 }
 
-const sortByLastDigits = async (data) => {
-  // console.log('data to be get..', data);
+// Rename s3 images and move those in final folder
+export const renameS3Images = async (data) => {
+  const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
 
-  console.log('data.... : ', data);
+  const fileData = await Promise.all(
+    data.propertyId.map(async (property) => {
+      console.log('property', property);
+      property = property.toObject();
+      const uploadParams = await AssignedProperty.findOne({
+        propertyId: property._id,
+      });
+      let images: any = [];
+      images = await getNumberOfImagesInBucket(
+        bucketName,
+        uploadParams.fieldAgentId,
+        uploadParams.propertyId,
+        'raw'
+      );
+      // copy images to final folder with rename
+      images.map(async (img) => {
+        const params = {
+          ACL: 'public-read',
+          Bucket: bucketName,
+          CopySource: `${bucketName}/${img.Key}`,
+          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${
+            uploadParams.propertyId
+          }-testing.png`
+        };
 
-  if (data && data.length) {
-    return await Promise.all(
-      data.map(async (val) => {
-        if (val.images && val.images.length) {
-          const imgs = val.images.sort(async (a, b) => {
-            const regex = /(\d+)\.PNG$/; // Regular expression to match the digits before ".PNG"
-            const aMatch = a.match(regex);
-            const bMatch = b.match(regex);
-
-            if (aMatch && bMatch) {
-              const aNumber = parseInt(aMatch[1]);
-              const bNumber = parseInt(bMatch[1]);
-              return aNumber - bNumber;
-            }
-
-            // If matching digits aren't found, maintain the original order
-            return 0;
-          });
-
-          console.log('imgs11111110----------------', imgs);
-          val.images = imgs.slice(0, 6);
-        }
-        return val;
-      })
-    );
-  }
+        s3.copyObject(params, (err, data) => {
+          if (err) {
+            console.error('Error copying object:', err);
+          } else {
+            console.log('data after copy', data);
+           
+          }
+        });
+      });      
+    })
+  );
+  console.log('final sortImages====================================', fileData);
+  // return fileData;
 };

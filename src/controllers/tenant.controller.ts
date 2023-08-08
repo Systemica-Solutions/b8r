@@ -8,7 +8,7 @@ import TenantDetail from '../models/tenantDetail.model';
 import Board from '../models/board.model';
 import { Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
-import { getS3ImagesByPropertyId } from './uploadImage.controller';
+import { getS3ImagesByPropertyId, renameS3Images } from './uploadImage.controller';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -230,6 +230,33 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     }
     const data = await getS3ImagesByPropertyId(board);
     return successResponse(res, 200, { board: data }, 'Board found successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+
+// Update last visited date of board
+export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
+  try {   
+    const boards = await Board.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.user.user._id },
+      {
+        $set: { lastVisitedDate: Date.now() },
+      },
+      { new: true }
+    )
+      .populate('tenantId propertyId')
+      .lean();
+    if (!boards) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { boards }, 'Board updated successfully.');
   } catch (error) {
     return failureResponse(
       res,
