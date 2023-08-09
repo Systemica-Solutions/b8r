@@ -154,7 +154,6 @@ export const getPropertyById = async (req: Request, res: Response) => {
 export const assignPropertyToFA = async (req: Request, res: Response) => {
   try {
     const dataObj = req.body;
-    // dataObj.propertyAgentId = req.user.user._id;
     const existing = await AssignedProperty.findOne({
       propertyId: dataObj.propertyId,
     });
@@ -163,6 +162,7 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
     } else {
       const detailObj = new AssignedProperty(dataObj);
       const savedObj: any = await detailObj.save();
+      const status = await changePropertyStatus(dataObj.propertyId, 'Pending');
       return successResponse(
         res,
         200,
@@ -178,6 +178,15 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
+};
+
+// Push property detail id in property table
+const changePropertyStatus = async (id, status) => {
+  return await Property.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
 };
 
 // Get property counts in agent dashboard
@@ -311,6 +320,7 @@ export const closeListingProperty = async (req: Request, res: Response) => {
         $set: {
           closeListingStatus: tempData.closeListingStatus,
           closeListingDetails: tempData.closeListingDetails,
+          status: 'Closed'
         },
       },
       { new: true }
