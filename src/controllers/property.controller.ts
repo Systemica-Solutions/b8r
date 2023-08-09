@@ -137,9 +137,18 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     if (filter && filter.trim()) {
       aggregationPipeline.push({
         $match: {
-          status: {
-            $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
-          },
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              closeListingStatus: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
         },
       });
     }
