@@ -145,7 +145,7 @@ export const getTenantById = async (req: Request, res: Response) => {
 };
 
 // Change status of tenant
-export const changeTenantStatus = async (req: Request, res: Response) => {
+export const deactivateTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
     const id = new Types.ObjectId(tempData.tenantId);
@@ -160,7 +160,7 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
       { new: true }
     )
       .populate('tenantDetails')
-      .exec((error, updatedRecord) => {
+      .exec(async (error, updatedRecord) => {
         if (error) {
           console.log('error while update', error);
           return failureResponse(
@@ -228,6 +228,7 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
+    const status = await changeTenantStatus(board.tenantId._id, 'CurrentlyViewing');
     const data = await getS3ImagesByPropertyId(board);
     return successResponse(res, 200, { board: data }, 'Board found successfully.');
   } catch (error) {
@@ -265,4 +266,13 @@ export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
+};
+
+// Change tenant status
+export const changeTenantStatus = async (id, status) => {
+  return await Tenant.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
 };

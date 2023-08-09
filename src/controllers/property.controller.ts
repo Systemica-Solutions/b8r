@@ -180,7 +180,7 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
   }
 };
 
-// Push property detail id in property table
+// Change property status
 const changePropertyStatus = async (id, status) => {
   return await Property.findByIdAndUpdate(
     { _id: id },

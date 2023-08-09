@@ -3,7 +3,7 @@ import {
   getAllTenantList,
   addTenant,
   getTenantById,
-  changeTenantStatus,
+  deactivateTenant,
   tenantLogin,
   getBoardByAgentId,
   updateLastVisitDateBoard
@@ -36,7 +36,7 @@ router.get('/:id', userAuth, getTenantById);
 router.get('/board/:id', userAuth, getBoardByAgentId);
 
 // Change status of tenant
-router.put('/change-status', userAuth, tenantStatusValidation, changeTenantStatus);
+router.put('/deactivate', userAuth, tenantStatusValidation, deactivateTenant);
 
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);
