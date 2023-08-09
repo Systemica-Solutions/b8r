@@ -228,9 +228,17 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    const status = await changeTenantStatus(board.tenantId._id, 'CurrentlyViewing');
+    const status = await changeTenantStatus(
+      board.tenantId._id,
+      'CurrentlyViewing'
+    );
     const data = await getS3ImagesByPropertyId(board);
-    return successResponse(res, 200, { board: data }, 'Board found successfully.');
+    return successResponse(
+      res,
+      200,
+      { board: data },
+      'Board found successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
@@ -240,7 +248,6 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     );
   }
 };
-
 
 // Update last visited date of board
 export const updateLastVisitDateBoard = async (req: Request, res: Response) => {

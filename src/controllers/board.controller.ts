@@ -230,7 +230,7 @@ export const shortlistDate = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    const status = await changeTenantStatus(tenantId, 'Shortlisted');    
+    const status = await changeTenantStatus(tenantId, 'Shortlisted');
     const update = updateShortlistDate(board, propertyId, tenantId);
     console.log('updated shortlisted', update);
     return successResponse(
