@@ -6,7 +6,7 @@ import {
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -103,9 +103,48 @@ const updatePropertyDetails = (id, detailsId, res) => {
 };
 
 //  Get all properties
-export const getAllPropertyList = async (_: Request, res: Response) => {
+export const getAllPropertyList = async (req: Request, res: Response) => {
   try {
-    const properties = await Property.find().populate('propertyDetails').lean();
+    // It search based on houseName of property
+    const searchText: any = req.query.search;
+    // It filters based on status of property like New/Pending/Verified/Closed
+    const filter: any = req.query.filter;
+    const userId = new Types.ObjectId(req.user.user._id);
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+      {
+        $match: {
+          'propertyDetails.propertyAgentId': userId,
+        },
+      },
+    ];
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          houseName: {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    if (filter && filter.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          status: {
+            $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    const properties = await Property.aggregate(aggregationPipeline);
+    // const properties = await Property.find(query).populate('propertyDetails').lean();
     if (!properties) {
       return failureResponse(res, 404, [], 'Properties not found.');
     }
@@ -320,7 +359,7 @@ export const closeListingProperty = async (req: Request, res: Response) => {
         $set: {
           closeListingStatus: tempData.closeListingStatus,
           closeListingDetails: tempData.closeListingDetails,
-          status: 'Closed'
+          status: 'Closed',
         },
       },
       { new: true }
