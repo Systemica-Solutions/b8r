@@ -6,7 +6,8 @@ import {
   deactivateTenant,
   tenantLogin,
   getBoardByAgentId,
-  updateLastVisitDateBoard
+  updateLastVisitDateBoard,
+  getDashboardCount
 } from '../../controllers/tenant.controller';
 import {
   addTenantValidation,
@@ -16,6 +17,9 @@ import {
 import { userAuth } from '../../middleware/user-auth.middleware';
 
 const router = Router();
+
+// Get count of tenants for property agent dashboard
+router.get('/count', userAuth, getDashboardCount);
 
 // Get all tenants
 router.get('/', userAuth, getAllTenantList);

@@ -21,10 +21,7 @@ export const addTenant = async (req: Request, res: Response) => {
     //         it should return as already exist tenant with this values
     //   2. If another user try to add tenant and it matches with phoneNumber & status then increment it's version
     Tenant.find({
-      $and: [
-        { phoneNumber: tempData.phoneNumber },
-        { status: tempData.status },
-      ],
+      $and: [{ phoneNumber: tempData.phoneNumber }],
     })
       .populate('tenantDetails')
       .exec(async (error: any, tenantExist: any) => {
@@ -331,4 +328,51 @@ export const changeTenantStatus = async (id, status) => {
     { $set: { status } },
     { new: true }
   );
+};
+
+export const getDashboardCount = async (req: Request, res: Response) => {
+  try {
+    const userId = new Types.ObjectId(req.user.user._id);
+    const aggregateQuery = await Tenant.aggregate([
+      {
+        $lookup: {
+          from: 'tenantdetails',
+          localField: 'tenantDetails',
+          foreignField: '_id',
+          as: 'tenantDetails',
+        },
+      },
+      {
+        $match: {
+          'tenantDetails.propertyAgentId': userId,
+        },
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: '$_id',
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    console.log('aggregateQuery result ', aggregateQuery);
+    const tenant = aggregateQuery.reduce((obj, item) => {
+      obj[item.status] = item.count;
+      return obj;
+    }, {});
+    return successResponse(
+      res,
+      200,
+      { tenant },
+      'Tenant dashboard count get successfully.'
+    );
+  } catch (error) {
+    console.log('error', error);
+  }
 };
