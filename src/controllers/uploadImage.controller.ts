@@ -242,7 +242,7 @@ export const copyAndRenameS3Images = async (data) => {
           ACL: 'public-read',
           Bucket: bucketName,
           CopySource: img.link,
-          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}-${img.revisedName}`,
+          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}_${img.revisedName}`,
         };
 
         s3.copyObject(params, (err, updated) => {

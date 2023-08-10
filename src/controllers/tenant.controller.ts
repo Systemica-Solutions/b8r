@@ -6,7 +6,7 @@ import {
 import Tenant from '../models/tenant.model';
 import TenantDetail from '../models/tenantDetail.model';
 import Board from '../models/board.model';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
 import { getS3ImagesByPropertyId } from './uploadImage.controller';
 
@@ -102,9 +102,58 @@ const updateTenantDetails = (id, detailsId, res) => {
 };
 
 //  Get all tenants
-export const getAllTenantList = async (_: Request, res: Response) => {
+export const getAllTenantList = async (req: Request, res: Response) => {
   try {
-    const tenants = await Tenant.find().populate('tenantDetails').lean();
+    /* Search is based on tenant name
+     Filter is based on status of tenant like WaitingForProperty/Shared/CurrentlyViewing/Shortlisted/Deactivate
+     and also for archive filter of deactivateStatus */
+    const searchText: any = req.query.search;
+    const filter: any = req.query.filter;
+    const userId = new Types.ObjectId(req.user.user._id);
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'tenantdetails',
+          localField: 'tenantDetails',
+          foreignField: '_id',
+          as: 'tenantDetails',
+        },
+      },
+      {
+        $match: {
+          'tenantDetails.propertyAgentId': userId,
+        },
+      },
+    ];
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          'tenantDetails.name': {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    if (filter && filter.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              deactivateStatus: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+    const tenants = await Tenant.aggregate(aggregationPipeline);
+    // const tenants = await Tenant.find().populate('tenantDetails').lean();
     if (!tenants) {
       throw { status: 404, message: 'Tenants not found.' };
     }

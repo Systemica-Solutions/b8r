@@ -107,7 +107,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
   try {
     // It search based on houseName of property
     const searchText: any = req.query.search;
-    // It filters based on status of property like New/Pending/Verified/Closed
+    // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingStatus
     const filter: any = req.query.filter;
     const userId = new Types.ObjectId(req.user.user._id);
     const aggregationPipeline: PipelineStage[] = [
