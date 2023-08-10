@@ -73,7 +73,7 @@ export const addProperty = async (req: Request, res: Response) => {
 };
 
 // Push property detail id in property table
-const updatePropertyDetails = (id, detailsId, res) => {
+export const updatePropertyDetails = (id, detailsId, res) => {
   const detailId = new Types.ObjectId(detailsId);
   Property.findByIdAndUpdate(
     { _id: id },
@@ -237,7 +237,7 @@ const changePropertyStatus = async (id, status) => {
   );
 };
 
-// Get property counts in agent dashboard
+// Get property dashboard count
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const pendingProperties = [];
@@ -265,88 +265,6 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       },
       'Property found successfully.'
     );
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
-// Get pending property for field agent dashboard
-export const getFieldAgentPendingProperty = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const propertyAgentId = new Types.ObjectId(req.user.user._id);
-    const property = await AssignedProperty.find({
-      fieldAgentId: propertyAgentId,
-    })
-      .populate('propertyImageId')
-      .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
-    if (!property) {
-      return failureResponse(res, 500, [], 'Something went wrong');
-    }
-    const pendingList = property.filter(
-      (x) => x.propertyId.status === 'Pending'
-    );
-    return successResponse(
-      res,
-      200,
-      { property: pendingList },
-      'Pending property list get successfully.'
-    );
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
-// Verify property
-export const verifyProperty = async (req: Request, res: Response) => {
-  try {
-    const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(
-      req.user.user._id
-    );
-    tempData.status = 'Verified';
-    Property.find({
-      $and: [
-        { houseName: tempData.houseName },
-        { societyName: tempData.societyName },
-        { pinCode: tempData.pinCode },
-      ],
-    })
-      .populate('propertyDetails')
-      .exec(async (error: any, propertyExist: any) => {
-        if (error) {
-          return failureResponse(
-            res,
-            error.status || 500,
-            error,
-            error.message || 'Something went wrong'
-          );
-        } else if (propertyExist && propertyExist.length) {
-          tempData.propertyData.version =
-            propertyExist[0].propertyDetails.length + 1;
-          const detailObj = new PropertyDetail(tempData.propertyData);
-          const savedObj: any = await detailObj.save();
-          updatePropertyDetails(propertyExist[0]._id, savedObj._id, res);
-        } else {
-          const detailObj = new PropertyDetail(tempData.propertyData);
-          const savedObj: any = await detailObj.save();
-          const propertyObj = new Property(tempData);
-          const saveObj = await propertyObj.save();
-          updatePropertyDetails(saveObj._id, savedObj._id, res);
-        }
-      });
   } catch (error) {
     return failureResponse(
       res,

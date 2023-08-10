@@ -3,37 +3,23 @@ import {
   getAllPropertyList,
   addProperty,
   getPropertyById,
-  verifyProperty,
   closeListingProperty,
   assignPropertyToFA,
   getPropertyCounts,
-  getFieldAgentPendingProperty,
   shortlistedProperty,
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
   propertyDetailValidation,
-  verifyPropertyValidation,
   closeListingValidation,
 } from '../../validation/property.validation';
-import {
-  userAuth,
-  fieldAgentAccess,
-} from '../../middleware/user-auth.middleware';
+import { userAuth } from '../../middleware/user-auth.middleware';
 import uploadRoutes from '../apis/upload.routes';
 
 const router = Router();
 
-// Get properties for field agent
-router.get('/count', userAuth, fieldAgentAccess, getPropertyCounts);
-
-// Get pending property for field agent dashboard
-router.get(
-  '/pending',
-  userAuth,
-  fieldAgentAccess,
-  getFieldAgentPendingProperty
-);
+// Get property dashboard count
+router.get('/count', userAuth, getPropertyCounts);
 
 // Get all properties
 router.get('/', userAuth, getAllPropertyList);
@@ -53,11 +39,13 @@ router.get('/:id', userAuth, getPropertyById);
 // Assign property to Field Agent
 router.post('/assign', userAuth, assignPropertyToFA);
 
-// Assign property to Field Agent
-router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
-
 // Edit property status with close listing property
-router.put('/close-listing', userAuth, closeListingValidation, closeListingProperty);
+router.put(
+  '/close-listing',
+  userAuth,
+  closeListingValidation,
+  closeListingProperty
+);
 
 // Short-listed shared property
 router.put('/short-listed', shortlistedProperty);

@@ -330,6 +330,7 @@ export const changeTenantStatus = async (id, status) => {
   );
 };
 
+// Get tenant dashboard count
 export const getDashboardCount = async (req: Request, res: Response) => {
   try {
     const userId = new Types.ObjectId(req.user.user._id);
@@ -373,6 +374,11 @@ export const getDashboardCount = async (req: Request, res: Response) => {
       'Tenant dashboard count get successfully.'
     );
   } catch (error) {
-    console.log('error', error);
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
   }
 };
