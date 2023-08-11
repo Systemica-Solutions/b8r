@@ -7,6 +7,7 @@ import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
 import { PipelineStage, Types } from 'mongoose';
+import { count } from 'console';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -239,33 +240,9 @@ const changePropertyStatus = async (id, status) => {
 
 // Get property dashboard count
 export const getPropertyCounts = async (req: Request, res: Response) => {
-  try {
-    const pendingProperties = [];
-    const verifiedProperties = [];
-    const propertyAgentId = new Types.ObjectId(req.user.user._id);
-    const property = await AssignedProperty.find({
-      fieldAgentId: propertyAgentId,
-    }).populate('propertyId');
-    if (!property) {
-      return failureResponse(res, 500, [], 'Something went wrong');
-    }
-    property.forEach(function(doc) {
-      if (doc.propertyId.status === 'Pending') {
-        pendingProperties.push(doc);
-      } else if (doc.propertyId.status === 'Verified') {
-        verifiedProperties.push(doc);
-      }
-    });
-    return successResponse(
-      res,
-      200,
-      {
-        pending: pendingProperties.length,
-        verified: verifiedProperties.length,
-      },
-      'Property found successfully.'
-    );
-  } catch (error) {
+ try{
+
+ } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
@@ -319,10 +296,4 @@ export const closeListingProperty = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
-};
-
-// Short-listed shared property
-export const shortlistedProperty = async (req: Request, res: Response) => {
-  try {
-  } catch (error) {}
 };

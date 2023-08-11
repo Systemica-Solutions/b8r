@@ -6,7 +6,6 @@ import {
   closeListingProperty,
   assignPropertyToFA,
   getPropertyCounts,
-  shortlistedProperty,
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -46,9 +45,6 @@ router.put(
   closeListingValidation,
   closeListingProperty
 );
-
-// Short-listed shared property
-router.put('/short-listed', shortlistedProperty);
 
 // Upload property images
 router.use('/upload', uploadRoutes);
