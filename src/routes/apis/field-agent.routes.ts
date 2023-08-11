@@ -4,7 +4,10 @@ import {
   getFieldAgentHomeCount,
   getFieldAgentPendingProperty,
 } from '../../controllers/field-agent.controller';
-import { verifyPropertyValidation } from '../../validation/property.validation';
+import {
+  propertyDetailValidation,
+  verifyPropertyValidation,
+} from '../../validation/property.validation';
 import {
   userAuth,
   fieldAgentAccess,
@@ -24,6 +27,12 @@ router.get(
 );
 
 // Verify property
-router.post('/verify', userAuth, verifyPropertyValidation, verifyProperty);
+router.post(
+  '/verify',
+  userAuth,
+  verifyPropertyValidation,
+  propertyDetailValidation,
+  verifyProperty
+);
 
 export default router;
