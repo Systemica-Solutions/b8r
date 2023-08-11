@@ -6,7 +6,7 @@ import {
 import Tenant from '../models/tenant.model';
 import TenantDetail from '../models/tenantDetail.model';
 import Board from '../models/board.model';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
 import { getS3ImagesByPropertyId } from './uploadImage.controller';
 
@@ -21,10 +21,7 @@ export const addTenant = async (req: Request, res: Response) => {
     //         it should return as already exist tenant with this values
     //   2. If another user try to add tenant and it matches with phoneNumber & status then increment it's version
     Tenant.find({
-      $and: [
-        { phoneNumber: tempData.phoneNumber },
-        { status: tempData.status },
-      ],
+      $and: [{ phoneNumber: tempData.phoneNumber }],
     })
       .populate('tenantDetails')
       .exec(async (error: any, tenantExist: any) => {
@@ -102,9 +99,58 @@ const updateTenantDetails = (id, detailsId, res) => {
 };
 
 //  Get all tenants
-export const getAllTenantList = async (_: Request, res: Response) => {
+export const getAllTenantList = async (req: Request, res: Response) => {
   try {
-    const tenants = await Tenant.find().populate('tenantDetails').lean();
+    /* Search is based on tenant name
+     Filter is based on status of tenant like WaitingForProperty/Shared/CurrentlyViewing/Shortlisted/Deactivate
+     and also for archive filter of deactivateStatus */
+    const searchText: any = req.query.search;
+    const filter: any = req.query.filter;
+    const userId = new Types.ObjectId(req.user.user._id);
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'tenantdetails',
+          localField: 'tenantDetails',
+          foreignField: '_id',
+          as: 'tenantDetails',
+        },
+      },
+      {
+        $match: {
+          'tenantDetails.propertyAgentId': userId,
+        },
+      },
+    ];
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          'tenantDetails.name': {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    if (filter && filter.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              deactivateStatus: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+    const tenants = await Tenant.aggregate(aggregationPipeline);
+    // const tenants = await Tenant.find().populate('tenantDetails').lean();
     if (!tenants) {
       throw { status: 404, message: 'Tenants not found.' };
     }
@@ -145,7 +191,7 @@ export const getTenantById = async (req: Request, res: Response) => {
 };
 
 // Change status of tenant
-export const changeTenantStatus = async (req: Request, res: Response) => {
+export const deactivateTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
     const id = new Types.ObjectId(tempData.tenantId);
@@ -160,7 +206,7 @@ export const changeTenantStatus = async (req: Request, res: Response) => {
       { new: true }
     )
       .populate('tenantDetails')
-      .exec((error, updatedRecord) => {
+      .exec(async (error, updatedRecord) => {
         if (error) {
           console.log('error while update', error);
           return failureResponse(
@@ -228,8 +274,17 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
+    const status = await changeTenantStatus(
+      board.tenantId._id,
+      'CurrentlyViewing'
+    );
     const data = await getS3ImagesByPropertyId(board);
-    return successResponse(res, 200, { board: data }, 'Board found successfully.');
+    return successResponse(
+      res,
+      200,
+      { board: data },
+      'Board found successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
@@ -239,7 +294,6 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     );
   }
 };
-
 
 // Update last visited date of board
 export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
@@ -257,6 +311,68 @@ export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
       return failureResponse(res, 404, [], 'Board not found.');
     }
     return successResponse(res, 200, { boards }, 'Board updated successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Change tenant status
+export const changeTenantStatus = async (id, status) => {
+  return await Tenant.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
+};
+
+// Get tenant dashboard count
+export const getDashboardCount = async (req: Request, res: Response) => {
+  try {
+    const userId = new Types.ObjectId(req.user.user._id);
+    const aggregateQuery = await Tenant.aggregate([
+      {
+        $lookup: {
+          from: 'tenantdetails',
+          localField: 'tenantDetails',
+          foreignField: '_id',
+          as: 'tenantDetails',
+        },
+      },
+      {
+        $match: {
+          'tenantDetails.propertyAgentId': userId,
+        },
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: '$_id',
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    console.log('aggregateQuery result ', aggregateQuery);
+    const tenant = aggregateQuery.reduce((obj, item) => {
+      obj[item.status] = item.count;
+      return obj;
+    }, {});
+    return successResponse(
+      res,
+      200,
+      { tenant },
+      'Tenant dashboard count get successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,

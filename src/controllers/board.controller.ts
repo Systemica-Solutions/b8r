@@ -9,6 +9,7 @@ import SharedProperty from '../models/common.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
 import { copyAndRenameS3Images, getS3Images } from './uploadImage.controller';
+import { changeTenantStatus } from './tenant.controller';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
@@ -176,6 +177,7 @@ export const shareBoard = async (req: Request, res: Response) => {
       return failureResponse(res, 404, [], 'Board not found.');
     }
     const update = updateSharedDate(board);
+    const status = await changeTenantStatus(board.tenantId._id, 'Shared');
     return successResponse(res, 200, { board }, 'Board finalize successfully.');
   } catch (error) {
     return failureResponse(
@@ -228,6 +230,7 @@ export const shortlistDate = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
+    const status = await changeTenantStatus(tenantId, 'Shortlisted');
     const update = updateShortlistDate(board, propertyId, tenantId);
     console.log('updated shortlisted', update);
     return successResponse(

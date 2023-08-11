@@ -6,7 +6,7 @@ import {
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -73,7 +73,7 @@ export const addProperty = async (req: Request, res: Response) => {
 };
 
 // Push property detail id in property table
-const updatePropertyDetails = (id, detailsId, res) => {
+export const updatePropertyDetails = (id, detailsId, res) => {
   const detailId = new Types.ObjectId(detailsId);
   Property.findByIdAndUpdate(
     { _id: id },
@@ -103,9 +103,57 @@ const updatePropertyDetails = (id, detailsId, res) => {
 };
 
 //  Get all properties
-export const getAllPropertyList = async (_: Request, res: Response) => {
+export const getAllPropertyList = async (req: Request, res: Response) => {
   try {
-    const properties = await Property.find().populate('propertyDetails').lean();
+    // It search based on houseName of property
+    const searchText: any = req.query.search;
+    // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingStatus
+    const filter: any = req.query.filter;
+    const userId = new Types.ObjectId(req.user.user._id);
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+      {
+        $match: {
+          'propertyDetails.propertyAgentId': userId,
+        },
+      },
+    ];
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          houseName: {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    if (filter && filter.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              closeListingStatus: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+    const properties = await Property.aggregate(aggregationPipeline);
+    // const properties = await Property.find(query).populate('propertyDetails').lean();
     if (!properties) {
       return failureResponse(res, 404, [], 'Properties not found.');
     }
@@ -154,7 +202,6 @@ export const getPropertyById = async (req: Request, res: Response) => {
 export const assignPropertyToFA = async (req: Request, res: Response) => {
   try {
     const dataObj = req.body;
-    // dataObj.propertyAgentId = req.user.user._id;
     const existing = await AssignedProperty.findOne({
       propertyId: dataObj.propertyId,
     });
@@ -163,6 +210,7 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
     } else {
       const detailObj = new AssignedProperty(dataObj);
       const savedObj: any = await detailObj.save();
+      const status = await changePropertyStatus(dataObj.propertyId, 'Pending');
       return successResponse(
         res,
         200,
@@ -180,7 +228,16 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
   }
 };
 
-// Get property counts in agent dashboard
+// Change property status
+const changePropertyStatus = async (id, status) => {
+  return await Property.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
+};
+
+// Get property dashboard count
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const pendingProperties = [];
@@ -218,88 +275,6 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
   }
 };
 
-// Get pending property for field agent dashboard
-export const getFieldAgentPendingProperty = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const propertyAgentId = new Types.ObjectId(req.user.user._id);
-    const property = await AssignedProperty.find({
-      fieldAgentId: propertyAgentId,
-    })
-      .populate('propertyImageId')
-      .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
-    if (!property) {
-      return failureResponse(res, 500, [], 'Something went wrong');
-    }
-    const pendingList = property.filter(
-      (x) => x.propertyId.status === 'Pending'
-    );
-    return successResponse(
-      res,
-      200,
-      { property: pendingList },
-      'Pending property list get successfully.'
-    );
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
-// Verify property
-export const verifyProperty = async (req: Request, res: Response) => {
-  try {
-    const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(
-      req.user.user._id
-    );
-    tempData.status = 'Verified';
-    Property.find({
-      $and: [
-        { houseName: tempData.houseName },
-        { societyName: tempData.societyName },
-        { pinCode: tempData.pinCode },
-      ],
-    })
-      .populate('propertyDetails')
-      .exec(async (error: any, propertyExist: any) => {
-        if (error) {
-          return failureResponse(
-            res,
-            error.status || 500,
-            error,
-            error.message || 'Something went wrong'
-          );
-        } else if (propertyExist && propertyExist.length) {
-          tempData.propertyData.version =
-            propertyExist[0].propertyDetails.length + 1;
-          const detailObj = new PropertyDetail(tempData.propertyData);
-          const savedObj: any = await detailObj.save();
-          updatePropertyDetails(propertyExist[0]._id, savedObj._id, res);
-        } else {
-          const detailObj = new PropertyDetail(tempData.propertyData);
-          const savedObj: any = await detailObj.save();
-          const propertyObj = new Property(tempData);
-          const saveObj = await propertyObj.save();
-          updatePropertyDetails(saveObj._id, savedObj._id, res);
-        }
-      });
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
 // Edit property status with close listing property
 export const closeListingProperty = async (req: Request, res: Response) => {
   try {
@@ -311,6 +286,7 @@ export const closeListingProperty = async (req: Request, res: Response) => {
         $set: {
           closeListingStatus: tempData.closeListingStatus,
           closeListingDetails: tempData.closeListingDetails,
+          status: 'Closed',
         },
       },
       { new: true }
