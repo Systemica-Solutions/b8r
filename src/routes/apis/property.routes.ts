@@ -7,7 +7,8 @@ import {
   assignPropertyToFA,
   getPropertyCounts,
   getPropertyImagesFromS3,
-  renameAndCopyBoardImagesOfS3
+  renameAndCopyBoardImagesOfS3,
+  getAllPropertyImages
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -47,6 +48,9 @@ router.put(
   closeListingValidation,
   closeListingProperty
 );
+
+// Get all property images fom s3 which are not moved to final folder yet
+router.get('/s3-img', getAllPropertyImages);
 
 // Get s3 images of property
 router.get('/s3-img/:id', getPropertyImagesFromS3);

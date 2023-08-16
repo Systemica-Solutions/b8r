@@ -20,7 +20,8 @@ export const agentSignUp = async (req: Request, res: Response) => {
         if (iCode === 400 || iCode === 403) {
           return failureResponse(res, 400, [], 'Invalid invitation code');
         }
-        const agentObj = new Agent(req.body);
+        if (iCode.startsWith('FA')) { agentData.isFieldAgent = true; }
+        const agentObj = new Agent(agentData);
         const agentSave = await agentObj.save();
         const authObj = await saveAuthCode(agentSave);
         if (authObj === 200) {

@@ -586,3 +586,18 @@ export const renameAndCopyBoardImagesOfS3 = async (
     );
   }
 };
+
+// Get all property images fom s3 which are not moved to final folder yet
+export const getAllPropertyImages = async (req: Request, res: Response) => {
+  try {
+    // const images = await getS3ImagesByPropertyId(req.params.id);
+    // return successResponse(res, 200, { images }, 'S3 images get successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
