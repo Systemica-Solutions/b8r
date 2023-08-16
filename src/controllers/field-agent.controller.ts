@@ -9,6 +9,53 @@ import AssignedProperty from '../models/assignedProperty.model';
 import { Types } from 'mongoose';
 import { updatePropertyDetails } from './property.controller';
 
+// Add 3D tour link and change status to verified
+export const add3DTourLink = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    Property.findOneAndUpdate(
+      { _id: req.params.id, imagesApproved: true },
+      {
+        $set: { tourLink3D: tempData.tourLink3D, status: 'Verified' },
+      },
+      { new: true }
+    )
+      .populate('propertyDetails')
+      .exec((error, updatedRecord) => {
+        if (error) {
+          console.log('error while update', error);
+          return failureResponse(
+            res,
+            500,
+            [],
+            error.message || 'Something went wrong'
+          );
+        } else if (!updatedRecord || updatedRecord === null) {
+          return failureResponse(
+            res,
+            500,
+            [],
+            'Property should be verified with upload and approve image'
+          );
+        } else {
+          return successResponse(
+            res,
+            200,
+            { property: updatedRecord },
+            'Link added successfully.'
+          );
+        }
+      });
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Verify property
 export const verifyProperty = async (req: Request, res: Response) => {
   try {
