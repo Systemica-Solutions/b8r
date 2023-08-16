@@ -8,14 +8,13 @@ import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
 import { PipelineStage, Types } from 'mongoose';
 import { count } from 'console';
+import { copyAndRenameS3Images, getS3ImagesByPropertyId } from './uploadImage.controller';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.agentId = new Types.ObjectId(
-      req.user.user._id
-    );
+    tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of property based on below conditions while add new property
     //   1. If same agent try to enter again same value for houseName, societyName, pinCode then
@@ -261,8 +260,8 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
           from: 'sharedproperties',
           localField: 'sharedProperty',
           foreignField: '_id',
-          as: 'sharedPropertyInfo'
-        }
+          as: 'sharedPropertyInfo',
+        },
       },
       {
         $project: {
@@ -272,16 +271,16 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
               $filter: {
                 input: '$sharedPropertyInfo',
                 as: 'sp',
-                cond: { $eq: ['$$sp.isShortlisted', true] }
-              }
-            }
-          }
-        }
+                cond: { $eq: ['$$sp.isShortlisted', true] },
+              },
+            },
+          },
+        },
       },
       {
         $project: {
-          count: { $size: '$sharedPropertyInfo' } // Count the elements in the array
-        }
+          count: { $size: '$sharedPropertyInfo' }, // Count the elements in the array
+        },
       },
       // {
       //   $match: {
@@ -363,28 +362,27 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       //     count: { $sum: 1 }
       //   }
       // }
-    //   {
-    //     $addFields: {
-    //         hasShortlistedSharedProperty: {
-    //             $anyElementTrue: '$sharedProperties.isShortlisted'
-    //         }
-    //     }
-    // },
+      //   {
+      //     $addFields: {
+      //         hasShortlistedSharedProperty: {
+      //             $anyElementTrue: '$sharedProperties.isShortlisted'
+      //         }
+      //     }
+      // },
 
-    // {
-    //     $match: {
-    //       '$sharedProperties.isShortlisted': true,
-    //       count: { $sum: 1 },
-    //     },
-    // },
+      // {
+      //     $match: {
+      //       '$sharedProperties.isShortlisted': true,
+      //       count: { $sum: 1 },
+      //     },
+      // },
 
-    //   {
+      //   {
       //     $unwind: {
       //         path: '$shortListProperties',
       //         preserveNullAndEmptyArrays: true
       //     }
       // },
-
     ]);
 
     console.log('step3 : ', step3);
@@ -515,6 +513,55 @@ export const closeListingProperty = async (req: Request, res: Response) => {
           );
         }
       });
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get property images from s3 by propertyId
+export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
+  try {
+    const files = await getS3ImagesByPropertyId(req.params.id);
+    return successResponse(
+      res,
+      200,
+      { files },
+      'S3 images get successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get property images from s3 for renaming file-name
+export const renameAndCopyBoardImagesOfS3 = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const board = await Property.findById(req.params.id)
+      .populate('tenantId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const file = await copyAndRenameS3Images(req.body.data);
+    return successResponse(
+      res,
+      200,
+      {},
+      'Images has been renamed and copied successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,

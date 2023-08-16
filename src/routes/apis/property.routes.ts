@@ -6,6 +6,8 @@ import {
   closeListingProperty,
   assignPropertyToFA,
   getPropertyCounts,
+  getPropertyImagesFromS3,
+  renameAndCopyBoardImagesOfS3
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -45,6 +47,12 @@ router.put(
   closeListingValidation,
   closeListingProperty
 );
+
+// Get s3 images of property
+router.get('/s3-img/:id', getPropertyImagesFromS3);
+
+// Rename and copy s3 files to files folder
+router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
 
 // Upload property images
 router.use('/upload', uploadRoutes);

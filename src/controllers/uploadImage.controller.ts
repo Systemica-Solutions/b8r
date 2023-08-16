@@ -74,7 +74,7 @@ export const uploadPrpertyImages = async (req, res) => {
           Body: fileStream,
           Key: `b8rHomes/${fieldAgentId}/${reqData.propertyId}/photos/raw/${
             reqData.propertyId
-          }-${++imageCount}.${file.originalname.split('.').pop()}`,
+          }_${++imageCount}.${file.originalname.split('.').pop()}`,
         };
         return s3.upload(uploadParams).promise();
       });
@@ -150,7 +150,7 @@ async function getNumberOfImagesInBucket(bucket, faId, propId, status) {
 }
 
 // pending all property images get // 6 images get by priority
-export const getS3ImagesByPropertyId = async (data) => {
+export const getS3ImagesByRankingSystem = async (data) => {
   const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
 
   const fileData = await Promise.all(
@@ -194,37 +194,27 @@ function imageRankingSort(a, b) {
 }
 
 // Get s3 images and move those in final folder
-export const getS3Images = async (data) => {
+export const getS3ImagesByPropertyId = async (id) => {
   const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
 
-  const fileData = await Promise.all(
-    data.propertyId.map(async (property) => {
-      console.log('property', property);
-      const uploadParams = await AssignedProperty.findOne({
-        propertyId: property._id,
-      });
-      let images: any = [];
-      images = await getNumberOfImagesInBucket(
-        bucketName,
-        uploadParams.fieldAgentId,
-        uploadParams.propertyId,
-        'raw'
-      );
-      console.log('images', images);
-      images.map(async (img) => {
-        property.images.push({
-          link: prefix.concat(img.Key),
-          name: img.Key.split('/').pop(),
-        });
-      });
-      return { propertyId: uploadParams.propertyId, images: property.images };
-    })
+  const tempImgs = [];
+  const uploadParams = await AssignedProperty.findOne({
+    propertyId: id,
+  });
+  let images: any = [];
+  images = await getNumberOfImagesInBucket(
+    bucketName,
+    uploadParams.fieldAgentId,
+    uploadParams.propertyId,
+    'raw'
   );
-  console.log(
-    'final sortImages ===================>',
-    JSON.stringify(fileData)
-  );
-  return fileData;
+  images.map(async (img) => {
+    tempImgs.push({
+      link: prefix.concat(img.Key),
+      name: img.Key.split('/').pop(),
+    });
+  });
+  return await tempImgs;
 };
 
 // Get s3 images and move those in final folder

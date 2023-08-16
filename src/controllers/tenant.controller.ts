@@ -8,7 +8,7 @@ import TenantDetail from '../models/tenantDetail.model';
 import Board from '../models/board.model';
 import { PipelineStage, Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
-import { getS3ImagesByPropertyId } from './uploadImage.controller';
+import { getS3ImagesByRankingSystem } from './uploadImage.controller';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -278,7 +278,7 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
       board.tenantId._id,
       'CurrentlyViewing'
     );
-    const data = await getS3ImagesByPropertyId(board);
+    const data = await getS3ImagesByRankingSystem(board);
     return successResponse(
       res,
       200,
