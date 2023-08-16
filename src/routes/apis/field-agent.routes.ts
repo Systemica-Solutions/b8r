@@ -26,9 +26,9 @@ router.get(
   getFieldAgentPendingProperty
 );
 
-// Verify property
-router.post(
-  '/verify',
+// Verify property details
+router.put(
+  '/verify/:id',
   userAuth,
   verifyPropertyValidation,
   propertyDetailValidation,

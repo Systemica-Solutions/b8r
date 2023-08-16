@@ -97,7 +97,7 @@ export const updatePropertyDetails = (id, detailsId, res) => {
           res,
           200,
           { property: updatedRecord },
-          'New property added successfully.'
+          'Property added successfully.'
         );
       }
     });

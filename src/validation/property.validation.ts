@@ -215,7 +215,7 @@ export const addPropertyValidation = async (req, res, next) => {
   }
 };
 
-// Verify property validations
+// Verify property details validations
 export const verifyPropertyValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     houseName: Joi.string().optional(),
@@ -227,9 +227,7 @@ export const verifyPropertyValidation = async (req, res, next) => {
       .valid(...Object.keys(staticStatus))
       .optional(),
     propertyData: Joi.any().optional(),
-    propertyDetails: Joi.array().items(Joi.string()).optional(),
-    images: Joi.array().items(Joi.string()).required(),
-    tourLink3D: Joi.string().required(),
+    propertyDetails: Joi.array().items(Joi.string()).optional()
   });
   const value = schema.validate(req.body);
   if (value.error) {
