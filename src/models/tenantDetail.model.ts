@@ -13,9 +13,9 @@ const TenantDetailSchema: Schema = new Schema(
       type: Schema.Types.Number,
       default: 1,
     },
-    propertyAgentId: {
+    agentId: {
       type: Schema.Types.ObjectId,
-      ref: MODELS.USERS,
+      ref: MODELS.AGENT,
     },
     email: {
       type: Schema.Types.String,

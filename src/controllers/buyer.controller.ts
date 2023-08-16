@@ -11,12 +11,12 @@ import { Types } from 'mongoose';
 export const addBuyer = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.buyerData.propertyAgentId = new Types.ObjectId(req.user.user._id);
+    tempData.buyerData.agentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of buyer based on below conditions while add new buyer
-    //   1. If same user try to enter again same value for phoneNumber & status
+    //   1. If same agent try to enter again same value for phoneNumber & status
     //         it should return as already exist buyer with this values
-    //   2. If another user try to add buyer and it matches with phoneNumber & status then increment it's version
+    //   2. If another agent try to add buyer and it matches with phoneNumber & status then increment it's version
     Buyer.find({
       $and: [
         { phoneNumber: tempData.phoneNumber },
@@ -34,7 +34,7 @@ export const addBuyer = async (req: Request, res: Response) => {
           );
         } else if (buyerExist && buyerExist.length) {
           const buyerObj = buyerExist[0].buyerDetails.filter((x) =>
-            x.propertyAgentId.equals(tempData.buyerData.propertyAgentId)
+            x.agentId.equals(tempData.buyerData.agentId)
           );
           if (buyerObj && buyerObj.length) {
             return failureResponse(

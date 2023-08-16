@@ -26,7 +26,7 @@ export const buyertDetailValidation = async (req, res, next) => {
     moveIn: Joi.string().optional(),
     budget: Joi.string().optional(),
     version: Joi.number().optional(),
-    propertyAgentId: Joi.string().optional(),
+    agentId: Joi.string().optional(),
   });
   const value = schema.validate(req.body.buyerData);
   if (value.error) {

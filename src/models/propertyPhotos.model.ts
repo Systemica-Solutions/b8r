@@ -3,9 +3,9 @@ import { MODELS } from '../constants/model.constants';
 
 const PropertyPhotosSchema: Schema = new Schema(
   {
-    propertyAgentId: {
+    agentId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Agent',
     },
     propertyId: {
       type: Schema.Types.ObjectId,

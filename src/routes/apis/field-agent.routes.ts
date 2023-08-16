@@ -3,6 +3,7 @@ import {
   verifyProperty,
   getFieldAgentHomeCount,
   getFieldAgentPendingProperty,
+  add3DTourLink
 } from '../../controllers/field-agent.controller';
 import {
   propertyDetailValidation,
@@ -26,13 +27,22 @@ router.get(
   getFieldAgentPendingProperty
 );
 
-// Verify property
-router.post(
-  '/verify',
+// Verify property details
+router.put(
+  '/verify/:id',
   userAuth,
+  fieldAgentAccess,
   verifyPropertyValidation,
   propertyDetailValidation,
   verifyProperty
 );
+
+router.put(
+  '/3d-link/:id',
+  userAuth,
+  fieldAgentAccess,
+  add3DTourLink
+);
+
 
 export default router;

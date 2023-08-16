@@ -3,41 +3,41 @@ import {
   successResponse,
   failureResponse,
 } from '../helpers/api-response.helper';
-import User from '../models/user.model';
+import Agent from '../models/agent.model';
 import Authcode from '../models/authcode.model';
 import { encrypt, decrypt, generateJWTToken } from '../services/crypto.service';
 
-//  Sign up the new user details and generate the JWT token for that user
-export const signUpUser = async (req: Request, res: Response) => {
+//  Sign up the new agent details and generate the JWT token for that agent
+export const agentSignUp = async (req: Request, res: Response) => {
   try {
     console.log('req', req.body);
-    let userData: any = {};
-    userData = req.body;
-    const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
-    if (!userExist) {
-      if (userData.inviteCode) {
-        const iCode = await checkInviteCode(userData);
+    let agentData: any = {};
+    agentData = req.body;
+    const agentExist = await Agent.findOne({ phoneNumber: agentData.phoneNumber });
+    if (!agentExist) {
+      if (agentData.inviteCode) {
+        const iCode = await checkInviteCode(agentData);
         if (iCode === 400 || iCode === 403) {
           return failureResponse(res, 400, [], 'Invalid invitation code');
         }
-        const userObj = new User(req.body);
-        const userSave = await userObj.save();
-        const authObj = await saveAuthCode(userSave);
+        const agentObj = new Agent(req.body);
+        const agentSave = await agentObj.save();
+        const authObj = await saveAuthCode(agentSave);
         if (authObj === 200) {
           return successResponse(
             res,
             200,
-            { user: userSave },
-            'User Signup Successfully.'
+            { agent: agentSave },
+            'Agent Signup Successfully.'
           );
         } else {
-          console.log('userDAta', userData);
+          console.log('agentDAta', agentData);
           return failureResponse(res, 500, [authObj], 'Something went wrong');
         }
       } else {
         return failureResponse(res, 500, [], 'Auth code is required.');
       }
-      // return successResponse(res, 200, { user: userSave, authRegistery: authObj }, 'User Signup Successfully.');
+      // return successResponse(res, 200, { agent: agentSave, authRegistery: authObj }, 'agent Signup Successfully.');
     } else {
       return failureResponse(res, 403, [], 'Phone number already exists');
     }
@@ -58,7 +58,7 @@ const checkInviteCode = async (data: any) => {
     if (!authcodeExist) {
       return 400;
     } else {
-      if (authcodeExist && authcodeExist.propertyAgentId !== null) {
+      if (authcodeExist && authcodeExist.agentId !== null) {
         return 403;
       } else {
         return authcodeExist.code;
@@ -74,12 +74,12 @@ const checkInviteCode = async (data: any) => {
   }
 };
 
-// Save user-id in authcode after sign-up
+// Save agentId in authcode after sign-up
 const saveAuthCode = async (data: any) => {
   try {
     const obj = await Authcode.findOneAndUpdate(
       { code: data.inviteCode },
-      { $set: { propertyAgentId: data._id } },
+      { $set: { agentId: data._id } },
       { new: true }
     );
     if (!obj) {
@@ -97,25 +97,25 @@ const saveAuthCode = async (data: any) => {
     // return error;
   }
   // const authRegistery = {
-  //   propertyAgentId : userObj._id,
-  //   entity: userObj.name,
-  //   authCode: userObj.authCode,
-  //   authCodeType: userObj.authCode.substring(0, 2) === 'FL' ? 'Field Agent' :
-  //   userObj.authCode.substring(0, 2) === 'BA' ? 'Property Agent' : 'Other'
+  //   agentId : agentObj._id,
+  //   entity: agentObj.name,
+  //   authCode: agentObj.authCode,
+  //   authCodeType: agentObj.authCode.substring(0, 2) === 'FL' ? 'Field Agent' :
+  //   agentObj.authCode.substring(0, 2) === 'BA' ? 'Property Agent' : 'Other'
   // };
   // const authObj = new Authcode(authRegistery);
   // const saveObj = await authObj.save();
   // return saveObj;
 };
 
-//  Get all users
-export const getAllUsersList = async (_: Request, res: Response) => {
+//  Get all agents
+export const getAllAgentList = async (_: Request, res: Response) => {
   try {
-    const users = await User.find().lean();
-    if (!users) {
-      throw { status: 404, message: 'Users not found.' };
+    const agents = await Agent.find().lean();
+    if (!agents) {
+      throw { status: 404, message: 'agents not found.' };
     }
-    return successResponse(res, 200, { users }, 'Users found successfully.');
+    return successResponse(res, 200, { agents }, 'Agents found successfully.');
   } catch (error) {
     return failureResponse(
       res,
@@ -126,22 +126,22 @@ export const getAllUsersList = async (_: Request, res: Response) => {
   }
 };
 
-// Login user
-export const signInUser = async (req: Request, res: Response) => {
+// Login agent
+export const signInAgent = async (req: Request, res: Response) => {
   try {
-    const userData = req.body;
-    const userExist = await User.findOne({ phoneNumber: userData.phoneNumber });
-    if (!userExist) {
-      return failureResponse(res, 404, [], 'User not found!');
+    const agentData = req.body;
+    const agentExist = await Agent.findOne({ phoneNumber: agentData.phoneNumber });
+    if (!agentExist) {
+      return failureResponse(res, 404, [], 'Agent not found!');
     } else {
-      const dbPassword = await decrypt(userData.password, userExist.password);
+      const dbPassword = await decrypt(agentData.password, agentExist.password);
       if (dbPassword) {
-        const jwtToken = generateJWTToken(userExist);
+        const jwtToken = generateJWTToken(agentExist);
         return successResponse(
           res,
           200,
-          { user: userExist, jwtToken },
-          'User login successfully.'
+          { agent: agentExist, jwtToken },
+          'Agent login successfully.'
         );
       } else {
         return failureResponse(res, 401, [], 'Invalid password');
@@ -157,11 +157,11 @@ export const signInUser = async (req: Request, res: Response) => {
   }
 };
 
-// Forgot and Reset password of user
+// Forgot and Reset password of agent
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const updatedData = req.body;
-    User.findOneAndUpdate(
+    Agent.findOneAndUpdate(
       { phoneNumber: updatedData.phoneNumber },
       {
         $set: {
@@ -169,7 +169,7 @@ export const resetPassword = async (req: Request, res: Response) => {
           lastResetPasswordDate: new Date(),
         },
       },
-      (err, user) => {
+      (err, agent) => {
         if (err) {
           return failureResponse(
             res,
@@ -177,11 +177,11 @@ export const resetPassword = async (req: Request, res: Response) => {
             err,
             err.message || 'Internal Server Error'
           );
-        } else if (user) {
+        } else if (agent) {
           return successResponse(
             res,
             200,
-            { user },
+            { agent },
             'Password updated successfully.'
           );
         } else {
@@ -199,17 +199,17 @@ export const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
-// Update user details
-export const updateUserDetails = async (req: Request, res: Response) => {
+// Update agent details
+export const updateAgentDetails = async (req: Request, res: Response) => {
   try {
     const updatedData = req.body;
     const dbContact = req.user.user.phoneNumber;
     if (dbContact === updatedData.phoneNumber) {
-      User.findOneAndUpdate(
+      Agent.findOneAndUpdate(
         { phoneNumber: updatedData.phoneNumber },
         { $set: updatedData },
         { new: true },
-        (error, user) => {
+        (error, agent) => {
           if (error) {
             return failureResponse(
               res,
@@ -217,12 +217,12 @@ export const updateUserDetails = async (req: Request, res: Response) => {
               [error],
               error.message || 'Internal Server Error'
             );
-          } else if (user) {
+          } else if (agent) {
             return successResponse(
               res,
               200,
-              { user },
-              'User details updated successfully.'
+              { agent },
+              'Agent details updated successfully.'
             );
           } else {
             return failureResponse(
@@ -239,7 +239,7 @@ export const updateUserDetails = async (req: Request, res: Response) => {
         res,
         401,
         [],
-        'You are not authorized to update user details'
+        'You are not authorized to update agent details'
       );
     }
   } catch (error) {

@@ -3,13 +3,13 @@ import { MODELS } from '../constants/model.constants';
 
 const AssignedPropertySchema: Schema = new Schema(
   {
-    // propertyAgentId: {
+    // agentId: {
     //   type: Schema.Types.ObjectId,
     //   ref: 'User',
     // },
     fieldAgentId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Agent',
       required: true,
     },
     propertyId: {

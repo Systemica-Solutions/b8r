@@ -3,9 +3,9 @@ import { MODELS } from '../constants/model.constants';
 
 const BoardSchema: Schema = new Schema(
   {
-    propertyAgentId: {
+    agentId: {
       type: Schema.Types.ObjectId,
-      ref: MODELS.USERS,
+      ref: MODELS.AGENT,
     },
     tenantId: {
       type: Schema.Types.ObjectId,

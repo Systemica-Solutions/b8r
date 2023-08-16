@@ -13,14 +13,14 @@ import { count } from 'console';
 export const addProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+    tempData.propertyData.agentId = new Types.ObjectId(
       req.user.user._id
     );
 
     //  Check version of property based on below conditions while add new property
-    //   1. If same user try to enter again same value for houseName, societyName, pinCode then
+    //   1. If same agent try to enter again same value for houseName, societyName, pinCode then
     //         it should return as already exist property with this values
-    //   2. If another user try to add property and it matches with houseName, societyName, pinCode then increment it's version
+    //   2. If another agent try to add property and it matches with houseName, societyName, pinCode then increment it's version
     Property.find({
       $and: [
         { houseName: tempData.houseName },
@@ -38,10 +38,10 @@ export const addProperty = async (req: Request, res: Response) => {
             error.message || 'Something went wrong'
           );
         } else if (propertyExist && propertyExist.length) {
-          const userProperty = propertyExist[0].propertyDetails.filter((x) =>
-            x.propertyAgentId.equals(tempData.propertyData.propertyAgentId)
+          const agentProperty = propertyExist[0].propertyDetails.filter((x) =>
+            x.agentId.equals(tempData.propertyData.agentId)
           );
-          if (userProperty && userProperty.length) {
+          if (agentProperty && agentProperty.length) {
             return failureResponse(
               res,
               403,
@@ -97,7 +97,7 @@ export const updatePropertyDetails = (id, detailsId, res) => {
           res,
           200,
           { property: updatedRecord },
-          'New property added successfully.'
+          'Property added successfully.'
         );
       }
     });
@@ -110,7 +110,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     const searchText: any = req.query.search;
     // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingStatus
     const filter: any = req.query.filter;
-    const userId = new Types.ObjectId(req.user.user._id);
+    const agentId = new Types.ObjectId(req.user.user._id);
     const aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -122,7 +122,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
       },
       {
         $match: {
-          'propertyDetails.propertyAgentId': userId,
+          'propertyDetails.agentId': agentId,
         },
       },
     ];
@@ -240,9 +240,236 @@ const changePropertyStatus = async (id, status) => {
 
 // Get property dashboard count
 export const getPropertyCounts = async (req: Request, res: Response) => {
- try{
+  try {
+    const agentId = new Types.ObjectId(req.user.user._id);
+    console.log('agentID', agentId);
 
- } catch (error) {
+    // shared count
+    const step1 = await Property.countDocuments({
+      $expr: { $gt: [{ $size: '$sharedProperty' }, 0] },
+    });
+
+    // shared count
+    const step2 = await Property.countDocuments({
+      $expr: { $eq: [{ $size: '$sharedProperty' }, 0] },
+    });
+
+    // shared count
+    const step3 = await Property.aggregate([
+      {
+        $lookup: {
+          from: 'sharedproperties',
+          localField: 'sharedProperty',
+          foreignField: '_id',
+          as: 'sharedPropertyInfo'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          count: {
+            $size: {
+              $filter: {
+                input: '$sharedPropertyInfo',
+                as: 'sp',
+                cond: { $eq: ['$$sp.isShortlisted', true] }
+              }
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          count: { $size: '$sharedPropertyInfo' } // Count the elements in the array
+        }
+      },
+      // {
+      //   $match: {
+      //     count: { $gt: 0 }
+      //   }
+      // }
+      // {
+      //   $match: {
+      //     count: { $gt: 0 }
+      //   }
+      // },
+      // {
+      //   $group: {
+      //     _id: 0,
+      //     count: { $size: 1 }
+      //   }
+      // }
+      // {
+      //   $addFields: {
+      //     hasShortlisted: {
+      //       $anyElementTrue: {
+      //         $map: {
+      //           input: '$sharedPropertyInfo',
+      //           as: 'sp',
+      //           in: '$$sp.isShortlisted'
+      //         }
+      //       }
+      //     }
+      //   }
+      // },
+      // {
+      //   $group: {
+      //     _id: '$_id',
+      //     count: { $sum: { $cond: [{ $eq: ['$hasShortlisted', true] }, 1, 0] } }
+      //   }
+      // }
+      // {
+      //   $lookup: {
+      //     from: 'sharedproperty',
+      //     localField: 'sharedProperty',
+      //     foreignField: '_id',
+      //     as: 'sharedPropertyInfo',
+      //   },
+      // },
+      // {
+      //   $lookup: {
+      //     from: 'sharedproperties',
+      //     let: { sharedPropertyIds: { $ifNull: ['$sharedproperties', []] } },
+      //     // let: { sharedPropertyIds: '$sharedproperties' },
+      //     pipeline: [
+      //       {
+      //         $match: {
+      //           $expr: {
+      //             $and: [
+      //               { $in: ['$_id', '$$sharedPropertyIds'] },
+      //               { $eq: ['$isShortlisted', true] }
+      //             ]
+      //           }
+      //         }
+      //       }
+      //     ],
+      //     as: 'shortlistedSharedProperties'
+      //   }
+      // },
+      // {
+      //   $project: {
+      //     _id: 1,
+      //     count: { $size: '$shortlistedSharedProperties' }
+      //   }
+      // }
+      // {
+      //   $match: {
+      //     'shortListProperties.isShortlisted': true
+      //   }
+      // },
+      // {
+      //   $group: {
+      //     _id: null,
+      //     count: { $sum: 1 }
+      //   }
+      // }
+    //   {
+    //     $addFields: {
+    //         hasShortlistedSharedProperty: {
+    //             $anyElementTrue: '$sharedProperties.isShortlisted'
+    //         }
+    //     }
+    // },
+
+    // {
+    //     $match: {
+    //       '$sharedProperties.isShortlisted': true,
+    //       count: { $sum: 1 },
+    //     },
+    // },
+
+    //   {
+      //     $unwind: {
+      //         path: '$shortListProperties',
+      //         preserveNullAndEmptyArrays: true
+      //     }
+      // },
+
+    ]);
+
+    console.log('step3 : ', step3);
+
+    // const aggregateQuery = await Property.aggregate([
+    //   {
+    //     $group: {
+    //       _id: { $size: '$sharedProperty' }, // Group by the length of the "data" array
+    //       new2: {
+    //         $sum: {
+    //           $cond: [{ $gt: [{ $size: '$sharedProperty' }, 0] }, 1, 0],
+    //         },
+    //       },
+    //     },
+    //   },
+    // ]);
+
+    // const aggregateQuery = await Property.aggregate([
+    //     {
+    //       $lookup: {
+    //         from: 'sharedproperty',
+    //         localField: 'sharedProperty',
+    //         foreignField: '_id',
+    //         as: 'sharedProperties'
+    //       }
+    //     },
+    //     {
+    //       $project: {
+    //         _id: 1,
+    //         hasSharedProperty: { $gt: [{ $size: '$sharedProperties' }, 0] },
+    //         hasShortlistedSharedProperty: {
+    //           $anyElementTrue: {
+    //             $map: {
+    //               input: '$sharedProperties',
+    //               as: 'sharedProp',
+    //               in: '$$sharedProp.isShortlisted'
+    //             }
+    //           }
+    //         },
+    //         sharedPropertyCount: { $size: '$sharedProperties' }
+    //       }
+    //     },
+    //     {
+    //       $group: {
+    //         _id: null,
+    //         propertiesWithNoSharedProperty: {
+    //           $sum: {
+    //             $cond: [{ $eq: ['$sharedPropertyCount', 0] }, 1, 0]
+    //           }
+    //         },
+    //         propertiesWithSharedProperty: {
+    //           $sum: {
+    //             $cond: [{ $gt: ['$sharedPropertyCount', 0] }, 1, 0]
+    //           }
+    //         },
+    //         propertiesWithShortlistedSharedProperty: {
+    //           $sum: {
+    //             $cond: ['$hasShortlistedSharedProperty', 1, 0]
+    //           }
+    //         }
+    //       }
+    //     },
+    //     {
+    //       $project: {
+    //         _id: 0,
+    //         propertiesWithNoSharedProperty: 1,
+    //         propertiesWithSharedProperty: 1,
+    //         propertiesWithShortlistedSharedProperty: 1
+    //       }
+    //     }
+    //   ]);
+
+    // console.log('aggregateQuery result ', aggregateQuery);
+    // const property = aggregateQuery.reduce((obj, item) => {
+    //   obj[item.status] = item.count;
+    //   return obj;
+    // }, {});
+
+    // return successResponse(
+    //   res,
+    //   200,
+    //   { property },
+    //   'Property dashboard count get successfully.'
+    // );
+  } catch (error) {
     return failureResponse(
       res,
       error.status || 500,

@@ -35,6 +35,10 @@ const PropertySchema: Schema = new Schema(
         type: Schema.Types.String,
       }
     ],
+    imagesApproved: {
+      type: Schema.Types.Boolean,
+      default: false
+    },
     closeListingStatus: {
       // deactive property with close listing
       type: Schema.Types.String,
