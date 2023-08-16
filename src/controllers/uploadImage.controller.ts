@@ -218,32 +218,30 @@ export const getS3ImagesByPropertyId = async (id) => {
 };
 
 // Get s3 images and move those in final folder
-export const copyAndRenameS3Images = async (data) => {
-  const fileData = await Promise.all(
-    data.map(async (property) => {
-      console.log('property', property);
-      const uploadParams = await AssignedProperty.findOne({
-        propertyId: property.propertyId,
+export const copyAndRenameS3Images = async (id, imgs) => {
+  const uploadParams = await AssignedProperty.findOne({
+    propertyId: id,
+  });
+  if (uploadParams) {
+    const imgUrl = `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}`;
+    // copy images to final folder with rename
+    imgs.map(async (img) => {
+      const params = {
+        ACL: 'public-read',
+        Bucket: bucketName,
+        CopySource: img.link,
+        Key: `${imgUrl}_${img.revisedName}`,
+      };
+      s3.copyObject(params, (err, updated) => {
+        if (err) {
+          console.error('Error copying object:', err);
+        } else {
+          console.log('data after copy', updated);
+        }
       });
-
-      // copy images to final folder with rename
-      property.images.map(async (img) => {
-        const params = {
-          ACL: 'public-read',
-          Bucket: bucketName,
-          CopySource: img.link,
-          Key: `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}_${img.revisedName}`,
-        };
-
-        s3.copyObject(params, (err, updated) => {
-          if (err) {
-            console.error('Error copying object:', err);
-          } else {
-            console.log('data after copy', updated);
-          }
-        });
-      });
-    })
-  );
-  return fileData;
+    });
+    return await imgs;
+  } else {
+    return failureResponse(null, 404, [], 'Data not found');
+  }
 };

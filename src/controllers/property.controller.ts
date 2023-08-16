@@ -8,7 +8,10 @@ import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
 import { PipelineStage, Types } from 'mongoose';
 import { count } from 'console';
-import { copyAndRenameS3Images, getS3ImagesByPropertyId } from './uploadImage.controller';
+import {
+  copyAndRenameS3Images,
+  getS3ImagesByPropertyId,
+} from './uploadImage.controller';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -526,13 +529,8 @@ export const closeListingProperty = async (req: Request, res: Response) => {
 // Get property images from s3 by propertyId
 export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
   try {
-    const files = await getS3ImagesByPropertyId(req.params.id);
-    return successResponse(
-      res,
-      200,
-      { files },
-      'S3 images get successfully.'
-    );
+    const images = await getS3ImagesByPropertyId(req.params.id);
+    return successResponse(res, 200, { images }, 'S3 images get successfully.');
   } catch (error) {
     return failureResponse(
       res,
@@ -543,25 +541,42 @@ export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
   }
 };
 
-// Get property images from s3 for renaming file-name
+// Get property images from s3 for renaming file-name and copy those into final folder
 export const renameAndCopyBoardImagesOfS3 = async (
   req: Request,
   res: Response
 ) => {
+  const propertyId = req.params.id;
   try {
-    const board = await Property.findById(req.params.id)
-      .populate('tenantId propertyId')
-      .lean();
-    if (!board) {
-      return failureResponse(res, 404, [], 'Board not found.');
+    const imgs = await copyAndRenameS3Images(propertyId, req.body.images);
+    if (imgs && imgs.length) {
+      Property.findByIdAndUpdate(
+        { _id: propertyId },
+        {
+          $set: {
+            imagesApproved: true,
+          },
+        },
+        { new: true }
+      ).exec((error, updatedRecord) => {
+        if (error) {
+          console.log('error while update', error);
+          return failureResponse(
+            res,
+            500,
+            [],
+            error.message || 'Something went wrong'
+          );
+        } else {
+          return successResponse(
+            res,
+            200,
+            {},
+            'Images has been renamed and copied successfully.'
+          );
+        }
+      });
     }
-    const file = await copyAndRenameS3Images(req.body.data);
-    return successResponse(
-      res,
-      200,
-      {},
-      'Images has been renamed and copied successfully.'
-    );
   } catch (error) {
     return failureResponse(
       res,
