@@ -13,7 +13,7 @@ import { count } from 'console';
 export const addProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+    tempData.propertyData.agentId = new Types.ObjectId(
       req.user.user._id
     );
 
@@ -39,7 +39,7 @@ export const addProperty = async (req: Request, res: Response) => {
           );
         } else if (propertyExist && propertyExist.length) {
           const userProperty = propertyExist[0].propertyDetails.filter((x) =>
-            x.propertyAgentId.equals(tempData.propertyData.propertyAgentId)
+            x.agentId.equals(tempData.propertyData.agentId)
           );
           if (userProperty && userProperty.length) {
             return failureResponse(
@@ -110,7 +110,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     const searchText: any = req.query.search;
     // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingStatus
     const filter: any = req.query.filter;
-    const userId = new Types.ObjectId(req.user.user._id);
+    const agentId = new Types.ObjectId(req.user.user._id);
     const aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -122,7 +122,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
       },
       {
         $match: {
-          'propertyDetails.propertyAgentId': userId,
+          'propertyDetails.agentId': agentId,
         },
       },
     ];

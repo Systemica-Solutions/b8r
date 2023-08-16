@@ -22,9 +22,9 @@ const BuyerDetailSchema: Schema = new Schema(
       type: Schema.Types.String,
       required: true,
     },
-    propertyAgentId: {
+    agentId: {
       type: Schema.Types.ObjectId,
-      ref: MODELS.USERS,
+      ref: MODELS.AGENT,
     },
     houseConfiguration: {
       type: Schema.Types.String,

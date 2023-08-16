@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import { EmailValidation } from '../helpers/validation.helper';
 
-const UserSchema: Schema = new Schema(
+const AgentSchema: Schema = new Schema(
   {
     name: {
       type: Schema.Types.String,
@@ -42,4 +42,4 @@ const UserSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export default model(MODELS.USERS, UserSchema);
+export default model(MODELS.AGENT, AgentSchema);

@@ -14,7 +14,7 @@ import { getS3ImagesByPropertyId } from './uploadImage.controller';
 export const addTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.tenantData.propertyAgentId = new Types.ObjectId(req.user.user._id);
+    tempData.tenantData.agentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of tenant based on below conditions while add new tenant
     //   1. If same user try to enter again same value for phoneNumber & status
@@ -34,7 +34,7 @@ export const addTenant = async (req: Request, res: Response) => {
           );
         } else if (tenantExist && tenantExist.length) {
           const tenantObj = tenantExist[0].tenantDetails.filter((x) =>
-            x.propertyAgentId.equals(tempData.tenantData.propertyAgentId)
+            x.agentId.equals(tempData.tenantData.agentId)
           );
           if (tenantObj && tenantObj.length) {
             return failureResponse(
@@ -106,7 +106,7 @@ export const getAllTenantList = async (req: Request, res: Response) => {
      and also for archive filter of deactivateStatus */
     const searchText: any = req.query.search;
     const filter: any = req.query.filter;
-    const userId = new Types.ObjectId(req.user.user._id);
+    const agentId = new Types.ObjectId(req.user.user._id);
     const aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -118,7 +118,7 @@ export const getAllTenantList = async (req: Request, res: Response) => {
       },
       {
         $match: {
-          'tenantDetails.propertyAgentId': userId,
+          'tenantDetails.agentId': agentId,
         },
       },
     ];
@@ -333,7 +333,7 @@ export const changeTenantStatus = async (id, status) => {
 // Get tenant dashboard count
 export const getDashboardCount = async (req: Request, res: Response) => {
   try {
-    const userId = new Types.ObjectId(req.user.user._id);
+    const agentId = new Types.ObjectId(req.user.user._id);
     const aggregateQuery = await Tenant.aggregate([
       {
         $lookup: {
@@ -345,7 +345,7 @@ export const getDashboardCount = async (req: Request, res: Response) => {
       },
       {
         $match: {
-          'tenantDetails.propertyAgentId': userId,
+          'tenantDetails.agentId': agentId,
         },
       },
       {

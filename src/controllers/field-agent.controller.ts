@@ -13,7 +13,7 @@ import { updatePropertyDetails } from './property.controller';
 export const verifyProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.propertyAgentId = new Types.ObjectId(
+    tempData.propertyData.agentId = new Types.ObjectId(
       req.user.user._id
     );
     tempData.status = 'Verified';
@@ -63,9 +63,9 @@ export const getFieldAgentPendingProperty = async (
   res: Response
 ) => {
   try {
-    const propertyAgentId = new Types.ObjectId(req.user.user._id);
+    const agentId = new Types.ObjectId(req.user.user._id);
     const property = await AssignedProperty.find({
-      fieldAgentId: propertyAgentId,
+      fieldAgentId: agentId,
     })
       .populate('propertyImageId')
       .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
@@ -96,9 +96,9 @@ export const getFieldAgentHomeCount = async (req: Request, res: Response) => {
   try {
     const pendingProperties = [];
     const verifiedProperties = [];
-    const propertyAgentId = new Types.ObjectId(req.user.user._id);
+    const agentId = new Types.ObjectId(req.user.user._id);
     const property = await AssignedProperty.find({
-      fieldAgentId: propertyAgentId,
+      fieldAgentId: agentId,
     }).populate('propertyId');
     if (!property) {
       return failureResponse(res, 500, [], 'Something went wrong');

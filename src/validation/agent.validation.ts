@@ -3,7 +3,7 @@ import { failureResponse } from '../helpers/api-response.helper';
 import { encrypt } from '../services/crypto.service';
 
 // Sign-up schema validation
-export const signupUserValidation = async (req, res, next) => {
+export const signupAgentValidation = async (req, res, next) => {
   // console.log('Here is the req Body..', req.body);
   const schema = Joi.object().keys({
     name: Joi.string().required().messages({
@@ -57,7 +57,7 @@ export const signupUserValidation = async (req, res, next) => {
 };
 
 // Sign-in schema validation
-export const signinUserValidation = async (req, res, next) => {
+export const signinAgentValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     password: Joi.string().required(),
     phoneNumber: Joi.string()
@@ -124,7 +124,7 @@ export const resetPasswordValidation = async (req, res, next) => {
 };
 
 // update user schema validation
-export const updateUserValidation = async (req, res, next) => {
+export const updateAgentValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     name: Joi.string().required().messages({
       'string.base': `Name should be a type of 'text'`,
@@ -162,7 +162,7 @@ export const updateUserValidation = async (req, res, next) => {
 // Add auth-code schema validation
 export const addAuthCodeValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
-    propertyAgentId: Joi.string().optional(),
+    agentId: Joi.string().optional(),
     entity: Joi.string().optional(),
     code: Joi.string().required(),
     codeType: Joi.string().optional(),

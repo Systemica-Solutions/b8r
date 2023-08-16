@@ -11,7 +11,7 @@ import {
 // Check validations while add tenant
 export const tenantDetailValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
-    propertyAgentId: Joi.string().optional(),
+    agentId: Joi.string().optional(),
     email: Joi.string().email().required(),
     name: Joi.string().required(),
     stayDuration: Joi.string().optional(),

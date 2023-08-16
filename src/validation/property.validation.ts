@@ -149,7 +149,7 @@ export const propertyDetailValidation = async (req, res, next) => {
 
   const schema = Joi.object().keys({
     version: Joi.number().optional(),
-    propertyAgentId: Joi.string().optional(),
+    agentId: Joi.string().optional(),
     propertyInfo: propertyBasicInfo.required(),
     ownerInfo: ownerBasicInfo.required(),
     featureInfo: featureBasicInfo.required(),

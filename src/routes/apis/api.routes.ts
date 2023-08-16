@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import userRoutes from '../apis/user.routes';
+import agentRoutes from '../apis/agent.routes';
 import propertyRoutes from '../apis/property.routes';
 import buyerRoutes from '../apis/buyer.routes';
 import tenantRoutes from '../apis/tenant.routes';
@@ -8,7 +8,7 @@ import fieldAgentRoutes from '../apis/field-agent.routes';
 
 const router = Router();
 
-router.use('/user', userRoutes);
+router.use('/agent', agentRoutes);
 
 router.use('/property', propertyRoutes);
 
