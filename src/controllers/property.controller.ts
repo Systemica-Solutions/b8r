@@ -18,9 +18,9 @@ export const addProperty = async (req: Request, res: Response) => {
     );
 
     //  Check version of property based on below conditions while add new property
-    //   1. If same user try to enter again same value for houseName, societyName, pinCode then
+    //   1. If same agent try to enter again same value for houseName, societyName, pinCode then
     //         it should return as already exist property with this values
-    //   2. If another user try to add property and it matches with houseName, societyName, pinCode then increment it's version
+    //   2. If another agent try to add property and it matches with houseName, societyName, pinCode then increment it's version
     Property.find({
       $and: [
         { houseName: tempData.houseName },
@@ -38,10 +38,10 @@ export const addProperty = async (req: Request, res: Response) => {
             error.message || 'Something went wrong'
           );
         } else if (propertyExist && propertyExist.length) {
-          const userProperty = propertyExist[0].propertyDetails.filter((x) =>
+          const agentProperty = propertyExist[0].propertyDetails.filter((x) =>
             x.agentId.equals(tempData.propertyData.agentId)
           );
-          if (userProperty && userProperty.length) {
+          if (agentProperty && agentProperty.length) {
             return failureResponse(
               res,
               403,
@@ -241,8 +241,8 @@ const changePropertyStatus = async (id, status) => {
 // Get property dashboard count
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
-    const userId = new Types.ObjectId(req.user.user._id);
-    console.log('userID', userId);
+    const agentId = new Types.ObjectId(req.user.user._id);
+    console.log('agentID', agentId);
 
     // shared count
     const step1 = await Property.countDocuments({

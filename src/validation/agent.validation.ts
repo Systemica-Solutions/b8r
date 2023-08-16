@@ -123,7 +123,7 @@ export const resetPasswordValidation = async (req, res, next) => {
   }
 };
 
-// update user schema validation
+// update agent schema validation
 export const updateAgentValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     name: Joi.string().required().messages({

@@ -17,9 +17,9 @@ export const addTenant = async (req: Request, res: Response) => {
     tempData.tenantData.agentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of tenant based on below conditions while add new tenant
-    //   1. If same user try to enter again same value for phoneNumber & status
+    //   1. If same agent try to enter again same value for phoneNumber & status
     //         it should return as already exist tenant with this values
-    //   2. If another user try to add tenant and it matches with phoneNumber & status then increment it's version
+    //   2. If another agent try to add tenant and it matches with phoneNumber & status then increment it's version
     Tenant.find({
       $and: [{ phoneNumber: tempData.phoneNumber }],
     })

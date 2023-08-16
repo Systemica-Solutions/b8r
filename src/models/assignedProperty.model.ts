@@ -9,7 +9,7 @@ const AssignedPropertySchema: Schema = new Schema(
     // },
     fieldAgentId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Agent',
       required: true,
     },
     propertyId: {

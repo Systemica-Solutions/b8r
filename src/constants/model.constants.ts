@@ -1,5 +1,5 @@
 export const MODELS = {
-  AGENT: 'AGENT',
+  AGENT: 'Agent',
   AUTHCODE: 'Authcode',
   PROPERTY: 'Property',
   PROPERTYDETAILS: 'PropertyDetails',

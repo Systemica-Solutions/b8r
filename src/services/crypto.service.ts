@@ -24,10 +24,10 @@ export const generateRandomKey = (length) => {
 };
 
 /**
- * Generate JWT token using user details
+ * Generate JWT token using object details
  */
-export const generateJWTToken = (user) => {
-  return jwt.sign(user.toJSON(), process.env.SECRET, {
+export const generateJWTToken = (data) => {
+  return jwt.sign(data.toJSON(), process.env.SECRET, {
     expiresIn: process.env.JWT_EXPIRY,
   });
 };

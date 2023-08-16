@@ -5,7 +5,7 @@ const PropertyPhotosSchema: Schema = new Schema(
   {
     agentId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Agent',
     },
     propertyId: {
       type: Schema.Types.ObjectId,

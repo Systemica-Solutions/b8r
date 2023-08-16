@@ -14,9 +14,9 @@ export const addBuyer = async (req: Request, res: Response) => {
     tempData.buyerData.agentId = new Types.ObjectId(req.user.user._id);
 
     //  Check version of buyer based on below conditions while add new buyer
-    //   1. If same user try to enter again same value for phoneNumber & status
+    //   1. If same agent try to enter again same value for phoneNumber & status
     //         it should return as already exist buyer with this values
-    //   2. If another user try to add buyer and it matches with phoneNumber & status then increment it's version
+    //   2. If another agent try to add buyer and it matches with phoneNumber & status then increment it's version
     Buyer.find({
       $and: [
         { phoneNumber: tempData.phoneNumber },
