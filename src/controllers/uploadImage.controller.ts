@@ -217,6 +217,47 @@ export const getS3ImagesByPropertyId = async (id) => {
   return await tempImgs;
 };
 
+// Get all property images fom s3 which are not moved to final folder yet
+export const getAllPropertyS3Images = async () => {
+  try {
+    const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
+    const params = {
+      Bucket: bucketName,
+      Prefix: 'b8rHomes'
+    };
+    const response = await s3.listObjectsV2(params).promise();
+    const groupedData = response.Contents.reduce((acc, element) => {
+      const keyParts = element.Key.split('/'); // Split the Key into parts
+      const commonKey = keyParts[keyParts.length - 4]; // Get the common property images
+      const commonFolder = keyParts[keyParts.length - 2]; // check raw or final folder
+      if (!acc[commonKey]) {
+        acc[commonKey] = [];
+      }
+      if (commonFolder === 'raw') {
+        const obj = {
+          link: prefix.concat(element.Key),
+          name: element.Key.split('/').pop(),
+        };
+        acc[commonKey].push(obj);
+      }
+      return acc;
+    }, {});
+
+    // Convert the groupedData object into an array
+    const groupedArray = Object.entries(groupedData).map(([key, value]) => ({
+      propertyId: key,
+      images: value,
+    }));
+    return groupedArray;
+    // If there are more objects, handle pagination
+    // if (response.IsTruncated) {
+    //   console.log('More objects available; use pagination to fetch them.');
+    // }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 // Get s3 images and move those in final folder
 export const copyAndRenameS3Images = async (id, imgs) => {
   const uploadParams = await AssignedProperty.findOne({

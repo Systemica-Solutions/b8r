@@ -254,7 +254,7 @@ const updateShortlistDate = async (data, propertyId, tenantId) => {
     return await Promise.all(
       data.propertyId.map(async (singleProperty) => {
         if (
-          singleProperty._id == propertyId &&
+          singleProperty._id === propertyId &&
           singleProperty.sharedProperty &&
           singleProperty.sharedProperty.length
         ) {
