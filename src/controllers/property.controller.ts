@@ -10,6 +10,7 @@ import { PipelineStage, Types } from 'mongoose';
 import { count } from 'console';
 import {
   copyAndRenameS3Images,
+  getAllPropertyS3Images,
   getS3ImagesByPropertyId,
 } from './uploadImage.controller';
 
@@ -590,8 +591,16 @@ export const renameAndCopyBoardImagesOfS3 = async (
 // Get all property images fom s3 which are not moved to final folder yet
 export const getAllPropertyImages = async (req: Request, res: Response) => {
   try {
-    // const images = await getS3ImagesByPropertyId(req.params.id);
-    // return successResponse(res, 200, { images }, 'S3 images get successfully.');
+    const data = await getAllPropertyS3Images();
+    const propertyIds = data.map((item: any) => item.propertyId);
+    const propertieData: any = await Property.find({ _id: { $in: propertyIds }, imagesApproved: false});
+    const propertiesData = data.filter((item) => propertieData.some(property => property._id.toString() === item.propertyId));
+    return successResponse(
+      res,
+      200,
+      { properties: propertiesData },
+      'S3 images are get successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
