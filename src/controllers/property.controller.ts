@@ -113,6 +113,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     const searchText: any = req.query.search;
     // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingStatus
     const filter: any = req.query.filter;
+    const imagesApproved = req.query.imagesApproved;
     const agentId = new Types.ObjectId(req.user.user._id);
     const aggregationPipeline: PipelineStage[] = [
       {
@@ -155,6 +156,12 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
           ],
         },
       });
+    }
+    if (imagesApproved === 'false') {
+      aggregationPipeline.push({ $match: { imagesApproved: false } });
+    }
+    if (imagesApproved === 'true') {
+      aggregationPipeline.push({ $match: { imagesApproved: true } });
     }
     const properties = await Property.aggregate(aggregationPipeline);
     // const properties = await Property.find(query).populate('propertyDetails').lean();
@@ -593,8 +600,15 @@ export const getAllPropertyImages = async (req: Request, res: Response) => {
   try {
     const data = await getAllPropertyS3Images();
     const propertyIds = data.map((item: any) => item.propertyId);
-    const propertieData: any = await Property.find({ _id: { $in: propertyIds }, imagesApproved: false});
-    const propertiesData = data.filter((item) => propertieData.some(property => property._id.toString() === item.propertyId));
+    const propertieData: any = await Property.find({
+      _id: { $in: propertyIds },
+      imagesApproved: false,
+    });
+    const propertiesData = data.filter((item) =>
+      propertieData.some(
+        (property) => property._id.toString() === item.propertyId
+      )
+    );
     return successResponse(
       res,
       200,
