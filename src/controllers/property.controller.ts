@@ -7,7 +7,6 @@ import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
 import { PipelineStage, Types } from 'mongoose';
-import { count } from 'console';
 import {
   copyAndRenameS3Images,
   getAllPropertyS3Images,
@@ -332,6 +331,27 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       200,
       { counts: output },
       'Property dashboard count get successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Check status of single property
+export const getPropertyStatus = async (req: Request, res: Response) => {
+  try {
+    const property = await Property.findById(req.params.id)
+    .populate({ path: 'sharedProperty', populate: { path: 'tenantId' } });
+    return successResponse(
+      res,
+      200,
+      { property },
+      'Detailed property  data get successfully.'
     );
   } catch (error) {
     return failureResponse(

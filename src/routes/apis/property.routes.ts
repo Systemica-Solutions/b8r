@@ -8,7 +8,8 @@ import {
   getPropertyCounts,
   getPropertyImagesFromS3,
   renameAndCopyBoardImagesOfS3,
-  getAllPropertyImages
+  getAllPropertyImages,
+  getPropertyStatus
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -34,6 +35,9 @@ router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
 
 // Get property agent dashboard count
 router.get('/count', userAuth, getPropertyCounts);
+
+// Check status of single property
+router.get('/check-status/:id', userAuth, getPropertyStatus);
 
 // Get all properties
 router.get('/', userAuth, getAllPropertyList);
