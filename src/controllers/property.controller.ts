@@ -345,8 +345,10 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
 // Check status of single property
 export const getPropertyStatus = async (req: Request, res: Response) => {
   try {
-    const property = await Property.findById(req.params.id)
-    .populate({ path: 'sharedProperty', populate: { path: 'tenantId' } });
+    const property = await Property.findById(req.params.id).populate({
+      path: 'sharedProperty',
+      populate: { path: 'tenantId' },
+    });
     return successResponse(
       res,
       200,
@@ -490,6 +492,50 @@ export const getAllPropertyImages = async (req: Request, res: Response) => {
       { properties: propertiesData },
       'S3 images are get successfully.'
     );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Reactivate property and change status to verified
+export const reactivateProperty = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    Property.findByIdAndUpdate(
+      { _id: req.params.id },
+      {
+        $set: {
+          reactivateDetails: tempData.reactivateDetails,
+          status: 'Verified',
+        },
+      },
+      { new: true }
+    )
+      .populate('propertyDetails')
+      .exec((error, updatedRecord) => {
+        if (error) {
+          console.log('error while update', error);
+          return failureResponse(
+            res,
+            500,
+            [],
+            error.message || 'Something went wrong'
+          );
+        } else {
+          console.log('updatedRecord.......', updatedRecord);
+          return successResponse(
+            res,
+            200,
+            { property: updatedRecord },
+            'Property reactivated successfully.'
+          );
+        }
+      });
   } catch (error) {
     return failureResponse(
       res,

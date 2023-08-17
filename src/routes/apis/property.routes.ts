@@ -9,12 +9,14 @@ import {
   getPropertyImagesFromS3,
   renameAndCopyBoardImagesOfS3,
   getAllPropertyImages,
-  getPropertyStatus
+  getPropertyStatus,
+  reactivateProperty
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
   propertyDetailValidation,
   closeListingValidation,
+  reactivateValidation
 } from '../../validation/property.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 import uploadRoutes from '../apis/upload.routes';
@@ -65,5 +67,12 @@ router.put(
   closeListingProperty
 );
 
+// Edit property status with reactivate property
+router.put(
+  '/reactivate/:id',
+  userAuth,
+  reactivateValidation,
+  reactivateProperty
+);
 
 export default router;

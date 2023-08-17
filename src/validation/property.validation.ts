@@ -178,8 +178,16 @@ export const addPropertyValidation = async (req, res, next) => {
       .required(),
     rentAmount: Joi.number().optional(),
     agreementFor: Joi.number().integer().min(1).max(12).optional(),
-    tenancyStartDate: Joi.date().optional(),
+    tenancyStartDate: Joi.date().iso().optional(),
     feedback: Joi.string().optional(),
+  });
+
+  const reactivateData = Joi.object().keys({
+    tenantName: Joi.string().optional(),
+    phoneNumber: Joi.string()
+      .pattern(/^[0-9]{10}$/)
+      .optional(),
+    vacanyDate: Joi.date().iso().optional(),
   });
 
   const schema = Joi.object().keys({
@@ -199,6 +207,7 @@ export const addPropertyValidation = async (req, res, next) => {
       .valid(...Object.keys(propertyStatus))
       .optional(),
     closeListingDetails: closeListingData.optional(),
+    reactivateDetails: reactivateData.optional(),
   });
   const value = schema.validate(req.body);
   if (value.error) {
@@ -227,7 +236,7 @@ export const verifyPropertyValidation = async (req, res, next) => {
       .valid(...Object.keys(staticStatus))
       .optional(),
     propertyData: Joi.any().optional(),
-    propertyDetails: Joi.array().items(Joi.string()).optional()
+    propertyDetails: Joi.array().items(Joi.string()).optional(),
   });
   const value = schema.validate(req.body);
   if (value.error) {
@@ -260,6 +269,32 @@ export const closeListingValidation = async (req, res, next) => {
       agreementFor: Joi.string().optional(),
       tenancyStartDate: Joi.date().iso().optional(),
       feedback: Joi.string().optional(),
+    }),
+  });
+  const value = schema.validate(req.body);
+  if (value.error) {
+    return failureResponse(
+      res,
+      400,
+      value.error,
+      value.error.details[0].message
+        ? value.error.details[0].message
+        : 'Bad request'
+    );
+  } else {
+    next();
+  }
+};
+
+// Reactivate property validation
+export const reactivateValidation = async (req, res, next) => {
+  const schema = Joi.object().keys({
+    reactivateDetails: Joi.object().keys({
+      tenantName: Joi.string().optional(),
+      phoneNumber: Joi.string()
+        .pattern(/^[0-9]{10}$/)
+        .optional(),
+      vacanyDate: Joi.date().iso().optional(),
     }),
   });
   const value = schema.validate(req.body);

@@ -313,6 +313,23 @@ export const propertyCloseListingInfo: Schema = new Schema(
   { _id: false }
 );
 
+export const propertyReactivateInfo: Schema = new Schema(
+  {
+    tenantName: {
+      type: Schema.Types.String,
+    },
+    phoneNumber: {
+      type: Schema.Types.String,
+      required: true,
+    },
+    vacanyDate: {
+      type: Schema.Types.Date,
+      default: null
+    }
+  },
+  { _id: false }
+);
+
 export const sharedPropertyInfo: Schema = new Schema({
   tenantId: {
     type: Schema.Types.ObjectId,
