@@ -56,7 +56,7 @@ export enum staticStatus {
   'Closed',
 }
 
-export enum tenantStatus {
+export enum tenantBuyerStatus {
   'WaitingForProperty',
   'Shared',
   'CurrentlyViewing',
@@ -74,4 +74,9 @@ export enum propertyStatus {
   'Rented of B8R',
   'Delist / Owner Denied',
   'Rented Outside',
+}
+
+export enum agentType {
+  'Buyer',
+  'Tenant'
 }

@@ -58,6 +58,12 @@ const PropertySchema: Schema = new Schema(
         type: Schema.Types.ObjectId,
         ref: 'SharedProperty',
       },
+    ],
+    sharedBuyerProperty : [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'SharedBuyerProperty',
+      },
     ]
   },
   { timestamps: true }

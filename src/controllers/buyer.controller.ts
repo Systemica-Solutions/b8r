@@ -5,7 +5,7 @@ import {
 } from '../helpers/api-response.helper';
 import Buyer from '../models/buyer.model';
 import BuyerDetail from '../models/buyerDetail.model';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 
 // Add new buyer
 export const addBuyer = async (req: Request, res: Response) => {
@@ -18,10 +18,7 @@ export const addBuyer = async (req: Request, res: Response) => {
     //         it should return as already exist buyer with this values
     //   2. If another agent try to add buyer and it matches with phoneNumber & status then increment it's version
     Buyer.find({
-      $and: [
-        { phoneNumber: tempData.phoneNumber },
-        { status: tempData.status },
-      ],
+      $and: [{ phoneNumber: tempData.phoneNumber }],
     })
       .populate('buyerDetails')
       .exec(async (error: any, buyerExist: any) => {
@@ -98,9 +95,58 @@ const updateBuyerDetails = (id, detailsId, res) => {
 };
 
 //  Get all buyers
-export const getAllBuyerList = async (_: Request, res: Response) => {
+export const getAllBuyerList = async (req: Request, res: Response) => {
   try {
-    const buyers = await Buyer.find().populate('buyerDetails').lean();
+    /* Search is based on buyer name
+     Filter is based on status of buyer like WaitingForProperty/Shared/CurrentlyViewing/Shortlisted/Deactivate
+     and also for archive filter of deactivateStatus */
+    const searchText: any = req.query.search;
+    const filter: any = req.query.filter;
+    const agentId = new Types.ObjectId(req.user.user._id);
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'buyerdetails',
+          localField: 'buyerDetails',
+          foreignField: '_id',
+          as: 'buyerDetails',
+        },
+      },
+      {
+        $match: {
+          'buyerDetails.agentId': agentId,
+        },
+      },
+    ];
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          'buyerDetails.name': {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    if (filter && filter.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              deactivateStatus: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+    const buyers = await Buyer.aggregate(aggregationPipeline);
+    // const buyers = await Buyer.find().populate('buyerDetails').lean();
     if (!buyers) {
       throw { status: 404, message: 'Buyers not found.' };
     }

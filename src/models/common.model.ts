@@ -7,7 +7,7 @@ import {
   bikeParking,
   parkingType,
   houseHelpRoom,
-  furnishingType
+  furnishingType,
 } from '../constants/global.constants';
 
 export const propertyBasicInfo: Schema = new Schema(
@@ -213,77 +213,77 @@ export const propertyApproveInfo: Schema = new Schema(
   {
     liftLobby: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     entryDoor: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     homeEntry: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     livingRoom: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     tvArea: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     kitchen: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     utilityArea: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     backyard: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     commonWashroom: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     livingRoomBalcony: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     mainGate: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     clubHouse: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     groceryStore: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     swimmingPool: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     gym: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     parking: {
       type: Schema.Types.Boolean,
-      default: false
+      default: false,
     },
     feature1: {
-      type: Schema.Types.String
+      type: Schema.Types.String,
     },
     feature2: {
-      type: Schema.Types.String
+      type: Schema.Types.String,
     },
     feature3: {
-      type: Schema.Types.String
-    }
+      type: Schema.Types.String,
+    },
   },
   { _id: false }
 );
@@ -324,33 +324,8 @@ export const propertyReactivateInfo: Schema = new Schema(
     },
     vacanyDate: {
       type: Schema.Types.Date,
-      default: null
-    }
+      default: null,
+    },
   },
   { _id: false }
 );
-
-export const sharedPropertyInfo: Schema = new Schema({
-  tenantId: {
-    type: Schema.Types.ObjectId,
-    ref: MODELS.TENANT,
-  },
-  viewedAt: {
-    type: Schema.Types.Date,
-    default: null
-  },
-  isShortlisted: {
-    type: Schema.Types.Boolean,
-    default: false
-  },
-  shortListedAt: {
-    type: Schema.Types.Date,
-    default: null
-  },
-  sharedAt : {
-    type: Schema.Types.Date,
-    default: null
-  }
-}, { timestamps: true });
-
-export default model(MODELS.SHAREDPROPERTY, sharedPropertyInfo);

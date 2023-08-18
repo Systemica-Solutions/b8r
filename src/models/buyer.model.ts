@@ -1,6 +1,9 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { staticStatus } from '../constants/global.constants';
+import {
+  tenantBuyerStatus,
+  tenantDeactivationReason,
+} from '../constants/global.constants';
 
 const BuyerSchema: Schema = new Schema(
   {
@@ -11,8 +14,8 @@ const BuyerSchema: Schema = new Schema(
     status: {
       type: Schema.Types.String,
       trim: true,
-      enum: staticStatus,
-      default: 'Pending',
+      enum: tenantBuyerStatus,
+      default: 'WaitingForProperty',
     },
     buyerDetails: [
       {
@@ -20,6 +23,11 @@ const BuyerSchema: Schema = new Schema(
         ref: 'BuyerDetails',
       },
     ],
+    deactivateStatus: {
+      type: Schema.Types.String,
+      trim: true,
+      enum: tenantDeactivationReason,
+    },
   },
   { timestamps: true }
 );

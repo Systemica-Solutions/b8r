@@ -5,7 +5,7 @@ import {
 } from '../helpers/api-response.helper';
 import Board from '../models/board.model';
 import Property from '../models/property.model';
-import SharedProperty from '../models/common.model';
+import SharedProperty from '../models/sharedProperty.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
 import { changeTenantStatus } from './tenant.controller';

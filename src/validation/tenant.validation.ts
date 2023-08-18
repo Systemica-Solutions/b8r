@@ -4,7 +4,7 @@ import {
   furnishingType,
   houseConfiguration,
   houseType,
-  tenantStatus,
+  tenantBuyerStatus,
   tenantDeactivationReason,
 } from '../constants/global.constants';
 
@@ -66,7 +66,7 @@ export const addTenantValidation = async (req, res, next) => {
       .pattern(/^[0-9]{10}$/)
       .required(),
     status: Joi.string()
-      .valid(...Object.keys(tenantStatus))
+      .valid(...Object.keys(tenantBuyerStatus))
       .optional(),
     deactivateStatus: Joi.string()
       .valid(...Object.values(tenantDeactivationReason))
