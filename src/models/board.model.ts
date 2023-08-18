@@ -12,6 +12,10 @@ const BoardSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: MODELS.TENANT,
     },
+    buyerId: {
+      type: Schema.Types.ObjectId,
+      ref: MODELS.BUYER,
+    },
     propertyId: [
       {
         type: Schema.Types.ObjectId,
@@ -31,7 +35,7 @@ const BoardSchema: Schema = new Schema(
       default: null,
     },
     boardFor: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.String,
       enum: agentType,
     }
   },

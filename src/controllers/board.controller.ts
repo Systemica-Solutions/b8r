@@ -14,6 +14,8 @@ import { changeTenantStatus } from './tenant.controller';
 export const addBoard = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
+    if (!tempData.tenantId) { tempData.boardFor = 'Buyer'; }
+    else { tempData.boardFor = 'Tenant'; }
     tempData.agentId = new Types.ObjectId(req.user.user._id);
     tempData.key = await generateRandomKey(12);
     const detailObj: any = new Board(tempData);
