@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import {
+  buyerDeactivationReason,
   tenantBuyerStatus,
   tenantDeactivationReason,
 } from '../constants/global.constants';
@@ -26,7 +27,7 @@ const BuyerSchema: Schema = new Schema(
     deactivateStatus: {
       type: Schema.Types.String,
       trim: true,
-      enum: tenantDeactivationReason,
+      enum: buyerDeactivationReason,
     },
   },
   { timestamps: true }

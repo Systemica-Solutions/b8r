@@ -70,6 +70,13 @@ export enum tenantDeactivationReason {
   'Not responding',
 }
 
+export enum buyerDeactivationReason {
+  'Sold From B8R',
+  'Sold Externally',
+  'Does not need anymore',
+  'Not responding'
+}
+
 export enum propertyStatus {
   'Rented of B8R',
   'Delist / Owner Denied',
