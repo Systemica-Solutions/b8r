@@ -6,16 +6,21 @@ import {
 import Board from '../models/board.model';
 import Property from '../models/property.model';
 import SharedProperty from '../models/sharedProperty.model';
+import SharedBuyerProperty from '../models/sharedBuyerProperty.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
 import { changeTenantStatus } from './tenant.controller';
+import { changeBuyerStatus } from './buyer.controller';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    if (!tempData.tenantId) { tempData.boardFor = 'Buyer'; }
-    else { tempData.boardFor = 'Tenant'; }
+    if (!tempData.tenantId) {
+      tempData.boardFor = 'Buyer';
+    } else {
+      tempData.boardFor = 'Tenant';
+    }
     tempData.agentId = new Types.ObjectId(req.user.user._id);
     tempData.key = await generateRandomKey(12);
     const detailObj: any = new Board(tempData);
@@ -127,7 +132,7 @@ export const finalizeBoard = async (req: Request, res: Response) => {
       },
       { new: true }
     )
-      .populate('tenantId propertyId')
+      .populate('tenantId buyerId propertyId')
       .lean();
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
@@ -147,38 +152,67 @@ export const finalizeBoard = async (req: Request, res: Response) => {
 
 const updateSharedPropertyTable = async (data) => {
   console.log('data while update', data);
-  await Promise.all(
-    data.propertyId.map(async (singleProperty) => {
-      const obj = {
-        tenantId: data.tenantId,
-      };
-      const detailObj: any = new SharedProperty(obj);
-      const savedObj = await detailObj.save();
-      Property.findByIdAndUpdate(
-        singleProperty._id,
-        { $push: { sharedProperty: savedObj._id } },
-        { new: true }
-      ).exec((err, updatedValue) => {
-        if (err) {
-          return failureResponse(err, 404, [], 'Board not found.');
-        }
-        return updatedValue;
-      });
-    })
-  );
+  if (data && data.boardFor && data.boardFor === 'Tenant') {
+    await Promise.all(
+      data.propertyId.map(async (singleProperty) => {
+        const obj = {
+          tenantId: data.tenantId,
+        };
+        const detailObj: any = new SharedProperty(obj);
+        const savedObj = await detailObj.save();
+        Property.findByIdAndUpdate(
+          singleProperty._id,
+          { $push: { sharedProperty: savedObj._id } },
+          { new: true }
+        ).exec((err, updatedValue) => {
+          if (err) {
+            return failureResponse(err, 404, [], 'Board not found.');
+          }
+          return updatedValue;
+        });
+      })
+    );
+  } else {
+    await Promise.all(
+      data.propertyId.map(async (singleProperty) => {
+        const obj = {
+          buyerId: data.buyerId,
+        };
+        const detailObj: any = new SharedBuyerProperty(obj);
+        const savedObj = await detailObj.save();
+        Property.findByIdAndUpdate(
+          singleProperty._id,
+          { $push: { sharedBuyerProperty: savedObj._id } },
+          { new: true }
+        ).exec((err, updatedValue) => {
+          if (err) {
+            return failureResponse(err, 404, [], 'Board not found.');
+          }
+          return updatedValue;
+        });
+      })
+    );
+  }
 };
 
 // Share board by property agent
 export const shareBoard = async (req: Request, res: Response) => {
   try {
     const board = await Board.findById(req.params.id)
-      .populate('tenantId propertyId')
+      .populate('tenantId buyerId propertyId')
       .lean();
+    console.log('board', board);
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
     const update = updateSharedDate(board);
-    const status = await changeTenantStatus(board.tenantId._id, 'Shared');
+    let status1, status2;
+    if (board && board.boardFor && board.boardFor === 'Tenant') {
+      status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
+    } else if (board && board.boardFor && board.boardFor === 'Buyer') {
+      status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
+    }
+
     return successResponse(res, 200, { board }, 'Board finalize successfully.');
   } catch (error) {
     return failureResponse(
@@ -192,23 +226,44 @@ export const shareBoard = async (req: Request, res: Response) => {
 
 const updateSharedDate = async (data) => {
   try {
-    if (data && data.propertyId && data.propertyId.length) {
-      await Promise.all(
-        data.propertyId.map(async (singleProperty) => {
-          if (
-            singleProperty.sharedProperty &&
-            singleProperty.sharedProperty.length
-          ) {
-            return await SharedProperty.updateMany(
-              {
-                tenantId: data.tenantId._id,
-                _id: { $in: singleProperty.sharedProperty },
-              },
-              { $set: { sharedAt: data.updatedAt } }
-            );
-          }
-        })
-      );
+    if (data && data.boardFor && data.boardFor === 'Tenant') {
+      if (data && data.propertyId && data.propertyId.length) {
+        await Promise.all(
+          data.propertyId.map(async (singleProperty) => {
+            if (
+              singleProperty.sharedProperty &&
+              singleProperty.sharedProperty.length
+            ) {
+              return await SharedProperty.updateMany(
+                {
+                  tenantId: data.tenantId._id,
+                  _id: { $in: singleProperty.sharedProperty },
+                },
+                { $set: { sharedAt: data.updatedAt } }
+              );
+            }
+          })
+        );
+      }
+    } else {
+      if (data && data.propertyId && data.propertyId.length) {
+        await Promise.all(
+          data.propertyId.map(async (singleProperty) => {
+            if (
+              singleProperty.sharedBuyerProperty &&
+              singleProperty.sharedBuyerProperty.length
+            ) {
+              return await SharedBuyerProperty.updateMany(
+                {
+                  buyerId: data.buyerId._id,
+                  _id: { $in: singleProperty.sharedBuyerProperty },
+                },
+                { $set: { sharedAt: data.updatedAt } }
+              );
+            }
+          })
+        );
+      }
     }
   } catch (error) {
     return failureResponse(
@@ -279,3 +334,4 @@ const updateShortlistDate = async (data, propertyId, tenantId) => {
     );
   }
 };
+

@@ -320,3 +320,12 @@ export const getDashboardCount = async (req: Request, res: Response) => {
     );
   }
 };
+
+// Change buyer status
+export const changeBuyerStatus = async (id, status) => {
+  return await Buyer.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
+};
