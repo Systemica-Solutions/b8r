@@ -11,6 +11,7 @@ import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
 import { changeTenantStatus } from './tenant.controller';
 import { changeBuyerStatus } from './buyer.controller';
+import { Type } from '@aws-sdk/client-s3';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
@@ -278,16 +279,30 @@ const updateSharedDate = async (data) => {
 export const shortlistDate = async (req: Request, res: Response) => {
   try {
     const propertyId = req.body.propertyId;
-    const tenantId = req.user.user._id;
+    const userId = req.user.user._id;
     const board = await Board.findById(req.params.id)
-      .populate('tenantId propertyId')
+      .populate('tenantId buyerId propertyId')
       .lean();
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    const status = await changeTenantStatus(tenantId, 'Shortlisted');
-    const update = updateShortlistDate(board, propertyId, tenantId);
-    console.log('updated shortlisted', update);
+    if (board && board.boardFor && board.boardFor === 'Tenant') {
+      const status1 = await changeTenantStatus(userId, 'Shortlisted');
+      const update1 = await updateShortlistDate(
+        board,
+        propertyId,
+        userId,
+        'Tenant'
+      );
+    } else if (board && board.boardFor && board.boardFor === 'Buyer') {
+      const status2 = await changeBuyerStatus(userId, 'Shortlisted');
+      const update2 = await updateShortlistDate(
+        board,
+        propertyId,
+        userId,
+        'Buyer'
+      );
+    }
     return successResponse(
       res,
       200,
@@ -304,26 +319,46 @@ export const shortlistDate = async (req: Request, res: Response) => {
   }
 };
 
-const updateShortlistDate = async (data, propertyId, tenantId) => {
+const updateShortlistDate = async (data, propertyId, userId, boardFor) => {
   try {
-    // console.log('data', data, propertyId, tenantId);
-    return await Promise.all(
-      data.propertyId.map(async (singleProperty) => {
-        if (
-          singleProperty._id === propertyId &&
-          singleProperty.sharedProperty &&
-          singleProperty.sharedProperty.length
-        ) {
-          return await SharedProperty.updateMany(
-            {
-              tenantId,
-              _id: { $in: singleProperty.sharedProperty },
-            },
-            { $set: { shortListedAt: Date.now(), isShortlisted: true } }
-          );
-        }
-      })
-    );
+    console.log('data', data, propertyId, userId);
+    if (boardFor === 'Tenant') {
+      return await Promise.all(
+        data.propertyId.map(async (singleProperty) => {
+          if (
+            singleProperty._id.toString() === propertyId &&
+            singleProperty.sharedProperty &&
+            singleProperty.sharedProperty.length
+          ) {
+            return await SharedProperty.updateMany(
+              {
+                tenantId: userId,
+                _id: { $in: singleProperty.sharedProperty },
+              },
+              { $set: { shortListedAt: Date.now(), isShortlisted: true } }
+            );
+          }
+        })
+      );
+    } else if (boardFor === 'Buyer') {
+      return await Promise.all(
+        data.propertyId.map(async (singleProperty) => {
+          if (
+            singleProperty._id.toString() === propertyId &&
+            singleProperty.sharedBuyerProperty &&
+            singleProperty.sharedBuyerProperty.length
+          ) {
+            return await SharedBuyerProperty.updateMany(
+              {
+                buyerId: userId,
+                _id: { $in: singleProperty.sharedBuyerProperty },
+              },
+              { $set: { shortListedAt: Date.now(), isShortlisted: true } }
+            );
+          }
+        })
+      );
+    }
   } catch (error) {
     return failureResponse(
       {},
@@ -333,4 +368,3 @@ const updateShortlistDate = async (data, propertyId, tenantId) => {
     );
   }
 };
-
