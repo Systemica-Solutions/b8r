@@ -67,14 +67,14 @@ export const updatePropertyViewAtDate = async (req: Request, res: Response) => {
   try {
     console.log('req.pparams', req.params, req.user, req.body);
     const propertyId = req.body.propertyId;
-    const tenantId = req.user.user._id;
+    const userId = req.user.user._id;
     const board = await Board.findById(req.params.id)
-      .populate('tenantId propertyId')
+      .populate('tenantId propertyId buyerId')
       .lean();
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    const update = updateViewedAtDate(board, propertyId, tenantId);
+    const update = updateViewedAtDate(board, propertyId, userId);
     console.log('updated record', update);
     return successResponse(
       res,
@@ -92,26 +92,46 @@ export const updatePropertyViewAtDate = async (req: Request, res: Response) => {
   }
 };
 
-const updateViewedAtDate = async (data, propertyId, tenantId) => {
+const updateViewedAtDate = async (data, propertyId, userId) => {
   try {
     if (data && data.propertyId && data.propertyId.length) {
-      return await Promise.all(
-        data.propertyId.map(async (singleProperty) => {
-          if (
-            singleProperty._id === propertyId &&
-            singleProperty.sharedProperty &&
-            singleProperty.sharedProperty.length
-          ) {
-            return await SharedProperty.updateMany(
-              {
-                tenantId,
-                _id: { $in: singleProperty.sharedProperty },
-              },
-              { $set: { viewedAt: Date.now() } }
-            );
-          }
-        })
-      );
+      if (data && data.boardFor && data.boardFor === 'Tenant') {
+        return await Promise.all(
+          data.propertyId.map(async (singleProperty) => {
+            if (
+              singleProperty._id === propertyId &&
+              singleProperty.sharedProperty &&
+              singleProperty.sharedProperty.length
+            ) {
+              return await SharedProperty.updateMany(
+                {
+                  tenantId: userId,
+                  _id: { $in: singleProperty.sharedProperty },
+                },
+                { $set: { viewedAt: Date.now() } }
+              );
+            }
+          })
+        );
+      } else if (data && data.boardFor && data.boardFor === 'Buyer') {
+        return await Promise.all(
+          data.propertyId.map(async (singleProperty) => {
+            if (
+              singleProperty._id.toString() === propertyId &&
+              singleProperty.sharedBuyerProperty &&
+              singleProperty.sharedBuyerProperty.length
+            ) {
+              return await SharedBuyerProperty.updateMany(
+                {
+                  buyerId: userId,
+                  _id: { $in: singleProperty.sharedBuyerProperty },
+                },
+                { $set: { viewedAt: Date.now() } }
+              );
+            }
+          })
+        );
+      }
     }
   } catch (error) {
     return failureResponse(
