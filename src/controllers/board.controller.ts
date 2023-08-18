@@ -212,8 +212,7 @@ export const shareBoard = async (req: Request, res: Response) => {
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
       status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
     }
-
-    return successResponse(res, 200, { board }, 'Board finalize successfully.');
+    return successResponse(res, 200, { board }, 'Board shared successfully.');
   } catch (error) {
     return failureResponse(
       res,
@@ -245,7 +244,7 @@ const updateSharedDate = async (data) => {
           })
         );
       }
-    } else {
+    } else if (data && data.boardFor && data.boardFor === 'Buyer') {
       if (data && data.propertyId && data.propertyId.length) {
         await Promise.all(
           data.propertyId.map(async (singleProperty) => {
