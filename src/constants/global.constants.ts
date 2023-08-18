@@ -56,6 +56,7 @@ export enum staticStatus {
   'Closed',
 }
 
+
 export enum tenantBuyerStatus {
   'WaitingForProperty',
   'Shared',

@@ -1,11 +1,13 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   successResponse,
   failureResponse,
-} from "../helpers/api-response.helper";
-import Buyer from "../models/buyer.model";
-import BuyerDetail from "../models/buyerDetail.model";
-import { PipelineStage, Types } from "mongoose";
+} from '../helpers/api-response.helper';
+import Buyer from '../models/buyer.model';
+import BuyerDetail from '../models/buyerDetail.model';
+import { PipelineStage, Types } from 'mongoose';
+import { generateJWTToken } from '../services/crypto.service';
+import { tenantBuyerStatus } from '../constants/global.constants';
 
 // Add new buyer
 export const addBuyer = async (req: Request, res: Response) => {
@@ -20,14 +22,14 @@ export const addBuyer = async (req: Request, res: Response) => {
     Buyer.find({
       $and: [{ phoneNumber: tempData.phoneNumber }],
     })
-      .populate("buyerDetails")
+      .populate('buyerDetails')
       .exec(async (error: any, buyerExist: any) => {
         if (error) {
           return failureResponse(
             res,
             error.status || 500,
             error,
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else if (buyerExist && buyerExist.length) {
           const buyerObj = buyerExist[0].buyerDetails.filter((x) =>
@@ -38,7 +40,7 @@ export const addBuyer = async (req: Request, res: Response) => {
               res,
               403,
               [],
-              "Buyer already exist with this value"
+              'Buyer already exist with this value'
             );
           } else {
             tempData.buyerData.version = buyerExist[0].buyerDetails.length + 1;
@@ -59,7 +61,7 @@ export const addBuyer = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -72,23 +74,23 @@ const updateBuyerDetails = (id, detailsId, res) => {
     { $push: { buyerDetails: detailId } },
     { new: true }
   )
-    .populate("buyerDetails")
+    .populate('buyerDetails')
     .exec((error, updatedRecord) => {
       if (error) {
-        console.log("error while update", error);
+        console.log('error while update', error);
         return failureResponse(
           res,
           500,
           [],
-          error.message || "Something went wrong"
+          error.message || 'Something went wrong'
         );
       } else {
-        console.log("updatedRecord.......", updatedRecord);
+        console.log('updatedRecord.......', updatedRecord);
         return successResponse(
           res,
           200,
           { buyer: updatedRecord },
-          "New buyer added successfully."
+          'New buyer added successfully.'
         );
       }
     });
@@ -106,23 +108,23 @@ export const getAllBuyerList = async (req: Request, res: Response) => {
     const aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
-          from: "buyerdetails",
-          localField: "buyerDetails",
-          foreignField: "_id",
-          as: "buyerDetails",
+          from: 'buyerdetails',
+          localField: 'buyerDetails',
+          foreignField: '_id',
+          as: 'buyerDetails',
         },
       },
       {
         $match: {
-          "buyerDetails.agentId": agentId,
+          'buyerDetails.agentId': agentId,
         },
       },
     ];
     if (searchText && searchText.trim()) {
       aggregationPipeline.push({
         $match: {
-          "buyerDetails.name": {
-            $regex: new RegExp("^" + searchText.trim().toLowerCase(), "i"),
+          'buyerDetails.name': {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
           },
         },
       });
@@ -133,12 +135,12 @@ export const getAllBuyerList = async (req: Request, res: Response) => {
           $or: [
             {
               status: {
-                $regex: new RegExp("^" + filter.trim().toLowerCase(), "i"),
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
               },
             },
             {
               deactivateStatus: {
-                $regex: new RegExp("^" + filter.trim().toLowerCase(), "i"),
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
               },
             },
           ],
@@ -148,15 +150,15 @@ export const getAllBuyerList = async (req: Request, res: Response) => {
     const buyers = await Buyer.aggregate(aggregationPipeline);
     // const buyers = await Buyer.find().populate('buyerDetails').lean();
     if (!buyers) {
-      throw { status: 404, message: "Buyers not found." };
+      throw { status: 404, message: 'Buyers not found.' };
     }
-    return successResponse(res, 200, { buyers }, "Buyers found successfully.");
+    return successResponse(res, 200, { buyers }, 'Buyers found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -165,18 +167,18 @@ export const getAllBuyerList = async (req: Request, res: Response) => {
 export const getBuyerById = async (req: Request, res: Response) => {
   try {
     const buyer = await Buyer.findById(req.params.id)
-      .populate("buyerDetails")
+      .populate('buyerDetails')
       .lean();
     if (!buyer) {
-      return failureResponse(res, 404, [], "Buyer not found.");
+      return failureResponse(res, 404, [], 'Buyer not found.');
     }
-    return successResponse(res, 200, { buyer }, "Buyer found successfully.");
+    return successResponse(res, 200, { buyer }, 'Buyer found successfully.');
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
     );
   }
 };
@@ -191,28 +193,28 @@ export const deactivateBuyer = async (req: Request, res: Response) => {
       {
         $set: {
           deactivateStatus: tempData.deactivateStatus,
-          status: "Deactivate",
+          status: 'Deactivate',
         },
       },
       { new: true }
     )
-      .populate("buyerDetails")
+      .populate('buyerDetails')
       .exec(async (error, updatedRecord) => {
         if (error) {
-          console.log("error while update", error);
+          console.log('error while update', error);
           return failureResponse(
             res,
             500,
             [],
-            error.message || "Something went wrong"
+            error.message || 'Something went wrong'
           );
         } else {
-          console.log("updatedRecord.......", updatedRecord);
+          console.log('updatedRecord.......', updatedRecord);
           return successResponse(
             res,
             200,
             { buyer: updatedRecord },
-            "Buyer status updated successfully."
+            'Buyer status updated successfully.'
           );
         }
       });
@@ -221,7 +223,100 @@ export const deactivateBuyer = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || "Something went wrong"
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Buyer login by phoneNumber
+export const buyerLogin = async (req: Request, res: Response) => {
+  try {
+    const buyer = await Buyer.findOne({ phoneNumber: req.body.phoneNumber });
+    if (!buyer) {
+      return failureResponse(
+        res,
+        404,
+        [],
+        'Buyer not registered with this phone number.'
+      );
+    }
+    const jwtToken = generateJWTToken(buyer);
+    return successResponse(
+      res,
+      200,
+      { buyer, jwtToken },
+      'Buyer login successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get buyer dashboard count
+export const getDashboardCount = async (req: Request, res: Response) => {
+  try {
+    const agentId = new Types.ObjectId(req.user.user._id);
+    const aggregateQuery = await Buyer.aggregate([
+      {
+        $lookup: {
+          from: 'buyerdetails',
+          localField: 'buyerDetails',
+          foreignField: '_id',
+          as: 'buyerDetails',
+        },
+      },
+      {
+        $match: {
+          'buyerDetails.agentId': agentId,
+        },
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: '$_id',
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    const buyer = aggregateQuery.reduce((obj, item) => {
+      obj[item.status] = item.count;
+      return obj;
+    }, {});
+    // console.log('aggregateQuery result ', aggregateQuery, buyer);
+    // const statusCounts = {};
+    // const statusCounts = tenantBuyerStatus.reduce((acc, status) => {
+    //   acc[status] = 0;ntBuyerStatus.reduce((acc, status) => {
+    //   acc[status] = 0;
+    //   return acc;
+    // }, {});
+    // Object.keys(buyer).forEach(async status => {
+    //   if (statusCounts.hasOwnProperty(status)) {
+    //     statusCounts[status] = await buyer[status];
+    //   }
+    // });
+    return successResponse(
+      res,
+      200,
+      { buyer },
+      'Buyer dashboard count get successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
     );
   }
 };
