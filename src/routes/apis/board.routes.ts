@@ -6,6 +6,8 @@ import {
   shareBoard,
   updatePropertyViewAtDate,
   shortlistDate,
+  updateLastVisitDateTenantBoard,
+  updateLastVisitDateBuyerBoard
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -37,5 +39,12 @@ router.get('/finalize/:id', userAuth, finalizeBoard);
 
 // Share board
 router.put('/share/:id', userAuth, shareBoard);
+
+// Update last visited date of board by board-id
+router.put('/tenant/:id', userAuth, updateLastVisitDateTenantBoard);
+
+// Update last visited date of board by board-id
+router.put('/buyer/:id', userAuth, updateLastVisitDateBuyerBoard);
+
 
 export default router;

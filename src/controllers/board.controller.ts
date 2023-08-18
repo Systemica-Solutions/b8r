@@ -388,3 +388,55 @@ const updateShortlistDate = async (data, propertyId, userId, boardFor) => {
     );
   }
 };
+
+// Update last visited date of tenant board
+export const updateLastVisitDateTenantBoard = async (req: Request, res: Response) => {
+  try {
+    const boards = await Board.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.user.user._id },
+      {
+        $set: { lastVisitedAt: Date.now() },
+      },
+      { new: true }
+    )
+      .populate('tenantId propertyId')
+      .lean();
+    if (!boards) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { boards }, 'Board updated successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Update last visited date of buyer board
+export const updateLastVisitDateBuyerBoard = async (req: Request, res: Response) => {
+  try {
+    const boards = await Board.findOneAndUpdate(
+      { _id: req.params.id, buyerId: req.user.user._id },
+      {
+        $set: { lastVisitedAt: Date.now() },
+      },
+      { new: true }
+    )
+      .populate('buyerId propertyId')
+      .lean();
+    if (!boards) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { boards }, 'Board updated successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
