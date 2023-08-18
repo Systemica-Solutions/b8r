@@ -194,7 +194,7 @@ export const getTenantById = async (req: Request, res: Response) => {
 export const deactivateTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    const id = new Types.ObjectId(tempData.tenantId);
+    const id = new Types.ObjectId(req.params.id);
     Tenant.findByIdAndUpdate(
       { _id: id },
       {

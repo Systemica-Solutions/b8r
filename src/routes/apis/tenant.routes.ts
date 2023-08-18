@@ -40,7 +40,7 @@ router.get('/:id', userAuth, getTenantById);
 router.get('/board/:id', userAuth, getBoardByAgentId);
 
 // Change status of tenant
-router.put('/deactivate', userAuth, tenantStatusValidation, deactivateTenant);
+router.put('/deactivate/:id', userAuth, tenantStatusValidation, deactivateTenant);
 
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);
