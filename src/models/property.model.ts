@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
 import { staticStatus, propertyStatus } from '../constants/global.constants';
-import { propertyCloseListingInfo, sharedPropertyInfo } from './common.model';
+import { propertyCloseListingInfo, propertyReactivateInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema(
   {
@@ -49,10 +49,20 @@ const PropertySchema: Schema = new Schema(
       type: propertyCloseListingInfo,
       default: null,
     },
+    reactivateDetails: {
+      type: propertyReactivateInfo,
+      default: null,
+    },
     sharedProperty :  [
       {
         type: Schema.Types.ObjectId,
         ref: 'SharedProperty',
+      },
+    ],
+    sharedBuyerProperty : [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'SharedBuyerProperty',
       },
     ]
   },

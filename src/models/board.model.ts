@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
+import { agentType } from '../constants/global.constants';
 
 const BoardSchema: Schema = new Schema(
   {
@@ -10,6 +11,10 @@ const BoardSchema: Schema = new Schema(
     tenantId: {
       type: Schema.Types.ObjectId,
       ref: MODELS.TENANT,
+    },
+    buyerId: {
+      type: Schema.Types.ObjectId,
+      ref: MODELS.BUYER,
     },
     propertyId: [
       {
@@ -28,6 +33,10 @@ const BoardSchema: Schema = new Schema(
     lastVisitedAt: {
       type: Schema.Types.Date,
       default: null,
+    },
+    boardFor: {
+      type: Schema.Types.String,
+      enum: agentType,
     }
   },
   { timestamps: true }

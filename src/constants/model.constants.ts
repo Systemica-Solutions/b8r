@@ -10,5 +10,7 @@ export const MODELS = {
   BUYER: 'Buyer',
   BUYERDETAILS: 'BuyerDetails',
   BOARD: 'Board',
-  SHAREDPROPERTY: 'SharedProperty'
+  SHAREDPROPERTY: 'SharedProperty',
+  SHAREDPBUYERPROPERTY: 'SharedBuyerProperty'
+
 };

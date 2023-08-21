@@ -194,7 +194,7 @@ export const getTenantById = async (req: Request, res: Response) => {
 export const deactivateTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    const id = new Types.ObjectId(tempData.tenantId);
+    const id = new Types.ObjectId(req.params.id);
     Tenant.findByIdAndUpdate(
       { _id: id },
       {
@@ -285,32 +285,6 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
       { board: data },
       'Board found successfully.'
     );
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
-
-// Update last visited date of board
-export const updateLastVisitDateBoard = async (req: Request, res: Response) => {
-  try {
-    const boards = await Board.findOneAndUpdate(
-      { _id: req.params.id, tenantId: req.user.user._id },
-      {
-        $set: { lastVisitedAt: Date.now() },
-      },
-      { new: true }
-    )
-      .populate('tenantId propertyId')
-      .lean();
-    if (!boards) {
-      return failureResponse(res, 404, [], 'Board not found.');
-    }
-    return successResponse(res, 200, { boards }, 'Board updated successfully.');
   } catch (error) {
     return failureResponse(
       res,

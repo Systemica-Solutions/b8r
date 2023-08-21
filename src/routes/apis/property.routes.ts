@@ -8,12 +8,15 @@ import {
   getPropertyCounts,
   getPropertyImagesFromS3,
   renameAndCopyBoardImagesOfS3,
-  getAllPropertyImages
+  getAllPropertyImages,
+  getPropertyStatus,
+  reactivateProperty
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
   propertyDetailValidation,
   closeListingValidation,
+  reactivateValidation
 } from '../../validation/property.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 import uploadRoutes from '../apis/upload.routes';
@@ -34,6 +37,9 @@ router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
 
 // Get property agent dashboard count
 router.get('/count', userAuth, getPropertyCounts);
+
+// Check status of single property
+router.get('/check-status/:id', userAuth, getPropertyStatus);
 
 // Get all properties
 router.get('/', userAuth, getAllPropertyList);
@@ -61,5 +67,12 @@ router.put(
   closeListingProperty
 );
 
+// Edit property status with reactivate property
+router.put(
+  '/reactivate/:id',
+  userAuth,
+  reactivateValidation,
+  reactivateProperty
+);
 
 export default router;

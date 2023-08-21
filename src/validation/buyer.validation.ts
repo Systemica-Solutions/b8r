@@ -1,6 +1,7 @@
 import Joi from '@hapi/joi';
 import { failureResponse } from '../helpers/api-response.helper';
 import {
+  buyerDeactivationReason,
   furnishingType,
   houseConfiguration,
   houseType,
@@ -53,6 +54,28 @@ export const addBuyerValidation = async (req, res, next) => {
       .optional(),
     buyerDetails: Joi.array().items(Joi.string()).optional(),
     buyerData: Joi.any().optional(),
+  });
+  const value = schema.validate(req.body);
+  if (value.error) {
+    return failureResponse(
+      res,
+      400,
+      value.error,
+      value.error.details[0].message
+        ? value.error.details[0].message
+        : 'Bad request'
+    );
+  } else {
+    next();
+  }
+};
+
+// Buyer deactivate status validation
+export const buyerStatusValidation = async (req, res, next) => {
+  const schema = Joi.object().keys({
+    deactivateStatus: Joi.string()
+      .valid(...Object.values(buyerDeactivationReason))
+      .required()
   });
   const value = schema.validate(req.body);
   if (value.error) {

@@ -6,7 +6,6 @@ import {
   deactivateTenant,
   tenantLogin,
   getBoardByAgentId,
-  updateLastVisitDateBoard,
   getDashboardCount
 } from '../../controllers/tenant.controller';
 import {
@@ -40,12 +39,9 @@ router.get('/:id', userAuth, getTenantById);
 router.get('/board/:id', userAuth, getBoardByAgentId);
 
 // Change status of tenant
-router.put('/deactivate', userAuth, tenantStatusValidation, deactivateTenant);
+router.put('/deactivate/:id', userAuth, tenantStatusValidation, deactivateTenant);
 
 // Login tenant by phoneNumber
 router.post('/login', tenantLogin);
-
-// Update last visited date of board by board-id
-router.put('/board/:id', userAuth, updateLastVisitDateBoard);
 
 export default router;

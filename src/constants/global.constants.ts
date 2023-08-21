@@ -56,7 +56,8 @@ export enum staticStatus {
   'Closed',
 }
 
-export enum tenantStatus {
+
+export enum tenantBuyerStatus {
   'WaitingForProperty',
   'Shared',
   'CurrentlyViewing',
@@ -70,8 +71,20 @@ export enum tenantDeactivationReason {
   'Not responding',
 }
 
+export enum buyerDeactivationReason {
+  'Sold From B8R',
+  'Sold Externally',
+  'Does not need anymore',
+  'Not responding'
+}
+
 export enum propertyStatus {
   'Rented of B8R',
   'Delist / Owner Denied',
   'Rented Outside',
+}
+
+export enum agentType {
+  'Buyer',
+  'Tenant'
 }

@@ -5,7 +5,9 @@ import {
 } from '../helpers/api-response.helper';
 import Buyer from '../models/buyer.model';
 import BuyerDetail from '../models/buyerDetail.model';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
+import { generateJWTToken } from '../services/crypto.service';
+import { tenantBuyerStatus } from '../constants/global.constants';
 
 // Add new buyer
 export const addBuyer = async (req: Request, res: Response) => {
@@ -18,10 +20,7 @@ export const addBuyer = async (req: Request, res: Response) => {
     //         it should return as already exist buyer with this values
     //   2. If another agent try to add buyer and it matches with phoneNumber & status then increment it's version
     Buyer.find({
-      $and: [
-        { phoneNumber: tempData.phoneNumber },
-        { status: tempData.status },
-      ],
+      $and: [{ phoneNumber: tempData.phoneNumber }],
     })
       .populate('buyerDetails')
       .exec(async (error: any, buyerExist: any) => {
@@ -98,9 +97,58 @@ const updateBuyerDetails = (id, detailsId, res) => {
 };
 
 //  Get all buyers
-export const getAllBuyerList = async (_: Request, res: Response) => {
+export const getAllBuyerList = async (req: Request, res: Response) => {
   try {
-    const buyers = await Buyer.find().populate('buyerDetails').lean();
+    /* Search is based on buyer name
+     Filter is based on status of buyer like WaitingForProperty/Shared/CurrentlyViewing/Shortlisted/Deactivate
+     and also for archive filter of deactivateStatus */
+    const searchText: any = req.query.search;
+    const filter: any = req.query.filter;
+    const agentId = new Types.ObjectId(req.user.user._id);
+    const aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'buyerdetails',
+          localField: 'buyerDetails',
+          foreignField: '_id',
+          as: 'buyerDetails',
+        },
+      },
+      {
+        $match: {
+          'buyerDetails.agentId': agentId,
+        },
+      },
+    ];
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          'buyerDetails.name': {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+    if (filter && filter.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              deactivateStatus: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+    const buyers = await Buyer.aggregate(aggregationPipeline);
+    // const buyers = await Buyer.find().populate('buyerDetails').lean();
     if (!buyers) {
       throw { status: 404, message: 'Buyers not found.' };
     }
@@ -133,4 +181,151 @@ export const getBuyerById = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
+};
+
+// Change deactivate status of buyer
+export const deactivateBuyer = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    const id = new Types.ObjectId(req.params.id);
+    Buyer.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          deactivateStatus: tempData.deactivateStatus,
+          status: 'Deactivate',
+        },
+      },
+      { new: true }
+    )
+      .populate('buyerDetails')
+      .exec(async (error, updatedRecord) => {
+        if (error) {
+          console.log('error while update', error);
+          return failureResponse(
+            res,
+            500,
+            [],
+            error.message || 'Something went wrong'
+          );
+        } else {
+          console.log('updatedRecord.......', updatedRecord);
+          return successResponse(
+            res,
+            200,
+            { buyer: updatedRecord },
+            'Buyer status updated successfully.'
+          );
+        }
+      });
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Buyer login by phoneNumber
+export const buyerLogin = async (req: Request, res: Response) => {
+  try {
+    const buyer = await Buyer.findOne({ phoneNumber: req.body.phoneNumber });
+    if (!buyer) {
+      return failureResponse(
+        res,
+        404,
+        [],
+        'Buyer not registered with this phone number.'
+      );
+    }
+    const jwtToken = generateJWTToken(buyer);
+    return successResponse(
+      res,
+      200,
+      { buyer, jwtToken },
+      'Buyer login successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Get buyer dashboard count
+export const getDashboardCount = async (req: Request, res: Response) => {
+  try {
+    const agentId = new Types.ObjectId(req.user.user._id);
+    const aggregateQuery = await Buyer.aggregate([
+      {
+        $lookup: {
+          from: 'buyerdetails',
+          localField: 'buyerDetails',
+          foreignField: '_id',
+          as: 'buyerDetails',
+        },
+      },
+      {
+        $match: {
+          'buyerDetails.agentId': agentId,
+        },
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: '$_id',
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    const buyer = aggregateQuery.reduce((obj, item) => {
+      obj[item.status] = item.count;
+      return obj;
+    }, {});
+    // console.log('aggregateQuery result ', aggregateQuery, buyer);
+    // const statusCounts = {};
+    // const statusCounts = tenantBuyerStatus.reduce((acc, status) => {
+    //   acc[status] = 0;ntBuyerStatus.reduce((acc, status) => {
+    //   acc[status] = 0;
+    //   return acc;
+    // }, {});
+    // Object.keys(buyer).forEach(async status => {
+    //   if (statusCounts.hasOwnProperty(status)) {
+    //     statusCounts[status] = await buyer[status];
+    //   }
+    // });
+    return successResponse(
+      res,
+      200,
+      { buyer },
+      'Buyer dashboard count get successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Change buyer status
+export const changeBuyerStatus = async (id, status) => {
+  return await Buyer.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
 };
