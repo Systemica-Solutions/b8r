@@ -12,5 +12,4 @@ export const MODELS = {
   BOARD: 'Board',
   SHAREDPROPERTY: 'SharedProperty',
   SHAREDPBUYERPROPERTY: 'SharedBuyerProperty'
-
 };

@@ -227,11 +227,10 @@ export const shareBoard = async (req: Request, res: Response) => {
       return failureResponse(res, 404, [], 'Board not found.');
     }
     const update = updateSharedDate(board);
-    let status1, status2;
     if (board && board.boardFor && board.boardFor === 'Tenant') {
-      status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
+      const status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
-      status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
+      const status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
     }
     return successResponse(res, 200, { board }, 'Board shared successfully.');
   } catch (error) {

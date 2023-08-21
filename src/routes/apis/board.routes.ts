@@ -46,5 +46,4 @@ router.put('/tenant/:id', userAuth, updateLastVisitDateTenantBoard);
 // Update last visited date of board by board-id
 router.put('/buyer/:id', userAuth, updateLastVisitDateBuyerBoard);
 
-
 export default router;

@@ -19,7 +19,7 @@ const AuthCodeSchema: Schema = new Schema(
       required: true,
     },
     codeType: {
-      type: Schema.Types.String, // FL=field-agent, BA=property-agent, DA=other
+      type: Schema.Types.String, // FL=Field-agent, PA=property-agent, else other
       enum: authCodeType,
     },
     status: {

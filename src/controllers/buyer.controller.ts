@@ -7,7 +7,8 @@ import Buyer from '../models/buyer.model';
 import BuyerDetail from '../models/buyerDetail.model';
 import { PipelineStage, Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
-import { tenantBuyerStatus } from '../constants/global.constants';
+import Board from '../models/board.model';
+import { getS3ImagesByRankingSystem } from './uploadImage.controller';
 
 // Add new buyer
 export const addBuyer = async (req: Request, res: Response) => {
@@ -328,4 +329,35 @@ export const changeBuyerStatus = async (id, status) => {
     { $set: { status } },
     { new: true }
   );
+};
+
+// Get bords by buyer agent id
+export const getBoardByAgentId = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findOne({
+      _id: req.params.id,
+      buyerId: req.user.user._id,
+    }).populate('buyerId propertyId');
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const status = await changeBuyerStatus(
+      board.buyerId._id,
+      'CurrentlyViewing'
+    );
+    const data = await getS3ImagesByRankingSystem(board);
+    return successResponse(
+      res,
+      200,
+      { board: data },
+      'Board found successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
 };

@@ -5,7 +5,8 @@ import {
   getBuyerById,
   deactivateBuyer,
   buyerLogin,
-  getDashboardCount
+  getDashboardCount,
+  getBoardByAgentId
 } from '../../controllers/buyer.controller';
 import {
   addBuyerValidation,
@@ -33,6 +34,9 @@ router.post(
 
 // Get buyer by id
 router.get('/:id', userAuth, getBuyerById);
+
+// Get board by buyer agent id
+router.get('/board/:id', userAuth, getBoardByAgentId);
 
 // Change status of buyer
 router.put('/deactivate/:id', userAuth, buyerStatusValidation, deactivateBuyer);
