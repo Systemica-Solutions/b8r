@@ -143,6 +143,26 @@ const updateViewedAtDate = async (data, propertyId, userId) => {
   }
 };
 
+// Find board by board id
+export const getBoardById = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId buyerId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { board }, 'Board finalize successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Finalize board by property agent
 export const finalizeBoard = async (req: Request, res: Response) => {
   try {
@@ -227,11 +247,10 @@ export const shareBoard = async (req: Request, res: Response) => {
       return failureResponse(res, 404, [], 'Board not found.');
     }
     const update = updateSharedDate(board);
-    let status1, status2;
     if (board && board.boardFor && board.boardFor === 'Tenant') {
-      status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
+      const status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
-      status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
+      const status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
     }
     return successResponse(res, 200, { board }, 'Board shared successfully.');
   } catch (error) {
