@@ -143,6 +143,26 @@ const updateViewedAtDate = async (data, propertyId, userId) => {
   }
 };
 
+// Find board by board id
+export const getBoardById = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate('tenantId buyerId propertyId')
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    return successResponse(res, 200, { board }, 'Board finalize successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Finalize board by property agent
 export const finalizeBoard = async (req: Request, res: Response) => {
   try {
