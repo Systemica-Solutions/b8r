@@ -20,7 +20,7 @@ export const agentSignUp = async (req: Request, res: Response) => {
         if (iCode === 400 || iCode === 403) {
           return failureResponse(res, 400, [], 'Invalid invitation code');
         }
-        if (iCode.startsWith('FL')) { agentData.isFieldAgent = true; }
+        if (iCode.startsWith('FA')) { agentData.isFieldAgent = true; }
         const agentObj = new Agent(agentData);
         const agentSave = await agentObj.save();
         const authObj = await saveAuthCode(agentSave);
@@ -258,7 +258,7 @@ export const addCustomAuthCode = async (req: Request, res: Response) => {
   try {
     const authData = req.body;
     authData.codeType =
-      authData.code.substring(0, 2) === 'FL'
+      authData.code.substring(0, 2) === 'FA'
         ? 'Field Agent'
         : authData.code.substring(0, 2) === 'PA'
         ? 'Property Agent'
