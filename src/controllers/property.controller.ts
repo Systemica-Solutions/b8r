@@ -285,17 +285,56 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     ]);
 
     // shared count
-    const step1 = await Property.countDocuments({
-      $expr: { $gt: [{ $size: '$sharedProperty' }, 0] },
-    });
+    const step1 = await Property.aggregate([
+       {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+      {
+        $match: {
+          'propertyDetails.agentId': agentId,
+          $expr: { $gt: [{ $size: '$sharedProperty' }, 0] },
+        },
+      },
+    ]);
 
     // yet to shared count
-    const step2 = await Property.countDocuments({
-      $expr: { $eq: [{ $size: '$sharedProperty' }, 0] },
-    });
+    const step2 = await Property.aggregate([
+      {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+      {
+        $match: {
+          'propertyDetails.agentId': agentId,
+          $expr: { $eq: [{ $size: '$sharedProperty' }, 0] },
+        },
+      },
+    ]);
 
     // shortlisted property
     const step3 = await Property.aggregate([
+      {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+      {
+        $match: {
+          'propertyDetails.agentId': agentId
+        },
+      },
       {
         $lookup: {
           from: 'sharedproperties',
@@ -316,9 +355,6 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
     ]);
-
-    console.log('step0', step0);
-
     const newObj: any = {};
     for (const key in staticStatus) {
       if (typeof staticStatus[key] === 'string') {
@@ -336,9 +372,8 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     else {
     output  = newObj;
     }
-
-    output.Shared = step1 ? step1 : 0;
-    output.YetToShare = step2 ? step2 : 0;
+    output.Shared = step1.length ? step1.length : 0;
+    output.YetToShare = step2.length ? step2.length : 0;
     output.Sortlisted = step3 && step3.length ? step3[0].count : 0;
     output = { ...output, ...newObj };
     return successResponse(
