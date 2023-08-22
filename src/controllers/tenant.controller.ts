@@ -344,11 +344,17 @@ export const getDashboardCount = async (req: Request, res: Response) => {
       }
     }
     newObj.Total = 0;
-    const tenant = aggregateQuery.reduce((obj, item) => {
-      newObj[item.status] = item.count;
-      newObj.Total += item.count;
-      return newObj;
-    }, {});
+    let tenant = {};
+    if (Object.keys(aggregateQuery).length === 0) {
+      tenant = newObj;
+    } else {
+      tenant = aggregateQuery.reduce((obj, item) => {
+        newObj[item.status] = item.count;
+        newObj.Total += item.count;
+        return newObj;
+      }, {});
+    }
+    console.log('tenant', tenant);
     return successResponse(
       res,
       200,
