@@ -21,6 +21,7 @@ const s3 = new aws.S3();
 const bucketName = 'elasticbeanstalk-ap-south-1-493063914377';
 
 export const uploadPrpertyImages = async (req, res) => {
+
   const fieldAgentId = req.user.user._id;
   const reqData = req.body;
   let imageCount = 0;
@@ -67,6 +68,7 @@ export const uploadPrpertyImages = async (req, res) => {
 
       // Upload each file to S3
       const promises = req.files.map((file) => {
+        console.log('file', file);
         const fileStream = fs.createReadStream(file.path);
         const uploadParams = {
           ACL: 'public-read',

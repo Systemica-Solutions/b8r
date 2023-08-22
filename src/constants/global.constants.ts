@@ -82,6 +82,9 @@ export enum propertyStatus {
   'Rented of B8R',
   'Delist / Owner Denied',
   'Rented Outside',
+  'Sold on B8R',
+  'Delist (Owner Denied)',
+  'Sold Outside'
 }
 
 export enum agentType {

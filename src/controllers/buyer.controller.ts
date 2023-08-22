@@ -9,6 +9,7 @@ import { PipelineStage, Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
 import Board from '../models/board.model';
 import { getS3ImagesByRankingSystem } from './uploadImage.controller';
+import { tenantBuyerStatus } from '../constants/global.constants';
 
 // Add new buyer
 export const addBuyer = async (req: Request, res: Response) => {
@@ -290,22 +291,19 @@ export const getDashboardCount = async (req: Request, res: Response) => {
         },
       },
     ]);
+    const newObj: any = {};
+    for (const key in tenantBuyerStatus) {
+      if (typeof tenantBuyerStatus[key] === 'string') {
+        newObj[tenantBuyerStatus[key]] = 0;
+      }
+    }
+    newObj.Total = 0;
     const buyer = aggregateQuery.reduce((obj, item) => {
-      obj[item.status] = item.count;
-      return obj;
+      newObj[item.status] = item.count;
+      newObj.Total += item.count;
+      return newObj;
     }, {});
-    // console.log('aggregateQuery result ', aggregateQuery, buyer);
-    // const statusCounts = {};
-    // const statusCounts = tenantBuyerStatus.reduce((acc, status) => {
-    //   acc[status] = 0;ntBuyerStatus.reduce((acc, status) => {
-    //   acc[status] = 0;
-    //   return acc;
-    // }, {});
-    // Object.keys(buyer).forEach(async status => {
-    //   if (statusCounts.hasOwnProperty(status)) {
-    //     statusCounts[status] = await buyer[status];
-    //   }
-    // });
+    console.log('buyer', buyer);
     return successResponse(
       res,
       200,

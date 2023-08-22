@@ -12,6 +12,7 @@ import {
   getAllPropertyS3Images,
   getS3ImagesByPropertyId,
 } from './uploadImage.controller';
+import { staticStatus } from '../constants/global.constants';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -252,7 +253,6 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const agentId = new Types.ObjectId(req.user.user._id);
     console.log('agentID', agentId);
-    const query: PipelineStage[] = [];
 
     // status count
     const step0 = await Property.aggregate([
@@ -294,6 +294,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       $expr: { $eq: [{ $size: '$sharedProperty' }, 0] },
     });
 
+    // shortlisted property
     const step3 = await Property.aggregate([
       {
         $lookup: {
@@ -315,17 +316,23 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
     ]);
-
-    const output: any = {};
-    let i = 0;
+    const newObj: any = {};
+    for (const key in staticStatus) {
+      if (typeof staticStatus[key] === 'string') {
+        newObj[staticStatus[key]] = 0;
+      }
+    }
+    let output: any = {};
+    newObj.Total = 0;
     step0.forEach((item) => {
-      output[item.status] = item.count;
-      output.total = ++i;
+      newObj[item.status] = item.count;
+      newObj.Total += item.count;
     });
-    output.Shared = step1;
-    output.YetToShare = step2;
+
+    output.Shared = step1 ? step1 : 0;
+    output.YetToShare = step2 ? step2 : 0;
     output.Sortlisted = step3 && step3.length ? step3[0].count : 0;
-    console.log('output', output);
+    output = { ...output, ...newObj };
     return successResponse(
       res,
       200,

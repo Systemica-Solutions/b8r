@@ -9,6 +9,7 @@ import Board from '../models/board.model';
 import { PipelineStage, Types } from 'mongoose';
 import { generateJWTToken } from '../services/crypto.service';
 import { getS3ImagesByRankingSystem } from './uploadImage.controller';
+import { tenantBuyerStatus } from '../constants/global.constants';
 
 // Add new tenant
 export const addTenant = async (req: Request, res: Response) => {
@@ -336,10 +337,17 @@ export const getDashboardCount = async (req: Request, res: Response) => {
         },
       },
     ]);
-    console.log('aggregateQuery result ', aggregateQuery);
+    const newObj: any = {};
+    for (const key in tenantBuyerStatus) {
+      if (typeof tenantBuyerStatus[key] === 'string') {
+        newObj[tenantBuyerStatus[key]] = 0;
+      }
+    }
+    newObj.Total = 0;
     const tenant = aggregateQuery.reduce((obj, item) => {
-      obj[item.status] = item.count;
-      return obj;
+      newObj[item.status] = item.count;
+      newObj.Total += item.count;
+      return newObj;
     }, {});
     return successResponse(
       res,
