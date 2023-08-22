@@ -253,7 +253,6 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const agentId = new Types.ObjectId(req.user.user._id);
     console.log('agentID', agentId);
-    const query: PipelineStage[] = [];
 
     // status count
     const step0 = await Property.aggregate([
