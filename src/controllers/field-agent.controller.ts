@@ -35,7 +35,7 @@ export const add3DTourLink = async (req: Request, res: Response) => {
             res,
             500,
             [],
-            'Property should be verified with upload and approve image'
+            'Property should be verified after upload and approve image'
           );
         } else {
           return successResponse(

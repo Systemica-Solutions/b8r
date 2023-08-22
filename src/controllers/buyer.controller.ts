@@ -298,11 +298,17 @@ export const getDashboardCount = async (req: Request, res: Response) => {
       }
     }
     newObj.Total = 0;
-    const buyer = aggregateQuery.reduce((obj, item) => {
-      newObj[item.status] = item.count;
-      newObj.Total += item.count;
-      return newObj;
-    }, {});
+    console.log('aggregateQuery', aggregateQuery);
+    let buyer = {};
+    if (Object.keys(aggregateQuery).length === 0) {
+      buyer = newObj;
+    } else {
+      buyer = aggregateQuery.reduce((obj, item) => {
+        newObj[item.status] = item.count;
+        newObj.Total += item.count;
+        return newObj;
+      }, {});
+    }
     console.log('buyer', buyer);
     return successResponse(
       res,

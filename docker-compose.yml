@@ -10,7 +10,7 @@ services:
       - NODE_ENV=production
       - PORT=8080
       - APP_KEY=
-      - DB_URI=mongodb+srv://b8r_app:EsM5QXMGzuCzNKvs@cluster0.sbfwcs4.mongodb.net/testing
+      - DB_URI=mongodb+srv://b8r_app:EsM5QXMGzuCzNKvs@cluster0.sbfwcs4.mongodb.net/b8r_home
       - API_PREFIX=/api/v1
       - TIMEZONE=IN
       - SECRET=b8r_home

@@ -316,6 +316,9 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
     ]);
+
+    console.log('step0', step0);
+
     const newObj: any = {};
     for (const key in staticStatus) {
       if (typeof staticStatus[key] === 'string') {
@@ -324,10 +327,15 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     }
     let output: any = {};
     newObj.Total = 0;
+    if (step0 && step0.length) {
     step0.forEach((item) => {
       newObj[item.status] = item.count;
       newObj.Total += item.count;
     });
+    }
+    else {
+    output  = newObj;
+    }
 
     output.Shared = step1 ? step1 : 0;
     output.YetToShare = step2 ? step2 : 0;
