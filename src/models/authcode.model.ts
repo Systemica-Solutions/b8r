@@ -27,11 +27,11 @@ const AuthCodeSchema: Schema = new Schema(
       default: false,
     },
     startTime: {
-      type: Schema.Types.String,
+      type: Schema.Types.Date,
       default: null,
     },
     endTime: {
-      type: Schema.Types.String,
+      type: Schema.Types.Date,
       default: null,
     },
   },

@@ -395,15 +395,20 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
 // Check status of single property
 export const getPropertyStatus = async (req: Request, res: Response) => {
   try {
-    const property = await Property.findById(req.params.id).populate({
+    const property = await Property.findById(req.params.id)
+    .populate({
       path: 'sharedProperty',
       populate: { path: 'tenantId' },
+    })
+    .populate({
+      path: 'sharedBuyerProperty',
+      populate: { path: 'buyerId' },
     });
     return successResponse(
       res,
       200,
       { property },
-      'Detailed property  data get successfully.'
+      'Detailed property data get successfully.'
     );
   } catch (error) {
     return failureResponse(

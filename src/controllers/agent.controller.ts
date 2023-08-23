@@ -5,7 +5,7 @@ import {
 } from '../helpers/api-response.helper';
 import Agent from '../models/agent.model';
 import Authcode from '../models/authcode.model';
-import { encrypt, decrypt, generateJWTToken } from '../services/crypto.service';
+import { decrypt, generateJWTToken } from '../services/crypto.service';
 
 //  Sign up the new agent details and generate the JWT token for that agent
 export const agentSignUp = async (req: Request, res: Response) => {
@@ -13,14 +13,18 @@ export const agentSignUp = async (req: Request, res: Response) => {
     console.log('req', req.body);
     let agentData: any = {};
     agentData = req.body;
-    const agentExist = await Agent.findOne({ phoneNumber: agentData.phoneNumber });
+    const agentExist = await Agent.findOne({
+      phoneNumber: agentData.phoneNumber,
+    });
     if (!agentExist) {
       if (agentData.inviteCode) {
         const iCode = await checkInviteCode(agentData);
-        if (iCode === 400 || iCode === 403) {
-          return failureResponse(res, 400, [], 'Invalid invitation code');
+        if (iCode === 400 || iCode === 403 || iCode == 410) {
+          return failureResponse(res, iCode, [], 'Invalid invitation code. Either expired, already used or does not exist.');
         }
-        if (iCode.startsWith('FA')) { agentData.isFieldAgent = true; }
+        if (iCode.startsWith('FA')) {
+          agentData.isFieldAgent = true;
+        }
         const agentObj = new Agent(agentData);
         const agentSave = await agentObj.save();
         const authObj = await saveAuthCode(agentSave);
@@ -62,7 +66,12 @@ const checkInviteCode = async (data: any) => {
       if (authcodeExist && authcodeExist.agentId !== null) {
         return 403;
       } else {
-        return authcodeExist.code;
+        const currentDate = new Date();
+        if (authcodeExist && authcodeExist.endTime > currentDate) {
+          return authcodeExist.code;
+        } else {
+          return 410;
+        }
       }
     }
   } catch (error) {
@@ -114,7 +123,7 @@ export const getAllAgentList = async (_: Request, res: Response) => {
   try {
     const agents = await Agent.find().lean();
     if (!agents) {
-      throw { status: 404, message: 'agents not found.' };
+      throw { status: 404, message: 'Agents not found.' };
     }
     return successResponse(res, 200, { agents }, 'Agents found successfully.');
   } catch (error) {
@@ -131,7 +140,9 @@ export const getAllAgentList = async (_: Request, res: Response) => {
 export const signInAgent = async (req: Request, res: Response) => {
   try {
     const agentData = req.body;
-    const agentExist = await Agent.findOne({ phoneNumber: agentData.phoneNumber });
+    const agentExist = await Agent.findOne({
+      phoneNumber: agentData.phoneNumber,
+    });
     if (!agentExist) {
       return failureResponse(res, 404, [], 'Agent not found!');
     } else {
@@ -257,12 +268,16 @@ export const updateAgentDetails = async (req: Request, res: Response) => {
 export const addCustomAuthCode = async (req: Request, res: Response) => {
   try {
     const authData = req.body;
-    authData.codeType =
-      authData.code.substring(0, 2) === 'FA'
-        ? 'Field Agent'
-        : authData.code.substring(0, 2) === 'PA'
-        ? 'Property Agent'
-        : 'Other';
+    /* authData.codeType =
+      authData.code.substring(0, 2) === 'FA' ? 'Field Agent'
+        : authData.code.substring(0, 2) === 'PA' ? 'Property Agent'
+        : 'Other'; */
+    if (authData && authData.startTime) {
+      const startTime = new Date(authData.startTime);
+      const endTime = new Date(startTime);
+      endTime.setDate(endTime.getDate() + 14);
+      authData.endTime = endTime.toISOString();
+    }
     const authObj = new Authcode(authData);
     const saveObj = await authObj.save();
     return successResponse(

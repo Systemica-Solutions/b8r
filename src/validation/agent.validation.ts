@@ -164,7 +164,7 @@ export const addAuthCodeValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     agentId: Joi.string().optional(),
     entity: Joi.string().optional(),
-    code: Joi.string().required(),
+    code: Joi.string().regex(/^[A-Z]{2}\d{2,4}$/).required(),
     codeType: Joi.string().optional(),
     status: Joi.boolean().optional(),
     startTime: Joi.date().optional(),
