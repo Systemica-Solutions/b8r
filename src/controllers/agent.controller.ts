@@ -19,7 +19,7 @@ export const agentSignUp = async (req: Request, res: Response) => {
     if (!agentExist) {
       if (agentData.inviteCode) {
         const iCode = await checkInviteCode(agentData);
-        if (iCode === 400 || iCode === 403 || iCode == 410) {
+        if (iCode === 400 || iCode === 403 || iCode === 410) {
           return failureResponse(res, iCode, [], 'Invalid invitation code. Either expired, already used or does not exist.');
         }
         if (iCode.startsWith('FA')) {
