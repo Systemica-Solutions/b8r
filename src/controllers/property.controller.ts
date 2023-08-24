@@ -115,7 +115,8 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     const filter: any = req.query.filter;
     const imagesApproved = req.query.imagesApproved;
     const agentId = new Types.ObjectId(req.user.user._id);
-    const aggregationPipeline: PipelineStage[] = [
+
+    let aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
           from: 'propertydetails',
@@ -130,6 +131,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
         },
       },
     ];
+
     if (searchText && searchText.trim()) {
       aggregationPipeline.push({
         $match: {
@@ -139,19 +141,13 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
         },
       });
     }
+
     if (
       filter &&
       filter.trim() &&
-      (filter.trim().toLowerCase() !== 'shortlisted' ||
-        filter.trim().toLowerCase() !== 'Shared')
+      filter.trim().toLowerCase() !== 'shortlisted' &&
+      filter.trim().toLowerCase() !== 'shared'
     ) {
-      aggregationPipeline.push({
-        $match: {
-          houseName: {
-            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
-          },
-        },
-      });
       aggregationPipeline.push({
         $match: {
           $or: [
@@ -169,14 +165,62 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
         },
       });
     }
+
+    if (filter && filter.trim() && filter.trim().toLowerCase() === 'shared') {
+      aggregationPipeline.push({
+        $match: {
+          $expr: {
+            $or: [
+              { $gt: [{ $size: '$sharedProperty' }, 0] },
+              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+            ],
+          },
+        },
+      });
+    }
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() === 'shortlisted'
+    ) {
+      aggregationPipeline = aggregationPipeline.concat([
+        {
+          $lookup: {
+            from: 'sharedbuyerproperties',
+            localField: 'sharedBuyerProperty',
+            foreignField: '_id',
+            as: 'sharedBuyerProperty',
+          },
+        },
+        {
+          $lookup: {
+            from: 'sharedproperties',
+            localField: 'sharedProperty',
+            foreignField: '_id',
+            as: 'sharedProperty',
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { 'sharedProperty.isShortlisted': true },
+              { 'sharedBuyerProperty.isShortlisted': true },
+            ],
+          },
+        },
+      ]);
+    }
+
     if (imagesApproved === 'false') {
       aggregationPipeline.push({ $match: { imagesApproved: false } });
     }
     if (imagesApproved === 'true') {
       aggregationPipeline.push({ $match: { imagesApproved: true } });
     }
+
     const properties = await Property.aggregate(aggregationPipeline);
-    // const properties = await Property.find(query).populate('propertyDetails').lean();
+
     if (!properties) {
       return failureResponse(res, 404, [], 'Properties not found.');
     }
