@@ -256,7 +256,6 @@ export const verifyPropertyValidation = async (req, res, next) => {
 // Close-listing status validation
 export const closeListingValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
-    propertyId: Joi.string().required(),
     closeListingStatus: Joi.string()
       .valid(...Object.keys(propertyStatus))
       .required(),
@@ -264,7 +263,7 @@ export const closeListingValidation = async (req, res, next) => {
       name: Joi.string().optional(),
       phoneNumber: Joi.string()
         .pattern(/^[0-9]{10}$/)
-        .required(),
+        .optional(),
       rentAmount: Joi.number().optional(),
       agreementFor: Joi.string().optional(),
       tenancyStartDate: Joi.date().iso().optional(),

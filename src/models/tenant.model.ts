@@ -28,6 +28,10 @@ const TenantSchema: Schema = new Schema(
       trim: true,
       enum: tenantDeactivationReason,
     },
+    isOnBoard: {
+      type: Schema.Types.Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

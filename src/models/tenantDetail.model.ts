@@ -101,10 +101,6 @@ const TenantDetailSchema: Schema = new Schema(
       type: Schema.Types.Boolean,
       default: false,
     },
-    onBoard: {
-      type: Schema.Types.Boolean,
-      default: false,
-    },
     deactivateDate: {
       type: Schema.Types.Date,
     },

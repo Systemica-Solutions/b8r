@@ -5,13 +5,14 @@ import {
 } from '../helpers/api-response.helper';
 import Board from '../models/board.model';
 import Property from '../models/property.model';
+import Tenant from '../models/tenant.model';
+import Buyer from '../models/buyer.model';
 import SharedProperty from '../models/sharedProperty.model';
 import SharedBuyerProperty from '../models/sharedBuyerProperty.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
 import { changeTenantStatus } from './tenant.controller';
 import { changeBuyerStatus } from './buyer.controller';
-import { Type } from '@aws-sdk/client-s3';
 
 // Add new board
 export const addBoard = async (req: Request, res: Response) => {
@@ -28,6 +29,8 @@ export const addBoard = async (req: Request, res: Response) => {
     const savedRecord: any = await detailObj.save();
     await savedRecord.populate('propertyId');
     await savedRecord.populate('tenantId');
+    await savedRecord.populate('buyerId');
+    const flagChanged = await changeFlag(savedRecord);
     return successResponse(
       res,
       200,
@@ -37,6 +40,27 @@ export const addBoard = async (req: Request, res: Response) => {
   } catch (error) {
     return failureResponse(
       res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+const changeFlag = async (data) => {
+  try {
+    if (data && data.boardFor && data.boardFor === 'Tenant') {
+      await Tenant.findByIdAndUpdate(data.tenantId, {
+        $set: { isOnBoard: true },
+      });
+    } else if (data && data.boardFor && data.boardFor === 'Buyer') {
+      await Buyer.findByIdAndUpdate(data.buyerId, {
+        $set: { isOnBoard: true },
+      });
+    }
+  } catch (error) {
+    return failureResponse(
+      {},
       error.status || 500,
       error,
       error.message || 'Something went wrong'
@@ -409,7 +433,10 @@ const updateShortlistDate = async (data, propertyId, userId, boardFor) => {
 };
 
 // Update last visited date of tenant board
-export const updateLastVisitDateTenantBoard = async (req: Request, res: Response) => {
+export const updateLastVisitDateTenantBoard = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const boards = await Board.findOneAndUpdate(
       { _id: req.params.id, tenantId: req.user.user._id },
@@ -435,7 +462,10 @@ export const updateLastVisitDateTenantBoard = async (req: Request, res: Response
 };
 
 // Update last visited date of buyer board
-export const updateLastVisitDateBuyerBoard = async (req: Request, res: Response) => {
+export const updateLastVisitDateBuyerBoard = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const boards = await Board.findOneAndUpdate(
       { _id: req.params.id, buyerId: req.user.user._id },

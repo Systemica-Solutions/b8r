@@ -29,6 +29,10 @@ const BuyerSchema: Schema = new Schema(
       trim: true,
       enum: buyerDeactivationReason,
     },
+    isOnBoard: {
+      type: Schema.Types.Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

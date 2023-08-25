@@ -115,7 +115,8 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     const filter: any = req.query.filter;
     const imagesApproved = req.query.imagesApproved;
     const agentId = new Types.ObjectId(req.user.user._id);
-    const aggregationPipeline: PipelineStage[] = [
+
+    let aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
           from: 'propertydetails',
@@ -130,6 +131,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
         },
       },
     ];
+
     if (searchText && searchText.trim()) {
       aggregationPipeline.push({
         $match: {
@@ -139,7 +141,13 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
         },
       });
     }
-    if (filter && filter.trim()) {
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() !== 'shortlisted' &&
+      filter.trim().toLowerCase() !== 'shared'
+    ) {
       aggregationPipeline.push({
         $match: {
           $or: [
@@ -157,14 +165,62 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
         },
       });
     }
+
+    if (filter && filter.trim() && filter.trim().toLowerCase() === 'shared') {
+      aggregationPipeline.push({
+        $match: {
+          $expr: {
+            $or: [
+              { $gt: [{ $size: '$sharedProperty' }, 0] },
+              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+            ],
+          },
+        },
+      });
+    }
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() === 'shortlisted'
+    ) {
+      aggregationPipeline = aggregationPipeline.concat([
+        {
+          $lookup: {
+            from: 'sharedbuyerproperties',
+            localField: 'sharedBuyerProperty',
+            foreignField: '_id',
+            as: 'sharedBuyerProperty',
+          },
+        },
+        {
+          $lookup: {
+            from: 'sharedproperties',
+            localField: 'sharedProperty',
+            foreignField: '_id',
+            as: 'sharedProperty',
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { 'sharedProperty.isShortlisted': true },
+              { 'sharedBuyerProperty.isShortlisted': true },
+            ],
+          },
+        },
+      ]);
+    }
+
     if (imagesApproved === 'false') {
       aggregationPipeline.push({ $match: { imagesApproved: false } });
     }
     if (imagesApproved === 'true') {
       aggregationPipeline.push({ $match: { imagesApproved: true } });
     }
+
     const properties = await Property.aggregate(aggregationPipeline);
-    // const properties = await Property.find(query).populate('propertyDetails').lean();
+
     if (!properties) {
       return failureResponse(res, 404, [], 'Properties not found.');
     }
@@ -286,7 +342,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
 
     // shared count
     const step1 = await Property.aggregate([
-       {
+      {
         $lookup: {
           from: 'propertydetails',
           localField: 'propertyDetails',
@@ -297,7 +353,12 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       {
         $match: {
           'propertyDetails.agentId': agentId,
-          $expr: { $gt: [{ $size: '$sharedProperty' }, 0] },
+          $expr: {
+            $or: [
+              { $gt: [{ $size: '$sharedProperty' }, 0] },
+              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+            ],
+          },
         },
       },
     ]);
@@ -315,7 +376,12 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       {
         $match: {
           'propertyDetails.agentId': agentId,
-          $expr: { $eq: [{ $size: '$sharedProperty' }, 0] },
+          $expr: {
+            $or: [
+              { $eq: [{ $size: '$sharedProperty' }, 0] },
+              { $eq: [{ $size: '$sharedBuyerProperty' }, 0] },
+            ],
+          },
         },
       },
     ]);
@@ -332,7 +398,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId
+          'propertyDetails.agentId': agentId,
         },
       },
       {
@@ -344,8 +410,19 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
       {
+        $lookup: {
+          from: 'sharedbuyerproperties',
+          localField: 'sharedBuyerProperty',
+          foreignField: '_id',
+          as: 'sharedBuyerProperties',
+        },
+      },
+      {
         $match: {
-          'sharedProperties.isShortlisted': true,
+          $or: [
+            { 'sharedProperties.isShortlisted': true },
+            { 'sharedBuyerProperties.isShortlisted': true },
+          ],
         },
       },
       {
@@ -364,13 +441,12 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     let output: any = {};
     newObj.Total = 0;
     if (step0 && step0.length) {
-    step0.forEach((item) => {
-      newObj[item.status] = item.count;
-      newObj.Total += item.count;
-    });
-    }
-    else {
-    output  = newObj;
+      step0.forEach((item) => {
+        newObj[item.status] = item.count;
+        newObj.Total += item.count;
+      });
+    } else {
+      output = newObj;
     }
     output.Shared = step1.length ? step1.length : 0;
     output.YetToShare = step2.length ? step2.length : 0;
@@ -396,14 +472,14 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
 export const getPropertyStatus = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id)
-    .populate({
-      path: 'sharedProperty',
-      populate: { path: 'tenantId' },
-    })
-    .populate({
-      path: 'sharedBuyerProperty',
-      populate: { path: 'buyerId' },
-    });
+      .populate({
+        path: 'sharedProperty',
+        populate: { path: 'tenantId' },
+      })
+      .populate({
+        path: 'sharedBuyerProperty',
+        populate: { path: 'buyerId' },
+      });
     return successResponse(
       res,
       200,
@@ -424,7 +500,7 @@ export const getPropertyStatus = async (req: Request, res: Response) => {
 export const closeListingProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    const id = new Types.ObjectId(tempData.propertyId);
+    const id = new Types.ObjectId(req.params.id);
     Property.findByIdAndUpdate(
       { _id: id },
       {
