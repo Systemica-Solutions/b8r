@@ -57,7 +57,7 @@ router.post(
 router.get('/:id', userAuth, getPropertyById);
 
 // Assign property to Field Agent
-router.post('/assign', userAuth, assignPropertyToFA);
+router.post('/assign', assignPropertyToFA);
 
 // Edit property status with close listing property
 router.put(
