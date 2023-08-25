@@ -500,7 +500,7 @@ export const getPropertyStatus = async (req: Request, res: Response) => {
 export const closeListingProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    const id = new Types.ObjectId(tempData.propertyId);
+    const id = new Types.ObjectId(req.params.id);
     Property.findByIdAndUpdate(
       { _id: id },
       {

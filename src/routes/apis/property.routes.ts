@@ -61,7 +61,7 @@ router.post('/assign', assignPropertyToFA);
 
 // Edit property status with close listing property
 router.put(
-  '/close-listing',
+  '/close-listing/:id',
   userAuth,
   closeListingValidation,
   closeListingProperty
