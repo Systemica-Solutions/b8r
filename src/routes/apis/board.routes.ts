@@ -39,7 +39,7 @@ router.put('/shortlist/:id', userAuth, shortlistDate);
 router.get('/:id', userAuth, getBoardById);
 
 // Finalize board
-router.get('/finalize/:id', userAuth, finalizeBoard);
+router.put('/finalize/:id', userAuth, finalizeBoard);
 
 // Share board
 router.put('/share/:id', userAuth, shareBoard);
