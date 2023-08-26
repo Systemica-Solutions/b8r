@@ -56,14 +56,19 @@ export const addProperty = async (req: Request, res: Response) => {
               propertyExist[0].propertyDetails.length + 1;
             const detailObj = new PropertyDetail(tempData.propertyData);
             const savedObj: any = await detailObj.save();
-            updatePropertyDetails(propertyExist[0]._id, savedObj._id, res);
+            updatePropertyDetails(
+              propertyExist[0]._id,
+              savedObj._id,
+              res,
+              'added'
+            );
           }
         } else {
           const detailObj = new PropertyDetail(tempData.propertyData);
           const savedObj: any = await detailObj.save();
           const propertyObj = new Property(tempData);
           const saveObj = await propertyObj.save();
-          updatePropertyDetails(saveObj._id, savedObj._id, res);
+          updatePropertyDetails(saveObj._id, savedObj._id, res, 'added');
         }
       });
   } catch (error) {
@@ -76,8 +81,38 @@ export const addProperty = async (req: Request, res: Response) => {
   }
 };
 
+// Edit property
+export const editProperty = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
+
+    const property = await Property.findByIdAndUpdate(req.params.id, {
+      $set: {
+        houseName: tempData.houseName,
+        societyName: tempData.societyName,
+        pinCode: tempData.pinCode,
+      },
+    });
+    if (!property) {
+      throw { status: 404, message: 'Property not found.' };
+    }
+    tempData.propertyData.version = property.propertyDetails.length + 1;
+    const detailObj = new PropertyDetail(tempData.propertyData);
+    const savedObj: any = await detailObj.save();
+    updatePropertyDetails(property._id, savedObj._id, res, 'edited');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Push property detail id in property table
-export const updatePropertyDetails = (id, detailsId, res) => {
+export const updatePropertyDetails = (id, detailsId, res, flag) => {
   const detailId = new Types.ObjectId(detailsId);
   Property.findByIdAndUpdate(
     { _id: id },
@@ -100,7 +135,7 @@ export const updatePropertyDetails = (id, detailsId, res) => {
           res,
           200,
           { property: updatedRecord },
-          'Property added successfully.'
+          `Property ${flag} successfully.`
         );
       }
     });
