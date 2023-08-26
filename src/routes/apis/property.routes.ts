@@ -23,6 +23,9 @@ import uploadRoutes from '../apis/upload.routes';
 
 const router = Router();
 
+
+// ------- upload routes start -------
+
 // Upload property images
 router.use('/upload', uploadRoutes);
 
@@ -31,6 +34,8 @@ router.get('/s3-img', getAllPropertyImages);
 
 // Get s3 images of property
 router.get('/s3-img/:id', getPropertyImagesFromS3);
+
+// ------- upload routes end -------
 
 // Rename and copy s3 files to files folder
 router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
