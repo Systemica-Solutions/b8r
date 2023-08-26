@@ -131,6 +131,10 @@ export const updatePropertyDetails = (id, detailsId, res, flag) => {
         );
       } else {
         console.log('updatedRecord.......', updatedRecord);
+        updatedRecord.propertyDetails =
+          updatedRecord.propertyDetails[
+            updatedRecord.propertyDetails.length - 1
+          ];
         return successResponse(
           res,
           200,
@@ -255,7 +259,12 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     }
 
     const properties = await Property.aggregate(aggregationPipeline);
-
+    if (properties && properties.length) {
+      properties.map(
+        (x) =>
+          (x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1])
+      );
+    }
     if (!properties) {
       return failureResponse(res, 404, [], 'Properties not found.');
     }
@@ -284,6 +293,8 @@ export const getPropertyById = async (req: Request, res: Response) => {
     if (!property) {
       return failureResponse(res, 404, [], 'Property not found.');
     }
+    property.propertyDetails =
+      property.propertyDetails[property.propertyDetails.length - 1];
     return successResponse(
       res,
       200,
@@ -559,6 +570,10 @@ export const closeListingProperty = async (req: Request, res: Response) => {
           );
         } else {
           console.log('updatedRecord.......', updatedRecord);
+          updatedRecord.propertyDetails =
+            updatedRecord.propertyDetails[
+              updatedRecord.propertyDetails.length - 1
+            ];
           return successResponse(
             res,
             200,
@@ -694,6 +709,10 @@ export const reactivateProperty = async (req: Request, res: Response) => {
           );
         } else {
           console.log('updatedRecord.......', updatedRecord);
+          updatedRecord.propertyDetails =
+            updatedRecord.propertyDetails[
+              updatedRecord.propertyDetails.length - 1
+            ];
           return successResponse(
             res,
             200,

@@ -38,6 +38,10 @@ export const add3DTourLink = async (req: Request, res: Response) => {
             'Property should be verified after upload and approve image'
           );
         } else {
+          updatedRecord.propertyDetails =
+          updatedRecord.propertyDetails[
+            updatedRecord.propertyDetails.length - 1
+          ];
           return successResponse(
             res,
             200,
@@ -134,6 +138,11 @@ export const getFieldAgentPendingProperty = async (
     }
     const pendingList = property.filter(
       (x) => x.propertyId.status === 'Pending'
+    );
+    pendingList.map(
+      (x) =>
+        (x.propertyId.propertyDetails =
+          x.propertyId.propertyDetails[x.propertyId.propertyDetails.length - 1])
     );
     return successResponse(
       res,
