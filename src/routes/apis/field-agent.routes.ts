@@ -39,8 +39,8 @@ router.put(
 
 router.put(
   '/3d-link/:id',
-  userAuth,
-  fieldAgentAccess,
+  // userAuth,
+  // fieldAgentAccess,
   add3DTourLink
 );
 

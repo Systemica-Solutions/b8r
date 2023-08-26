@@ -23,6 +23,9 @@ import uploadRoutes from '../apis/upload.routes';
 
 const router = Router();
 
+
+// ------- upload routes start -------
+
 // Upload property images
 router.use('/upload', uploadRoutes);
 
@@ -34,6 +37,9 @@ router.get('/s3-img/:id', getPropertyImagesFromS3);
 
 // Rename and copy s3 files to files folder
 router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
+
+// ------- upload routes end -------
+
 
 // Get property agent dashboard count
 router.get('/count', userAuth, getPropertyCounts);
