@@ -21,7 +21,6 @@ const s3 = new aws.S3();
 const bucketName = 'elasticbeanstalk-ap-south-1-493063914377';
 
 export const uploadPrpertyImages = async (req, res) => {
-
   const fieldAgentId = req.user.user._id;
   const reqData = req.body;
   let imageCount = 0;
@@ -198,25 +197,37 @@ function imageRankingSort(a, b) {
 // Get s3 images and move those in final folder
 export const getS3ImagesByPropertyId = async (id) => {
   const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
-
-  const tempImgs = [];
-  const uploadParams = await AssignedProperty.findOne({
-    propertyId: id,
-  });
-  let images: any = [];
-  images = await getNumberOfImagesInBucket(
-    bucketName,
-    uploadParams.fieldAgentId,
-    uploadParams.propertyId,
-    'raw'
-  );
-  images.map(async (img) => {
-    tempImgs.push({
-      link: prefix.concat(img.Key),
-      name: img.Key.split('/').pop(),
+  try {
+    const tempImgs = [];
+    const uploadParams = await AssignedProperty.findOne({
+      propertyId: id,
     });
-  });
-  return await tempImgs;
+    if (!uploadParams) {
+      throw { status: 404, message: 'Property does not exist on s3' };
+    }
+    let images: any = [];
+    images = await getNumberOfImagesInBucket(
+      bucketName,
+      uploadParams.fieldAgentId,
+      uploadParams.propertyId,
+      'raw'
+    );
+    images.map(async (img) => {
+      tempImgs.push({
+        link: prefix.concat(img.Key),
+        name: img.Key.split('/').pop(),
+      });
+    });
+    return await tempImgs;
+  } catch (error) {
+    console.error('Error:', error);
+    return failureResponse(
+      null,
+      error.status || 500,
+      error,
+      error.message || 'Property does not exist on s3'
+    );
+  }
 };
 
 // Get all property images fom s3 which are not moved to final folder yet
@@ -225,7 +236,7 @@ export const getAllPropertyS3Images = async () => {
     const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
     const params = {
       Bucket: bucketName,
-      Prefix: 'b8rHomes'
+      Prefix: 'b8rHomes',
     };
     const response = await s3.listObjectsV2(params).promise();
     const groupedData = response.Contents.reduce((acc, element) => {
