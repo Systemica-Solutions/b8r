@@ -56,14 +56,19 @@ export const addProperty = async (req: Request, res: Response) => {
               propertyExist[0].propertyDetails.length + 1;
             const detailObj = new PropertyDetail(tempData.propertyData);
             const savedObj: any = await detailObj.save();
-            updatePropertyDetails(propertyExist[0]._id, savedObj._id, res);
+            updatePropertyDetails(
+              propertyExist[0]._id,
+              savedObj._id,
+              res,
+              'added'
+            );
           }
         } else {
           const detailObj = new PropertyDetail(tempData.propertyData);
           const savedObj: any = await detailObj.save();
           const propertyObj = new Property(tempData);
           const saveObj = await propertyObj.save();
-          updatePropertyDetails(saveObj._id, savedObj._id, res);
+          updatePropertyDetails(saveObj._id, savedObj._id, res, 'added');
         }
       });
   } catch (error) {
@@ -76,8 +81,38 @@ export const addProperty = async (req: Request, res: Response) => {
   }
 };
 
+// Edit property
+export const editProperty = async (req: Request, res: Response) => {
+  try {
+    const tempData = req.body;
+    tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
+
+    const property = await Property.findByIdAndUpdate(req.params.id, {
+      $set: {
+        houseName: tempData.houseName,
+        societyName: tempData.societyName,
+        pinCode: tempData.pinCode,
+      },
+    });
+    if (!property) {
+      throw { status: 404, message: 'Property not found.' };
+    }
+    tempData.propertyData.version = property.propertyDetails.length + 1;
+    const detailObj = new PropertyDetail(tempData.propertyData);
+    const savedObj: any = await detailObj.save();
+    updatePropertyDetails(property._id, savedObj._id, res, 'edited');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Push property detail id in property table
-export const updatePropertyDetails = (id, detailsId, res) => {
+export const updatePropertyDetails = (id, detailsId, res, flag) => {
   const detailId = new Types.ObjectId(detailsId);
   Property.findByIdAndUpdate(
     { _id: id },
@@ -96,11 +131,15 @@ export const updatePropertyDetails = (id, detailsId, res) => {
         );
       } else {
         console.log('updatedRecord.......', updatedRecord);
+        updatedRecord.propertyDetails =
+          updatedRecord.propertyDetails[
+            updatedRecord.propertyDetails.length - 1
+          ];
         return successResponse(
           res,
           200,
           { property: updatedRecord },
-          'Property added successfully.'
+          `Property ${flag} successfully.`
         );
       }
     });
@@ -220,7 +259,12 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     }
 
     const properties = await Property.aggregate(aggregationPipeline);
-
+    if (properties && properties.length) {
+      properties.map(
+        (x) =>
+          (x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1])
+      );
+    }
     if (!properties) {
       return failureResponse(res, 404, [], 'Properties not found.');
     }
@@ -249,6 +293,8 @@ export const getPropertyById = async (req: Request, res: Response) => {
     if (!property) {
       return failureResponse(res, 404, [], 'Property not found.');
     }
+    property.propertyDetails =
+      property.propertyDetails[property.propertyDetails.length - 1];
     return successResponse(
       res,
       200,
@@ -524,6 +570,10 @@ export const closeListingProperty = async (req: Request, res: Response) => {
           );
         } else {
           console.log('updatedRecord.......', updatedRecord);
+          updatedRecord.propertyDetails =
+            updatedRecord.propertyDetails[
+              updatedRecord.propertyDetails.length - 1
+            ];
           return successResponse(
             res,
             200,
@@ -659,6 +709,10 @@ export const reactivateProperty = async (req: Request, res: Response) => {
           );
         } else {
           console.log('updatedRecord.......', updatedRecord);
+          updatedRecord.propertyDetails =
+            updatedRecord.propertyDetails[
+              updatedRecord.propertyDetails.length - 1
+            ];
           return successResponse(
             res,
             200,

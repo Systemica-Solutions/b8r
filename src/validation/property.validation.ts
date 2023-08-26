@@ -224,6 +224,32 @@ export const addPropertyValidation = async (req, res, next) => {
   }
 };
 
+// Edit property validations
+export const editPropertyValidation = async (req, res, next) => {
+  const schema = Joi.object().keys({
+    houseName: Joi.string().optional(),
+    societyName: Joi.string().optional(),
+    pinCode: Joi.string()
+      .pattern(/^[0-9]{6}$/)
+      .optional(),
+    propertyData: Joi.any().optional(),
+    propertyDetails: Joi.array().items(Joi.string()).optional(),
+  });
+  const value = schema.validate(req.body);
+  if (value.error) {
+    return failureResponse(
+      res,
+      400,
+      value.error,
+      value.error.details[0].message
+        ? value.error.details[0].message
+        : 'Bad request'
+    );
+  } else {
+    next();
+  }
+};
+
 // Verify property details validations
 export const verifyPropertyValidation = async (req, res, next) => {
   const schema = Joi.object().keys({

@@ -273,19 +273,24 @@ export const getAllPropertyS3Images = async () => {
 
 // Get s3 images and move those in final folder
 export const copyAndRenameS3Images = async (id, imgs) => {
+  const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
   const uploadParams = await AssignedProperty.findOne({
     propertyId: id,
   });
   if (uploadParams) {
-    const imgUrl = `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos/final/${uploadParams.propertyId}`;
+    const imgUrl = `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos`;
+    const oldUrl =  `${prefix}${imgUrl}/raw/`;
+    const newUrl = `${imgUrl}/final/${uploadParams.propertyId}`;
+
     // copy images to final folder with rename
     imgs.map(async (img) => {
       const params = {
         ACL: 'public-read',
         Bucket: bucketName,
-        CopySource: img.link,
-        Key: `${imgUrl}_${img.revisedName}`,
+        CopySource: `${oldUrl}${img.name}`,
+        Key: `${newUrl}_${img.revisedName}`,
       };
+      console.log('params', params);
       s3.copyObject(params, (err, updated) => {
         if (err) {
           console.error('Error copying object:', err);

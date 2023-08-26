@@ -38,6 +38,10 @@ export const add3DTourLink = async (req: Request, res: Response) => {
             'Property should be verified after upload and approve image'
           );
         } else {
+          updatedRecord.propertyDetails =
+          updatedRecord.propertyDetails[
+            updatedRecord.propertyDetails.length - 1
+          ];
           return successResponse(
             res,
             200,
@@ -75,7 +79,7 @@ export const verifyProperty = async (req: Request, res: Response) => {
     tempData.propertyData.version = proeprty.propertyDetails.length + 1;
     const detailObj = new PropertyDetail(tempData.propertyData);
     const savedObj: any = await detailObj.save();
-    updatePropertyDetails(proeprty._id, savedObj._id, res);
+    updatePropertyDetails(proeprty._id, savedObj._id, res, 'verified');
     // tempData.status = 'Verified';
     // Property.find({
     //   $and: [
@@ -134,6 +138,11 @@ export const getFieldAgentPendingProperty = async (
     }
     const pendingList = property.filter(
       (x) => x.propertyId.status === 'Pending'
+    );
+    pendingList.map(
+      (x) =>
+        (x.propertyId.propertyDetails =
+          x.propertyId.propertyDetails[x.propertyId.propertyDetails.length - 1])
     );
     return successResponse(
       res,

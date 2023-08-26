@@ -10,13 +10,15 @@ import {
   renameAndCopyBoardImagesOfS3,
   getAllPropertyImages,
   getPropertyStatus,
-  reactivateProperty
+  reactivateProperty,
+  editProperty
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
   propertyDetailValidation,
   closeListingValidation,
-  reactivateValidation
+  reactivateValidation,
+  editPropertyValidation
 } from '../../validation/property.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 import uploadRoutes from '../apis/upload.routes';
@@ -57,6 +59,15 @@ router.post(
   addPropertyValidation,
   propertyDetailValidation,
   addProperty
+);
+
+// Edit existing property
+router.put(
+  '/:id',
+  userAuth,
+  editPropertyValidation,
+  propertyDetailValidation,
+  editProperty
 );
 
 // Get property by id
