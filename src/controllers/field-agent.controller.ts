@@ -65,6 +65,7 @@ export const verifyProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
     tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
+    tempData.fieldAgentStatus = 'Completed';
     const proeprty = await Property.findByIdAndUpdate(
       req.params.id,
       {
@@ -137,7 +138,7 @@ export const getFieldAgentPendingProperty = async (
       return failureResponse(res, 500, [], 'Something went wrong');
     }
     const pendingList = property.filter(
-      (x) => x.propertyId.status === 'Pending'
+      (x) => x.propertyId.fieldAgentStatus === 'Pending'
     );
     pendingList.map(
       (x) =>
@@ -164,7 +165,7 @@ export const getFieldAgentPendingProperty = async (
 export const getFieldAgentHomeCount = async (req: Request, res: Response) => {
   try {
     const pendingProperties = [];
-    const verifiedProperties = [];
+    const completedProperties = [];
     const agentId = new Types.ObjectId(req.user.user._id);
     const property = await AssignedProperty.find({
       fieldAgentId: agentId,
@@ -173,10 +174,10 @@ export const getFieldAgentHomeCount = async (req: Request, res: Response) => {
       return failureResponse(res, 500, [], 'Something went wrong');
     }
     property.forEach(function(doc) {
-      if (doc.propertyId.status === 'Pending') {
+      if (doc.propertyId.fieldAgentStatus === 'Pending') {
         pendingProperties.push(doc);
-      } else if (doc.propertyId.status === 'Verified') {
-        verifiedProperties.push(doc);
+      } else if (doc.propertyId.fieldAgentStatus === 'Completed') {
+        completedProperties.push(doc);
       }
     });
     return successResponse(
@@ -184,7 +185,7 @@ export const getFieldAgentHomeCount = async (req: Request, res: Response) => {
       200,
       {
         pending: pendingProperties.length,
-        verified: verifiedProperties.length,
+        completed: completedProperties.length,
       },
       'Property found successfully.'
     );

@@ -56,6 +56,11 @@ export enum staticStatus {
   'Closed',
 }
 
+export enum fieldAgentStatus {
+  'Unassigned',
+  'Pending',
+  'Completed'
+}
 
 export enum tenantBuyerStatus {
   'WaitingForProperty',

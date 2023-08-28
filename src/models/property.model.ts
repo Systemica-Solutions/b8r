@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { MODELS } from '../constants/model.constants';
-import { staticStatus, propertyStatus } from '../constants/global.constants';
+import { staticStatus, propertyStatus, fieldAgentStatus } from '../constants/global.constants';
 import { propertyCloseListingInfo, propertyReactivateInfo } from './common.model';
 
 const PropertySchema: Schema = new Schema(
@@ -19,6 +19,12 @@ const PropertySchema: Schema = new Schema(
       trim: true,
       enum: staticStatus,
       default: 'New',
+    },
+    fieldAgentStatus: {
+      type: Schema.Types.String,
+      trim: true,
+      enum: fieldAgentStatus,
+      default: 'Unassigned',
     },
     propertyDetails: [
       {

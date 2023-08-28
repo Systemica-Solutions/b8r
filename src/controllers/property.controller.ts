@@ -343,11 +343,19 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
 
 // Change property status
 const changePropertyStatus = async (id, status) => {
-  return await Property.findByIdAndUpdate(
-    { _id: id },
-    { $set: { status } },
-    { new: true }
-  );
+  if (status === 'Pending') {
+    return await Property.findByIdAndUpdate(
+      { _id: id },
+      { $set: { status, fieldAgentStatus: status } },
+      { new: true }
+    );
+  } else {
+    return await Property.findByIdAndUpdate(
+      { _id: id },
+      { $set: { status } },
+      { new: true }
+    );
+  }
 };
 
 // Get property dashboard count
