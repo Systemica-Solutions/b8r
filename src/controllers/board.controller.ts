@@ -27,7 +27,10 @@ export const addBoard = async (req: Request, res: Response) => {
     tempData.key = await generateRandomKey(12);
     const detailObj: any = new Board(tempData);
     const savedRecord: any = await detailObj.save();
-    await savedRecord.populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
+    await savedRecord.populate({
+      path: 'propertyId',
+      populate: { path: 'propertyDetails' },
+    });
     await savedRecord.populate('tenantId');
     await savedRecord.populate('buyerId');
     // if (savedRecord && savedRecord.propertyId && savedRecord.propertyId.length) {
@@ -180,7 +183,43 @@ export const getBoardById = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    return successResponse(res, 200, { board }, 'Board finalize successfully.');
+    return successResponse(res, 200, { board }, 'Board get successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+// Find board details by board id
+export const getBoardDetailsById = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findById(req.params.id)
+      .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } })
+      .populate({ path: 'tenantId', populate: { path: 'tenantDetails' } })
+      .populate({ path: 'buyerId', populate: { path: 'buyerDetails' } })
+      .lean();
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    if (board && board.tenantId) {
+      board.tenantId.tenantDetails = [board.tenantId.tenantDetails[board.tenantId.tenantDetails.length - 1]];
+    }
+    if (board && board.buyerId) {
+      board.buyerId.buyerDetails = [board.buyerId.buyerDetails[board.buyerId.buyerDetails.length - 1]];
+    }
+    if (board && board.propertyId && board.propertyId.length) {
+      board.propertyId = board.propertyId.length;
+    }
+    return successResponse(
+      res,
+      200,
+      { board },
+      'Board details get successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
