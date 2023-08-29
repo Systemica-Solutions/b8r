@@ -5,6 +5,7 @@ import {
   successResponse,
 } from '../helpers/api-response.helper';
 import PropertyPhotos from '../models/propertyPhotos.model';
+import Property from '../models/property.model';
 import AssignedProperty from '../models/assignedProperty.model';
 import { Types } from 'mongoose';
 const mime = require('mime');
@@ -99,28 +100,29 @@ export const uploadPrpertyImages = async (req, res) => {
 
       if (fileData && fileData.length) {
         // store data in model
-        const imageURL = [];
-        fileData.forEach((obj) => imageURL.push(obj.Location));
-        const dataObj = {
-          photos: imageURL,
-          propertyId: reqData.propertyId,
-          fieldAgentId,
-        };
-        const propertyObj = new PropertyPhotos(dataObj);
-        const saveObj: any = await propertyObj.save();
+        // const imageURL = [];
+        // fileData.forEach((obj) => imageURL.push(obj.Location));
+        // const dataObj = {
+        //   photos: imageURL,
+        //   propertyId: reqData.propertyId,
+        //   fieldAgentId,
+        // };
+        // const propertyObj = new PropertyPhotos(dataObj);
+        // const saveObj: any = await propertyObj.save();
 
-        const imageModelId = new Types.ObjectId(saveObj.propertyId);
-        // Store property photos id in assign property table
-        const updateObj = await AssignedProperty.findOneAndUpdate(
-          { propertyId: imageModelId },
-          { $set: { propertyImageId: saveObj._id } },
+        // const imageModelId = new Types.ObjectId(saveObj.propertyId);
+        // // Store property photos id in assign property table
+        const updateObj = await Property.findByIdAndUpdate(
+          reqData.propertyId,
+          { $set: { fieldAgentStatus: 'Completed' } },
           { new: true }
-        );
+        ).populate('propertyDetails');
+        updateObj.propertyDetails = [updateObj.propertyDetails[updateObj.propertyDetails.length - 1]];
         return successResponse(
           res,
           200,
-          saveObj,
-          'File uploaded successfully.'
+          { property: updateObj },
+          'Images uploaded successfully.'
         );
       }
     })
@@ -279,7 +281,7 @@ export const copyAndRenameS3Images = async (id, imgs) => {
   });
   if (uploadParams) {
     const imgUrl = `b8rHomes/${uploadParams.fieldAgentId}/${uploadParams.propertyId}/photos`;
-    const oldUrl =  `${prefix}${imgUrl}/raw/`;
+    const oldUrl = `${prefix}${imgUrl}/raw/`;
     const newUrl = `${imgUrl}/final/${uploadParams.propertyId}`;
 
     // copy images to final folder with rename
