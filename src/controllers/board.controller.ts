@@ -27,9 +27,12 @@ export const addBoard = async (req: Request, res: Response) => {
     tempData.key = await generateRandomKey(12);
     const detailObj: any = new Board(tempData);
     const savedRecord: any = await detailObj.save();
-    await savedRecord.populate('propertyId');
+    await savedRecord.populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
     await savedRecord.populate('tenantId');
     await savedRecord.populate('buyerId');
+    // if (savedRecord && savedRecord.propertyId && savedRecord.propertyId.length) {
+    //   savedRecord.propertyId.map((x) => x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1]);
+    // }
     const flagChanged = await changeFlag(savedRecord);
     return successResponse(
       res,
@@ -74,10 +77,11 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
     req.params.id,
     { $addToSet: { propertyId: req.body.propertyId } },
     { new: true }
-  );
+  ).populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
   if (!board) {
     return failureResponse(res, 404, [], 'Board not found.');
   }
+  console.log(board);
   return successResponse(
     res,
     200,

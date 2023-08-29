@@ -140,11 +140,10 @@ export const getFieldAgentPendingProperty = async (
     const pendingList = property.filter(
       (x) => x.propertyId.fieldAgentStatus === 'Pending'
     );
-    pendingList.map(
-      (x) =>
-        (x.propertyId.propertyDetails =
-          x.propertyId.propertyDetails[x.propertyId.propertyDetails.length - 1])
-    );
+    pendingList.forEach((item) => {
+      const lastElement = item.propertyId.propertyDetails[item.propertyId.propertyDetails.length - 1];
+      item.propertyId.propertyDetails = [lastElement];
+    });
     return successResponse(
       res,
       200,
