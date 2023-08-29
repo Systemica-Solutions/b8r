@@ -17,10 +17,10 @@ const AssignedPropertySchema: Schema = new Schema(
       ref: 'Property',
       required: true,
     },
-    propertyImageId: {
-      type: Schema.Types.ObjectId,
-      ref: 'PropertyPhotos',
-    },
+    // propertyImageId: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'PropertyPhotos',
+    // },
   },
   { timestamps: true }
 );

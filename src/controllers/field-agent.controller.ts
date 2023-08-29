@@ -65,7 +65,7 @@ export const verifyProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
     tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
-    tempData.fieldAgentStatus = 'Completed';
+    tempData.fieldAgentStatus = 'DetailsCompleted';
     const proeprty = await Property.findByIdAndUpdate(
       req.params.id,
       {
@@ -132,7 +132,7 @@ export const getFieldAgentPendingProperty = async (
     const property = await AssignedProperty.find({
       fieldAgentId: agentId,
     })
-      .populate('propertyImageId')
+      // .populate('propertyImageId')
       .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
     if (!property) {
       return failureResponse(res, 500, [], 'Something went wrong');
@@ -140,11 +140,10 @@ export const getFieldAgentPendingProperty = async (
     const pendingList = property.filter(
       (x) => x.propertyId.fieldAgentStatus === 'Pending'
     );
-    pendingList.map(
-      (x) =>
-        (x.propertyId.propertyDetails =
-          x.propertyId.propertyDetails[x.propertyId.propertyDetails.length - 1])
-    );
+    pendingList.forEach((item) => {
+      const lastElement = item.propertyId.propertyDetails[item.propertyId.propertyDetails.length - 1];
+      item.propertyId.propertyDetails = [lastElement];
+    });
     return successResponse(
       res,
       200,

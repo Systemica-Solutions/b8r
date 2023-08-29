@@ -59,6 +59,7 @@ export enum staticStatus {
 export enum fieldAgentStatus {
   'Unassigned',
   'Pending',
+  'DetailsCompleted',
   'Completed'
 }
 
