@@ -1,18 +1,18 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 import {
   successResponse,
   failureResponse,
-} from '../helpers/api-response.helper';
-import Property from '../models/property.model';
-import PropertyDetail from '../models/propertyDetail.model';
-import AssignedProperty from '../models/assignedProperty.model';
-import { PipelineStage, Types } from 'mongoose';
+} from "../helpers/api-response.helper";
+import Property from "../models/property.model";
+import PropertyDetail from "../models/propertyDetail.model";
+import AssignedProperty from "../models/assignedProperty.model";
+import { PipelineStage, Types } from "mongoose";
 import {
   copyAndRenameS3Images,
   getAllPropertyS3Images,
   getS3ImagesByPropertyId,
-} from './uploadImage.controller';
-import { staticStatus } from '../constants/global.constants';
+} from "./uploadImage.controller";
+import { staticStatus } from "../constants/global.constants";
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -31,14 +31,14 @@ export const addProperty = async (req: Request, res: Response) => {
         { pinCode: tempData.pinCode },
       ],
     })
-      .populate('propertyDetails')
+      .populate("propertyDetails")
       .exec(async (error: any, propertyExist: any) => {
         if (error) {
           return failureResponse(
             res,
             error.status || 500,
             error,
-            error.message || 'Something went wrong'
+            error.message || "Something went wrong"
           );
         } else if (propertyExist && propertyExist.length) {
           const agentProperty = propertyExist[0].propertyDetails.filter((x) =>
@@ -49,7 +49,7 @@ export const addProperty = async (req: Request, res: Response) => {
               res,
               403,
               [],
-              'Property already exist with this value'
+              "Property already exist with this value"
             );
           } else {
             tempData.propertyData.version =
@@ -60,7 +60,7 @@ export const addProperty = async (req: Request, res: Response) => {
               propertyExist[0]._id,
               savedObj._id,
               res,
-              'added'
+              "added"
             );
           }
         } else {
@@ -68,7 +68,7 @@ export const addProperty = async (req: Request, res: Response) => {
           const savedObj: any = await detailObj.save();
           const propertyObj = new Property(tempData);
           const saveObj = await propertyObj.save();
-          updatePropertyDetails(saveObj._id, savedObj._id, res, 'added');
+          updatePropertyDetails(saveObj._id, savedObj._id, res, "added");
         }
       });
   } catch (error) {
@@ -76,7 +76,7 @@ export const addProperty = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -95,18 +95,18 @@ export const editProperty = async (req: Request, res: Response) => {
       },
     });
     if (!property) {
-      throw { status: 404, message: 'Property not found.' };
+      throw { status: 404, message: "Property not found." };
     }
     tempData.propertyDetails.version = property.propertyDetails.length + 1;
     const detailObj = new PropertyDetail(tempData.propertyDetails);
     const savedObj: any = await detailObj.save();
-    updatePropertyDetails(property._id, savedObj._id, res, 'edited');
+    updatePropertyDetails(property._id, savedObj._id, res, "edited");
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -119,22 +119,22 @@ export const updatePropertyDetails = (id, detailsId, res, flag) => {
     { $push: { propertyDetails: detailId } },
     { new: true }
   )
-    .populate('propertyDetails')
+    .populate("propertyDetails")
     .exec((error, updatedRecord) => {
       if (error) {
-        console.log('error while update', error);
+        console.log("error while update", error);
         return failureResponse(
           res,
           500,
           [],
-          error.message || 'Something went wrong'
+          error.message || "Something went wrong"
         );
       } else {
-        console.log('updatedRecord.......', updatedRecord);
-        updatedRecord.propertyDetails =
-         [ updatedRecord.propertyDetails[
+        updatedRecord.propertyDetails = [
+          updatedRecord.propertyDetails[
             updatedRecord.propertyDetails.length - 1
-          ]];
+          ],
+        ];
         return successResponse(
           res,
           200,
@@ -158,15 +158,15 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     let aggregationPipeline: PipelineStage[] = [
       {
         $lookup: {
-          from: 'propertydetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'propertyDetails',
+          from: "propertydetails",
+          localField: "propertyDetails",
+          foreignField: "_id",
+          as: "propertyDetails",
         },
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId,
+          "propertyDetails.agentId": agentId,
         },
       },
     ];
@@ -175,7 +175,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
       aggregationPipeline.push({
         $match: {
           houseName: {
-            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+            $regex: new RegExp("^" + searchText.trim().toLowerCase(), "i"),
           },
         },
       });
@@ -184,20 +184,20 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     if (
       filter &&
       filter.trim() &&
-      filter.trim().toLowerCase() !== 'shortlisted' &&
-      filter.trim().toLowerCase() !== 'shared'
+      filter.trim().toLowerCase() !== "shortlisted" &&
+      filter.trim().toLowerCase() !== "shared"
     ) {
       aggregationPipeline.push({
         $match: {
           $or: [
             {
               status: {
-                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+                $regex: new RegExp("^" + filter.trim().toLowerCase(), "i"),
               },
             },
             {
               closeListingStatus: {
-                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+                $regex: new RegExp("^" + filter.trim().toLowerCase(), "i"),
               },
             },
           ],
@@ -205,13 +205,13 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
       });
     }
 
-    if (filter && filter.trim() && filter.trim().toLowerCase() === 'shared') {
+    if (filter && filter.trim() && filter.trim().toLowerCase() === "shared") {
       aggregationPipeline.push({
         $match: {
           $expr: {
             $or: [
-              { $gt: [{ $size: '$sharedProperty' }, 0] },
-              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+              { $gt: [{ $size: "$sharedProperty" }, 0] },
+              { $gt: [{ $size: "$sharedBuyerProperty" }, 0] },
             ],
           },
         },
@@ -221,40 +221,40 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
     if (
       filter &&
       filter.trim() &&
-      filter.trim().toLowerCase() === 'shortlisted'
+      filter.trim().toLowerCase() === "shortlisted"
     ) {
       aggregationPipeline = aggregationPipeline.concat([
         {
           $lookup: {
-            from: 'sharedbuyerproperties',
-            localField: 'sharedBuyerProperty',
-            foreignField: '_id',
-            as: 'sharedBuyerProperty',
+            from: "sharedbuyerproperties",
+            localField: "sharedBuyerProperty",
+            foreignField: "_id",
+            as: "sharedBuyerProperty",
           },
         },
         {
           $lookup: {
-            from: 'sharedproperties',
-            localField: 'sharedProperty',
-            foreignField: '_id',
-            as: 'sharedProperty',
+            from: "sharedproperties",
+            localField: "sharedProperty",
+            foreignField: "_id",
+            as: "sharedProperty",
           },
         },
         {
           $match: {
             $or: [
-              { 'sharedProperty.isShortlisted': true },
-              { 'sharedBuyerProperty.isShortlisted': true },
+              { "sharedProperty.isShortlisted": true },
+              { "sharedBuyerProperty.isShortlisted": true },
             ],
           },
         },
       ]);
     }
 
-    if (imagesApproved === 'false') {
+    if (imagesApproved === "false") {
       aggregationPipeline.push({ $match: { imagesApproved: false } });
     }
-    if (imagesApproved === 'true') {
+    if (imagesApproved === "true") {
       aggregationPipeline.push({ $match: { imagesApproved: true } });
     }
 
@@ -266,20 +266,20 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
       );
     }
     if (!properties) {
-      return failureResponse(res, 404, [], 'Properties not found.');
+      return failureResponse(res, 404, [], "Properties not found.");
     }
     return successResponse(
       res,
       200,
       { properties },
-      'Properties found successfully.'
+      "Properties found successfully."
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -288,10 +288,10 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id)
-      .populate('propertyDetails')
+      .populate("propertyDetails")
       .lean();
     if (!property) {
-      return failureResponse(res, 404, [], 'Property not found.');
+      return failureResponse(res, 404, [], "Property not found.");
     }
     property.propertyDetails =
       property.propertyDetails[property.propertyDetails.length - 1];
@@ -299,14 +299,14 @@ export const getPropertyById = async (req: Request, res: Response) => {
       res,
       200,
       { property },
-      'Property found successfully.'
+      "Property found successfully."
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -319,16 +319,16 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
       propertyId: dataObj.propertyId,
     });
     if (existing) {
-      return failureResponse(res, 403, [], 'Property already assigned');
+      return failureResponse(res, 403, [], "Property already assigned");
     } else {
       const detailObj = new AssignedProperty(dataObj);
       const savedObj: any = await detailObj.save();
-      const status = await changePropertyStatus(dataObj.propertyId, 'Pending');
+      const status = await changePropertyStatus(dataObj.propertyId, "Pending");
       return successResponse(
         res,
         200,
         { assigned: savedObj },
-        'Property assigned to field agent successfully.'
+        "Property assigned to field agent successfully."
       );
     }
   } catch (error) {
@@ -336,14 +336,14 @@ export const assignPropertyToFA = async (req: Request, res: Response) => {
       res,
       500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
 
 // Change property status
 const changePropertyStatus = async (id, status) => {
-  if (status === 'Pending') {
+  if (status === "Pending") {
     return await Property.findByIdAndUpdate(
       { _id: id },
       { $set: { status, fieldAgentStatus: status } },
@@ -362,32 +362,31 @@ const changePropertyStatus = async (id, status) => {
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const agentId = new Types.ObjectId(req.user.user._id);
-    console.log('agentID', agentId);
 
     // status count
     const step0 = await Property.aggregate([
       {
         $lookup: {
-          from: 'propertydetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'propertyDetails',
+          from: "propertydetails",
+          localField: "propertyDetails",
+          foreignField: "_id",
+          as: "propertyDetails",
         },
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId,
+          "propertyDetails.agentId": agentId,
         },
       },
       {
         $group: {
-          _id: '$status',
+          _id: "$status",
           count: { $sum: 1 },
         },
       },
       {
         $project: {
-          status: '$_id',
+          status: "$_id",
           count: 1,
           _id: 0,
         },
@@ -398,19 +397,19 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     const step1 = await Property.aggregate([
       {
         $lookup: {
-          from: 'propertydetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'propertyDetails',
+          from: "propertydetails",
+          localField: "propertyDetails",
+          foreignField: "_id",
+          as: "propertyDetails",
         },
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId,
+          "propertyDetails.agentId": agentId,
           $expr: {
             $or: [
-              { $gt: [{ $size: '$sharedProperty' }, 0] },
-              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+              { $gt: [{ $size: "$sharedProperty" }, 0] },
+              { $gt: [{ $size: "$sharedBuyerProperty" }, 0] },
             ],
           },
         },
@@ -421,19 +420,19 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     const step2 = await Property.aggregate([
       {
         $lookup: {
-          from: 'propertydetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'propertyDetails',
+          from: "propertydetails",
+          localField: "propertyDetails",
+          foreignField: "_id",
+          as: "propertyDetails",
         },
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId,
+          "propertyDetails.agentId": agentId,
           $expr: {
             $or: [
-              { $eq: [{ $size: '$sharedProperty' }, 0] },
-              { $eq: [{ $size: '$sharedBuyerProperty' }, 0] },
+              { $eq: [{ $size: "$sharedProperty" }, 0] },
+              { $eq: [{ $size: "$sharedBuyerProperty" }, 0] },
             ],
           },
         },
@@ -444,51 +443,51 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     const step3 = await Property.aggregate([
       {
         $lookup: {
-          from: 'propertydetails',
-          localField: 'propertyDetails',
-          foreignField: '_id',
-          as: 'propertyDetails',
+          from: "propertydetails",
+          localField: "propertyDetails",
+          foreignField: "_id",
+          as: "propertyDetails",
         },
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId,
+          "propertyDetails.agentId": agentId,
         },
       },
       {
         $lookup: {
-          from: 'sharedproperties',
-          localField: 'sharedProperty',
-          foreignField: '_id',
-          as: 'sharedProperties',
+          from: "sharedproperties",
+          localField: "sharedProperty",
+          foreignField: "_id",
+          as: "sharedProperties",
         },
       },
       {
         $lookup: {
-          from: 'sharedbuyerproperties',
-          localField: 'sharedBuyerProperty',
-          foreignField: '_id',
-          as: 'sharedBuyerProperties',
+          from: "sharedbuyerproperties",
+          localField: "sharedBuyerProperty",
+          foreignField: "_id",
+          as: "sharedBuyerProperties",
         },
       },
       {
         $match: {
           $or: [
-            { 'sharedProperties.isShortlisted': true },
-            { 'sharedBuyerProperties.isShortlisted': true },
+            { "sharedProperties.isShortlisted": true },
+            { "sharedBuyerProperties.isShortlisted": true },
           ],
         },
       },
       {
         $group: {
-          _id: 'Sortlisted',
+          _id: "Sortlisted",
           count: { $sum: 1 },
         },
       },
     ]);
     const newObj: any = {};
     for (const key in staticStatus) {
-      if (typeof staticStatus[key] === 'string') {
+      if (typeof staticStatus[key] === "string") {
         newObj[staticStatus[key]] = 0;
       }
     }
@@ -510,14 +509,14 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       res,
       200,
       { counts: output },
-      'Property dashboard count get successfully.'
+      "Property dashboard count get successfully."
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -527,25 +526,25 @@ export const getPropertyStatus = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id)
       .populate({
-        path: 'sharedProperty',
-        populate: { path: 'tenantId' },
+        path: "sharedProperty",
+        populate: { path: "tenantId" },
       })
       .populate({
-        path: 'sharedBuyerProperty',
-        populate: { path: 'buyerId' },
+        path: "sharedBuyerProperty",
+        populate: { path: "buyerId" },
       });
     return successResponse(
       res,
       200,
       { property },
-      'Detailed property data get successfully.'
+      "Detailed property data get successfully."
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -561,32 +560,32 @@ export const closeListingProperty = async (req: Request, res: Response) => {
         $set: {
           closeListingStatus: tempData.closeListingStatus,
           closeListingDetails: tempData.closeListingDetails,
-          status: 'Closed',
+          status: "Closed",
         },
       },
       { new: true }
     )
-      .populate('propertyDetails')
+      .populate("propertyDetails")
       .exec((error, updatedRecord) => {
         if (error) {
-          console.log('error while update', error);
+          console.log("error while update", error);
           return failureResponse(
             res,
             500,
             [],
-            error.message || 'Something went wrong'
+            error.message || "Something went wrong"
           );
         } else {
-          console.log('updatedRecord.......', updatedRecord);
-          updatedRecord.propertyDetails =
+          updatedRecord.propertyDetails = [
             updatedRecord.propertyDetails[
               updatedRecord.propertyDetails.length - 1
-            ];
+            ],
+          ];
           return successResponse(
             res,
             200,
             { property: updatedRecord },
-            'Property status updated successfully.'
+            "Property status updated successfully."
           );
         }
       });
@@ -595,7 +594,7 @@ export const closeListingProperty = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -604,13 +603,13 @@ export const closeListingProperty = async (req: Request, res: Response) => {
 export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
   try {
     const images = await getS3ImagesByPropertyId(req.params.id);
-    return successResponse(res, 200, { images }, 'S3 images get successfully.');
+    return successResponse(res, 200, { images }, "S3 images get successfully.");
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -634,19 +633,19 @@ export const renameAndCopyBoardImagesOfS3 = async (
         { new: true }
       ).exec((error, updatedRecord) => {
         if (error) {
-          console.log('error while update', error);
+          console.log("error while update", error);
           return failureResponse(
             res,
             500,
             [],
-            error.message || 'Something went wrong'
+            error.message || "Something went wrong"
           );
         } else {
           return successResponse(
             res,
             200,
             {},
-            'Images has been renamed and copied successfully.'
+            "Images has been renamed and copied successfully."
           );
         }
       });
@@ -656,7 +655,7 @@ export const renameAndCopyBoardImagesOfS3 = async (
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -679,14 +678,14 @@ export const getAllPropertyImages = async (req: Request, res: Response) => {
       res,
       200,
       { properties: propertiesData },
-      'S3 images are get successfully.'
+      "S3 images are get successfully."
     );
   } catch (error) {
     return failureResponse(
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
@@ -700,32 +699,32 @@ export const reactivateProperty = async (req: Request, res: Response) => {
       {
         $set: {
           reactivateDetails: tempData.reactivateDetails,
-          status: 'Verified',
+          status: "Verified",
         },
       },
       { new: true }
     )
-      .populate('propertyDetails')
+      .populate("propertyDetails")
       .exec((error, updatedRecord) => {
         if (error) {
-          console.log('error while update', error);
+          console.log("error while update", error);
           return failureResponse(
             res,
             500,
             [],
-            error.message || 'Something went wrong'
+            error.message || "Something went wrong"
           );
         } else {
-          console.log('updatedRecord.......', updatedRecord);
-          updatedRecord.propertyDetails =
+          updatedRecord.propertyDetails = [
             updatedRecord.propertyDetails[
               updatedRecord.propertyDetails.length - 1
-            ];
+            ],
+          ];
           return successResponse(
             res,
             200,
             { property: updatedRecord },
-            'Property reactivated successfully.'
+            "Property reactivated successfully."
           );
         }
       });
@@ -734,7 +733,7 @@ export const reactivateProperty = async (req: Request, res: Response) => {
       res,
       error.status || 500,
       error,
-      error.message || 'Something went wrong'
+      error.message || "Something went wrong"
     );
   }
 };
