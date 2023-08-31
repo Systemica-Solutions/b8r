@@ -132,9 +132,9 @@ export const updatePropertyDetails = (id, detailsId, res, flag) => {
       } else {
         console.log('updatedRecord.......', updatedRecord);
         updatedRecord.propertyDetails =
-          updatedRecord.propertyDetails[
+         [updatedRecord.propertyDetails[
             updatedRecord.propertyDetails.length - 1
-          ];
+          ]];
         return successResponse(
           res,
           200,
