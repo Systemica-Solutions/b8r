@@ -233,8 +233,8 @@ export const editPropertyValidation = async (req, res, next) => {
     pinCode: Joi.string()
       .pattern(/^[0-9]{6}$/)
       .optional(),
-    propertyData: Joi.any().optional(),
-    propertyDetails: Joi.array().items(Joi.string()).optional(),
+      // propertyData: Joi.any().optional(),
+    propertyDetails: Joi.any().optional(),
   });
   const value = schema.validate(req.body);
   if (value.error) {
@@ -247,6 +247,8 @@ export const editPropertyValidation = async (req, res, next) => {
         : 'Bad request'
     );
   } else {
+    const userId = req.user.user._id;
+    req.body.propertyDetails.agentId = new Types.ObjectId(userId);
     next();
   }
 };

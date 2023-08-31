@@ -85,7 +85,7 @@ export const addProperty = async (req: Request, res: Response) => {
 export const editProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
+    tempData.propertyDetails.agentId = new Types.ObjectId(req.user.user._id);
 
     const property = await Property.findByIdAndUpdate(req.params.id, {
       $set: {
@@ -97,8 +97,8 @@ export const editProperty = async (req: Request, res: Response) => {
     if (!property) {
       throw { status: 404, message: 'Property not found.' };
     }
-    tempData.propertyData.version = property.propertyDetails.length + 1;
-    const detailObj = new PropertyDetail(tempData.propertyData);
+    tempData.propertyDetails.version = property.propertyDetails.length + 1;
+    const detailObj = new PropertyDetail(tempData.propertyDetails);
     const savedObj: any = await detailObj.save();
     updatePropertyDetails(property._id, savedObj._id, res, 'edited');
   } catch (error) {
@@ -132,7 +132,7 @@ export const updatePropertyDetails = (id, detailsId, res, flag) => {
       } else {
         console.log('updatedRecord.......', updatedRecord);
         updatedRecord.propertyDetails =
-         [updatedRecord.propertyDetails[
+         [ updatedRecord.propertyDetails[
             updatedRecord.propertyDetails.length - 1
           ]];
         return successResponse(
