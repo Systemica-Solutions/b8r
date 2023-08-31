@@ -31,11 +31,17 @@ export const addBoard = async (req: Request, res: Response) => {
       path: 'propertyId',
       populate: { path: 'propertyDetails' },
     });
-    await savedRecord.populate('tenantId');
-    await savedRecord.populate('buyerId');
-    // if (savedRecord && savedRecord.propertyId && savedRecord.propertyId.length) {
-    //   savedRecord.propertyId.map((x) => x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1]);
-    // }
+    await savedRecord.populate({
+      path: 'tenantId',
+      populate: { path: 'tenantDetails' },
+    });
+    await savedRecord.populate({
+      path: 'buyerId',
+      populate: { path: 'buyerDetails' },
+    });
+    if (savedRecord && savedRecord.propertyId && savedRecord.propertyId.length) {
+      savedRecord.propertyId.map((x) => x.propertyDetails = [x.propertyDetails[x.propertyDetails.length - 1]]);
+    }
     const flagChanged = await changeFlag(savedRecord);
     return successResponse(
       res,
@@ -83,6 +89,9 @@ export const addPropertyInBoard = async (req: Request, res: Response) => {
   ).populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
   if (!board) {
     return failureResponse(res, 404, [], 'Board not found.');
+  }
+  if (board && board.propertyId && board.propertyId.length) {
+    board.propertyId.map((x) => x.propertyDetails = [x.propertyDetails[x.propertyDetails.length - 1]]);
   }
   console.log(board);
   return successResponse(
