@@ -151,6 +151,12 @@ export const getAllTenantList = async (req: Request, res: Response) => {
       });
     }
     const tenants = await Tenant.aggregate(aggregationPipeline);
+    if (tenants && tenants.length) {
+      tenants.map(
+        (x) =>
+          (x.tenantDetails = x.tenantDetails[x.tenantDetails.length - 1])
+      );
+    }
     // const tenants = await Tenant.find().populate('tenantDetails').lean();
     if (!tenants) {
       throw { status: 404, message: 'Tenants not found.' };

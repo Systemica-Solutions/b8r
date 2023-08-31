@@ -18,7 +18,8 @@ import {
   propertyDetailValidation,
   closeListingValidation,
   reactivateValidation,
-  editPropertyValidation
+  editPropertyValidation,
+  propertyDetailVerificationValidation
 } from '../../validation/property.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 import uploadRoutes from '../apis/upload.routes';
@@ -66,7 +67,7 @@ router.put(
   '/:id',
   userAuth,
   editPropertyValidation,
-  propertyDetailValidation,
+  propertyDetailVerificationValidation,
   editProperty
 );
 

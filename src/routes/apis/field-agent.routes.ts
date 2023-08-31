@@ -6,8 +6,8 @@ import {
   add3DTourLink
 } from '../../controllers/field-agent.controller';
 import {
-  propertyDetailValidation,
   verifyPropertyValidation,
+  propertyDetailVerificationValidation
 } from '../../validation/property.validation';
 import {
   userAuth,
@@ -33,7 +33,7 @@ router.put(
   userAuth,
   fieldAgentAccess,
   verifyPropertyValidation,
-  propertyDetailValidation,
+  propertyDetailVerificationValidation,
   verifyProperty
 );
 

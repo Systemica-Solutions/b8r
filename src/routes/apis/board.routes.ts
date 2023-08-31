@@ -8,7 +8,8 @@ import {
   shortlistDate,
   updateLastVisitDateTenantBoard,
   updateLastVisitDateBuyerBoard,
-  getBoardById
+  getBoardById,
+  getBoardDetailsById
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -34,6 +35,9 @@ router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
 
 // Add date while shortlist property
 router.put('/shortlist/:id', userAuth, shortlistDate);
+
+// Get board details
+router.get('/details/:id', getBoardDetailsById);
 
 // Find board by board id
 router.get('/:id', userAuth, getBoardById);

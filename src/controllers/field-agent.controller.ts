@@ -64,12 +64,13 @@ export const add3DTourLink = async (req: Request, res: Response) => {
 export const verifyProperty = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    tempData.propertyData.agentId = new Types.ObjectId(req.user.user._id);
-    tempData.fieldAgentStatus = 'DetailsCompleted';
+    const { propertyDetails, ...rest } = req.body;
+    // tempData.propertyDetails.agentId = new Types.ObjectId(req.user.user._id);
+    rest.fieldAgentStatus = 'DetailsCompleted';
     const proeprty = await Property.findByIdAndUpdate(
       req.params.id,
       {
-        $set: tempData,
+        $set: rest,
       },
       { new: true }
     );
@@ -77,8 +78,8 @@ export const verifyProperty = async (req: Request, res: Response) => {
       return failureResponse(res, 404, [], 'Proeprty not found.');
     }
     console.log('property get', proeprty);
-    tempData.propertyData.version = proeprty.propertyDetails.length + 1;
-    const detailObj = new PropertyDetail(tempData.propertyData);
+    tempData.propertyDetails.version = proeprty.propertyDetails.length + 1;
+    const detailObj = new PropertyDetail(tempData.propertyDetails);
     const savedObj: any = await detailObj.save();
     updatePropertyDetails(proeprty._id, savedObj._id, res, 'verified');
     // tempData.status = 'Verified';
