@@ -201,7 +201,11 @@ export const getBoardById = async (req: Request, res: Response) => {
       board.buyerId.buyerDetails = [board.buyerId.buyerDetails[board.buyerId.buyerDetails.length - 1]];
     }
     if (board && board.propertyId && board.propertyId.length) {
-      board.propertyId.propertyDetails = [board.propertyId.propertyDetails[board.propertyId.propertyDetails.length - 1]];
+      board.propertyId.map(
+        (x) =>
+          (x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1])
+      );
+      // board.propertyId.propertyDetails = [board.propertyId.propertyDetails[board.propertyId.propertyDetails.length - 1]];
     }
     return successResponse(res, 200, { board }, 'Board get successfully.');
   } catch (error) {
