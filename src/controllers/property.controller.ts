@@ -621,7 +621,10 @@ export const renameAndCopyBoardImagesOfS3 = async (
 ) => {
   const propertyId = req.params.id;
   try {
-    const imgs = await copyAndRenameS3Images(propertyId, req.body.images);
+    let imgs: any = [];
+    imgs = await copyAndRenameS3Images(propertyId, req.body.images);
+    // console.log('imgs', imgs);
+    const sortedImgs = await imgs.sort(imageRankingSort);
     if (imgs && imgs.length) {
       Property.findByIdAndUpdate(
         { _id: propertyId },
@@ -629,6 +632,9 @@ export const renameAndCopyBoardImagesOfS3 = async (
           $set: {
             imagesApproved: true,
           },
+          $addToSet: {
+            images: sortedImgs
+          }
         },
         { new: true }
       ).exec((error, updatedRecord) => {
@@ -659,6 +665,19 @@ export const renameAndCopyBoardImagesOfS3 = async (
     );
   }
 };
+
+function imageRankingSort(a, b) {
+  const regex = /(\d+)\.PNG$/; // Regular expression to match the digits before ".PNG"
+  const aMatch = a.match(regex);
+  const bMatch = b.match(regex);
+  if (aMatch && bMatch) {
+    const aNumber = parseInt(aMatch[1], 10);
+    const bNumber = parseInt(bMatch[1], 10);
+    return aNumber - bNumber;
+  }
+  // If matching digits aren't found, maintain the original order
+  return 0;
+}
 
 // Get all property images fom s3 which are not moved to final folder yet
 export const getAllPropertyImages = async (req: Request, res: Response) => {

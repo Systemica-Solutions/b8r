@@ -89,6 +89,11 @@ const updateTenantDetails = (id, detailsId, res) => {
         );
       } else {
         console.log('updatedRecord.......', updatedRecord);
+        updatedRecord.tenantDetails = [
+          updatedRecord.tenantDetails[
+            updatedRecord.tenantDetails.length - 1
+          ],
+        ];
         return successResponse(
           res,
           200,
@@ -186,6 +191,7 @@ export const getTenantById = async (req: Request, res: Response) => {
     if (!tenant) {
       return failureResponse(res, 404, [], 'Tenant not found.');
     }
+    tenant.tenantDetails = [tenant.tenantDetails[tenant.tenantDetails.length - 1]];
     return successResponse(res, 200, { tenant }, 'Tenant found successfully.');
   } catch (error) {
     return failureResponse(
@@ -224,6 +230,7 @@ export const deactivateTenant = async (req: Request, res: Response) => {
           );
         } else {
           console.log('updatedRecord.......', updatedRecord);
+          updatedRecord.tenantDetails = [updatedRecord.tenantDetails[updatedRecord.tenantDetails.length - 1]];
           return successResponse(
             res,
             200,

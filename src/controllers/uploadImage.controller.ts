@@ -285,6 +285,7 @@ export const copyAndRenameS3Images = async (id, imgs) => {
     const newUrl = `${imgUrl}/final/${uploadParams.propertyId}`;
 
     // copy images to final folder with rename
+    const linkArray = [];
     imgs.map(async (img) => {
       const params = {
         ACL: 'public-read',
@@ -292,16 +293,16 @@ export const copyAndRenameS3Images = async (id, imgs) => {
         CopySource: `${oldUrl}${img.name}`,
         Key: `${newUrl}_${img.revisedName}`,
       };
-      console.log('params', params);
+      linkArray.push(`${prefix}${params.Key}`);
       s3.copyObject(params, (err, updated) => {
         if (err) {
           console.error('Error copying object:', err);
         } else {
-          console.log('data after copy', updated);
+          // console.log('data after copy', updated);
         }
       });
     });
-    return await imgs;
+    return await linkArray;
   } else {
     return failureResponse(null, 404, [], 'Data not found');
   }
