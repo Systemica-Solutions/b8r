@@ -39,9 +39,9 @@ export const add3DTourLink = async (req: Request, res: Response) => {
           );
         } else {
           updatedRecord.propertyDetails =
-          updatedRecord.propertyDetails[
+          [updatedRecord.propertyDetails[
             updatedRecord.propertyDetails.length - 1
-          ];
+          ]];
           return successResponse(
             res,
             200,

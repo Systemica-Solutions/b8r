@@ -88,6 +88,11 @@ const updateBuyerDetails = (id, detailsId, res) => {
         );
       } else {
         console.log('updatedRecord.......', updatedRecord);
+        updatedRecord.buyerDetails = [
+          updatedRecord.buyerDetails[
+            updatedRecord.buyerDetails.length - 1
+          ],
+        ];
         return successResponse(
           res,
           200,
@@ -154,6 +159,12 @@ export const getAllBuyerList = async (req: Request, res: Response) => {
     if (!buyers) {
       throw { status: 404, message: 'Buyers not found.' };
     }
+    if (buyers && buyers.length) {
+      buyers.map(
+        (x) =>
+          (x.buyerDetails = x.buyerDetails[x.buyerDetails.length - 1])
+      );
+    }
     return successResponse(res, 200, { buyers }, 'Buyers found successfully.');
   } catch (error) {
     return failureResponse(
@@ -174,6 +185,7 @@ export const getBuyerById = async (req: Request, res: Response) => {
     if (!buyer) {
       return failureResponse(res, 404, [], 'Buyer not found.');
     }
+    buyer.buyerDetails = [buyer.buyerDetails[buyer.buyerDetails.length - 1]];
     return successResponse(res, 200, { buyer }, 'Buyer found successfully.');
   } catch (error) {
     return failureResponse(
@@ -212,6 +224,7 @@ export const deactivateBuyer = async (req: Request, res: Response) => {
           );
         } else {
           console.log('updatedRecord.......', updatedRecord);
+          updatedRecord.buyerDetails = [updatedRecord.buyerDetails[updatedRecord.buyerDetails.length - 1]];
           return successResponse(
             res,
             200,
