@@ -2,13 +2,13 @@ version: '3'
 services:
   b8r-api:
     container_name: b8rapi
-    image: urvish91/betterhomes-backend:1.0.4
+    image: urvish91/betterhomes-backend:1.0.5
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
-      - PORT=8080
+      - PORT=80
       - APP_KEY=
       - DB_URI=mongodb+srv://b8r_app:EsM5QXMGzuCzNKvs@cluster0.sbfwcs4.mongodb.net/b8r_home
       - API_PREFIX=/api/v1
@@ -23,4 +23,4 @@ services:
       - S3_BUCKET_URL=
       - S3_BUCKET_NAME=elasticbeanstalk-ap-south-1-493063914377
     ports:
-      - "8080:8080"
+      - "80:80"
