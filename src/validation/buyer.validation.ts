@@ -54,6 +54,7 @@ export const addBuyerValidation = async (req, res, next) => {
       .optional(),
     buyerDetails: Joi.array().items(Joi.string()).optional(),
     buyerData: Joi.any().optional(),
+    boardId: Joi.any().optional()
   });
   const value = schema.validate(req.body);
   if (value.error) {

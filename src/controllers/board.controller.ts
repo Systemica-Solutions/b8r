@@ -43,6 +43,13 @@ export const addBoard = async (req: Request, res: Response) => {
       savedRecord.propertyId.map((x) => x.propertyDetails = [x.propertyDetails[x.propertyDetails.length - 1]]);
     }
     const flagChanged = await changeFlag(savedRecord);
+    if (savedRecord && savedRecord.boardFor && savedRecord.boardFor === 'Tenant') {
+      savedRecord.tenantId.isOnBoard = true;
+      savedRecord.tenantId.boardId = savedRecord._id;
+    } else if (savedRecord && savedRecord.boardFor && savedRecord.boardFor === 'Buyer') {
+      savedRecord.buyerId.isOnBoard = true;
+      savedRecord.buyerId.boardId = savedRecord._id;
+    }
     return successResponse(
       res,
       200,
@@ -63,11 +70,11 @@ const changeFlag = async (data) => {
   try {
     if (data && data.boardFor && data.boardFor === 'Tenant') {
       await Tenant.findByIdAndUpdate(data.tenantId, {
-        $set: { isOnBoard: true },
+        $set: { isOnBoard: true, boardId: data._id },
       });
     } else if (data && data.boardFor && data.boardFor === 'Buyer') {
       await Buyer.findByIdAndUpdate(data.buyerId, {
-        $set: { isOnBoard: true },
+        $set: { isOnBoard: true, boardId: data._id },
       });
     }
   } catch (error) {
