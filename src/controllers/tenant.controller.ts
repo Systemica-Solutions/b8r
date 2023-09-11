@@ -157,7 +157,7 @@ export const getAllTenantList = async (req: Request, res: Response) => {
     }
     const tenants = await Tenant.aggregate(aggregationPipeline);
     if (tenants && tenants.length) {
-      tenants.map(
+      await tenants.map(
         (x) =>
           (x.tenantDetails = x.tenantDetails[x.tenantDetails.length - 1])
       );
