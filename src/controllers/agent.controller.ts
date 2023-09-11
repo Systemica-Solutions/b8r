@@ -277,6 +277,11 @@ export const addCustomAuthCode = async (req: Request, res: Response) => {
       const endTime = new Date(startTime);
       endTime.setDate(endTime.getDate() + 14);
       authData.endTime = endTime.toISOString();
+    } else {
+      authData.startTime = new Date();
+      const endTime = new Date(authData.startTime);
+      endTime.setDate(endTime.getDate() + 14);
+      authData.endTime = endTime.toISOString();
     }
     const authObj = new Authcode(authData);
     const saveObj = await authObj.save();
