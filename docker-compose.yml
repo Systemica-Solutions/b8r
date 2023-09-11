@@ -3,6 +3,7 @@ services:
   b8r-api:
     container_name: b8rapi
     image: urvish91/betterhomes-backend:1.0.5
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
