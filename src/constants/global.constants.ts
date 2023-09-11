@@ -72,6 +72,7 @@ export enum tenantBuyerStatus {
 }
 
 export enum tenantDeactivationReason {
+  'Rented From B8R',
   'Rented Externally',
   'Does not need anymore',
   'Not responding',

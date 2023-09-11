@@ -89,7 +89,7 @@ const saveAuthCode = async (data: any) => {
   try {
     const obj = await Authcode.findOneAndUpdate(
       { code: data.inviteCode },
-      { $set: { agentId: data._id } },
+      { $set: { agentId: data._id, status: true } },
       { new: true }
     );
     if (!obj) {
@@ -268,13 +268,18 @@ export const updateAgentDetails = async (req: Request, res: Response) => {
 export const addCustomAuthCode = async (req: Request, res: Response) => {
   try {
     const authData = req.body;
-    /* authData.codeType =
+    authData.codeType =
       authData.code.substring(0, 2) === 'FA' ? 'Field Agent'
         : authData.code.substring(0, 2) === 'PA' ? 'Property Agent'
-        : 'Other'; */
+        : 'Other';
     if (authData && authData.startTime) {
       const startTime = new Date(authData.startTime);
       const endTime = new Date(startTime);
+      endTime.setDate(endTime.getDate() + 14);
+      authData.endTime = endTime.toISOString();
+    } else {
+      authData.startTime = new Date();
+      const endTime = new Date(authData.startTime);
       endTime.setDate(endTime.getDate() + 14);
       authData.endTime = endTime.toISOString();
     }
