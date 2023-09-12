@@ -290,7 +290,7 @@ export const propertyApproveInfo: Schema = new Schema(
 
 export const propertyCloseListingInfo: Schema = new Schema(
   {
-    name: {
+    tenantName: {
       type: Schema.Types.String,
     },
     phoneNumber: {

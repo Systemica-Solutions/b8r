@@ -150,7 +150,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
   try {
     // It search based on houseName of property
     const searchText: any = req.query.search;
-    // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingStatus
+    // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingReason
     const filter: any = req.query.filter;
     const imagesApproved = req.query.imagesApproved;
     const agentId = new Types.ObjectId(req.user.user._id);
@@ -196,7 +196,7 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
               },
             },
             {
-              closeListingStatus: {
+              closeListingReason: {
                 $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
               },
             },
@@ -558,7 +558,7 @@ export const closeListingProperty = async (req: Request, res: Response) => {
       { _id: id },
       {
         $set: {
-          closeListingStatus: tempData.closeListingStatus,
+          closeListingReason: tempData.closeListingReason,
           closeListingDetails: tempData.closeListingDetails,
           status: 'Closed',
         },
