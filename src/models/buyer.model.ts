@@ -33,6 +33,11 @@ const BuyerSchema: Schema = new Schema(
       type: Schema.Types.Boolean,
       default: false,
     },
+    boardId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Board',
+      default: null
+    },
   },
   { timestamps: true }
 );

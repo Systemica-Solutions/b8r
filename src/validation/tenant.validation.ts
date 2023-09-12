@@ -73,6 +73,7 @@ export const addTenantValidation = async (req, res, next) => {
       .optional(),
     tenantDetails: Joi.array().items(Joi.string()).optional(),
     tenantData: Joi.any().optional(),
+    boardId: Joi.any().optional()
   });
   const value = schema.validate(req.body);
   if (value.error) {
