@@ -233,7 +233,7 @@ export const editPropertyValidation = async (req, res, next) => {
     pinCode: Joi.string()
       .pattern(/^[0-9]{6}$/)
       .optional(),
-      // propertyData: Joi.any().optional(),
+    // propertyData: Joi.any().optional(),
     propertyDetails: Joi.any().optional(),
   });
   const value = schema.validate(req.body);
@@ -265,7 +265,7 @@ export const verifyPropertyValidation = async (req, res, next) => {
       .valid(...Object.keys(staticStatus))
       .optional(),
     propertyDetails: Joi.any().optional(),
-   });
+  });
   const value = schema.validate(req.body);
   if (value.error) {
     return failureResponse(
@@ -290,14 +290,59 @@ export const closeListingValidation = async (req, res, next) => {
       .valid(...Object.keys(propertyStatus))
       .required(),
     closeListingDetails: Joi.object().keys({
-      tenantName: Joi.string().optional(),
-      phoneNumber: Joi.string()
-        .pattern(/^[0-9]{10}$/)
-        .optional(),
-      rentAmount: Joi.number().optional(),
-      agreementFor: Joi.string().optional(),
-      tenancyStartDate: Joi.date().iso().optional(),
-      feedback: Joi.string().optional(),
+      tenantName: Joi.string().when('closeListingReason', {
+        is: Joi.valid(
+          'Rented of B8R',
+          'Rented Outside',
+          'Sold on B8R',
+          'Sold Outside'
+        ),
+        then: Joi.string().required(),
+        otherwise: Joi.string().optional(),
+      }),
+      phoneNumber: Joi.string().when('closeListingReason', {
+        is: Joi.valid(
+          'Rented of B8R',
+          'Rented Outside',
+          'Sold on B8R',
+          'Sold Outside'
+        ),
+        then: Joi.string().pattern(/^[0-9]{10}$/).required(),
+        otherwise: Joi.string().pattern(/^[0-9]{10}$/).optional(),
+      }),
+      rentAmount: Joi.number().when('closeListingReason', {
+        is: Joi.valid(
+          'Rented of B8R',
+          'Rented Outside',
+          'Sold on B8R',
+          'Sold Outside'
+        ),
+        then: Joi.number().required(),
+        otherwise: Joi.number().optional(),
+      }),
+      agreementFor: Joi.string().when('closeListingReason', {
+        is: Joi.valid(
+          'Rented of B8R',
+          'Rented Outside',
+          'Sold on B8R',
+          'Sold Outside'
+        ),
+        then: Joi.string().required(),
+        otherwise: Joi.string().optional(),
+      }),
+      tenancyStartDate: Joi.date().when('closeListingReason', {
+        is: Joi.valid('Rented of B8R', 'Sold on B8R'),
+        then: Joi.date().iso().required(),
+        otherwise: Joi.date().iso().optional(),
+      }),
+      feedback: Joi.string().when('closeListingReason', {
+        is: Joi.valid(
+          'Delist / Owner Denied',
+          'Delist (Owner Denied)'
+        ),
+        then: Joi.string().required(),
+        otherwise: Joi.string().optional(),
+      }),
     }),
   });
   const value = schema.validate(req.body);

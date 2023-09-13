@@ -291,23 +291,22 @@ export const propertyApproveInfo: Schema = new Schema(
 export const propertyCloseListingInfo: Schema = new Schema(
   {
     tenantName: {
-      type: Schema.Types.String,
+      type: Schema.Types.String
     },
     phoneNumber: {
-      type: Schema.Types.String,
-      required: true,
+      type: Schema.Types.String
     },
     rentAmount: {
-      type: Schema.Types.Number,
+      type: Schema.Types.Number
     },
     agreementFor: {
-      type: Schema.Types.Number,
+      type: Schema.Types.Number
     },
     tenancyStartDate: {
-      type: Schema.Types.Date,
+      type: Schema.Types.Date
     },
     feedback: {
-      type: Schema.Types.String,
+      type: Schema.Types.String
     },
   },
   { _id: false }
