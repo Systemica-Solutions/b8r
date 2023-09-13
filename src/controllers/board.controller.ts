@@ -267,7 +267,7 @@ export const finalizeBoard = async (req: Request, res: Response) => {
     const board = await Board.findByIdAndUpdate(
       req.params.id,
       {
-        $set: { status: true },
+        $set: { status: true, shareBoardLink: req.body.shareBoardLink },
       },
       { new: true }
     )

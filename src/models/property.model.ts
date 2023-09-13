@@ -45,7 +45,7 @@ const PropertySchema: Schema = new Schema(
       type: Schema.Types.Boolean,
       default: false
     },
-    closeListingStatus: {
+    closeListingReason: {
       // deactive property with close listing
       type: Schema.Types.String,
       trim: true,

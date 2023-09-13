@@ -20,7 +20,8 @@ export const boardValidation = async (req, res, next) => {
       .valid(...Object.keys(staticStatus))
       .optional(),
     key: Joi.string().optional(),
-    boardFor: Joi.string().optional()
+    boardFor: Joi.string().optional(),
+    shareBoardLink: Joi.string().optional()
   });
   const value = schema.validate(req.body);
   if (value.error) {

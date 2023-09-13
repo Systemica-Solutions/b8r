@@ -98,3 +98,18 @@ export enum agentType {
   'Buyer',
   'Tenant'
 }
+
+export enum closeListing1 {
+  'Rented of B8R',
+  'Rented Outside',
+  'Sold on B8R',
+  'Sold Outside'
+}
+export enum closeListing2 {
+  'Rented of B8R',
+  'Sold on B8R'
+}
+export enum closeListing3 {
+  'Delist / Owner Denied',
+  'Delist (Owner Denied)'
+}
