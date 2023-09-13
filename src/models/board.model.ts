@@ -37,6 +37,10 @@ const BoardSchema: Schema = new Schema(
     boardFor: {
       type: Schema.Types.String,
       enum: agentType,
+    },
+    shareBoardLink: {
+      type: Schema.Types.String,
+      default: null
     }
   },
   { timestamps: true }
