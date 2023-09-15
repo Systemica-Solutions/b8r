@@ -493,8 +493,8 @@ export const propertyDetailVerificationValidation = async (req, res, next) => {
     }),
     moveInFrom: Joi.when(Joi.ref('...propertyInfo.purposeSale'), {
       is: true,
-      then: Joi.number().required(),
-      otherwise: Joi.number().optional(),
+      then: Joi.date().iso().required(),
+      otherwise: Joi.date().iso().optional(),
     }),
   });
 
