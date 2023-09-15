@@ -429,6 +429,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       {
         $match: {
           'propertyDetails.agentId': agentId,
+          status: 'Verified',
           $expr: {
             $or: [
               { $eq: [{ $size: '$sharedProperty' }, 0] },
@@ -633,8 +634,8 @@ export const renameAndCopyBoardImagesOfS3 = async (
             imagesApproved: true,
           },
           $addToSet: {
-            images: sortedImgs
-          }
+            images: sortedImgs,
+          },
         },
         { new: true }
       ).exec((error, updatedRecord) => {
