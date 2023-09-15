@@ -203,7 +203,7 @@ export const propertyFeatureInfo: Schema = new Schema(
       type: Schema.Types.Number,
     },
     moveInFrom: {
-      type: Schema.Types.Number,
+      type: Schema.Types.Date,
     },
   },
   { _id: false }
