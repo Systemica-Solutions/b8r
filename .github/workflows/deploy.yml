@@ -28,7 +28,7 @@ jobs:
             aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             application_name: b8rhomes-api
             environment_name: B8rhomes-api-env
-            existing_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
+           # existing_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
             region: ${{ secrets.AWS_REGION }}
             version_label: ${{ github.sha }}
             deployment_package: deploy.zip
