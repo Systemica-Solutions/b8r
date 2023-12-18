@@ -12,6 +12,7 @@ import {
   getAllPropertyS3Images,
   getS3ImagesByPropertyId,
 } from './uploadImage.controller';
+import sharedProperty from '../models/sharedProperty.model';
 import { staticStatus } from '../constants/global.constants';
 
 // Add new property
@@ -362,6 +363,7 @@ const changePropertyStatus = async (id, status) => {
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
     const agentId = new Types.ObjectId(req.user.user._id);
+    console.log(agentId);
 
     // status count
     const step0 = await Property.aggregate([
@@ -428,7 +430,8 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       },
       {
         $match: {
-          'propertyDetails.agentId': agentId,
+           'propertyDetails.agentId': agentId,
+          status: 'Verified',
           $expr: {
             $or: [
               { $eq: [{ $size: '$sharedProperty' }, 0] },
@@ -450,41 +453,51 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
       {
-        $match: {
-          'propertyDetails.agentId': agentId,
-        },
+        $unwind: '$propertyDetails', // Unwind the array created by $lookup
       },
       {
         $lookup: {
           from: 'sharedproperties',
           localField: 'sharedProperty',
           foreignField: '_id',
-          as: 'sharedProperties',
+          as: 'sharedProperty',
         },
       },
       {
-        $lookup: {
-          from: 'sharedbuyerproperties',
-          localField: 'sharedBuyerProperty',
-          foreignField: '_id',
-          as: 'sharedBuyerProperties',
-        },
+        $unwind: '$sharedProperty', // Unwind the array created by $lookup
       },
       {
         $match: {
-          $or: [
-            { 'sharedProperties.isShortlisted': true },
-            { 'sharedBuyerProperties.isShortlisted': true },
-          ],
+           'propertyDetails.agentId': agentId,
+           'sharedProperty.isShortlisted': true,
+
         },
       },
       {
         $group: {
-          _id: 'Sortlisted',
+          _id: null,
           count: { $sum: 1 },
         },
       },
-    ]);
+      {
+        $project: {
+      _id: 0,
+      result: {
+        $cond: {
+          if: { $gt: ['$count', 0] }, // If count is greater than 0
+          then: 1,
+          else: 0,
+        },
+      },
+    },
+  },
+]);
+    // const shortlistedCount = step3.length;
+
+    // Now you can use shortlistedCount as the count of shortlisted properties for the specified agentId
+    console.log('Shortlisted Count:', step3.length);
+
+
     const newObj: any = {};
     for (const key in staticStatus) {
       if (typeof staticStatus[key] === 'string') {
@@ -503,7 +516,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     }
     output.Shared = step1.length ? step1.length : 0;
     output.YetToShare = step2.length ? step2.length : 0;
-    output.Sortlisted = step3 && step3.length ? step3[0].count : 0;
+    output.Shortlisted = step3.length > 0 ? step3[0].result : 0;
     output = { ...output, ...newObj };
     return successResponse(
       res,
@@ -519,6 +532,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
+
 };
 
 // Check status of single property
@@ -633,8 +647,8 @@ export const renameAndCopyBoardImagesOfS3 = async (
             imagesApproved: true,
           },
           $addToSet: {
-            images: sortedImgs
-          }
+            images: sortedImgs,
+          },
         },
         { new: true }
       ).exec((error, updatedRecord) => {
