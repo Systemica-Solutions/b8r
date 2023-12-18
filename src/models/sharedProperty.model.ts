@@ -15,6 +15,11 @@ export const sharedPropertyInfo: Schema = new Schema(
       type: Schema.Types.Boolean,
       default: false,
     },
+    shortlistedProperties: {
+      type: Schema.Types.Mixed,
+      default : null,
+
+    },
     shortListedAt: {
       type: Schema.Types.Date,
       default: null,

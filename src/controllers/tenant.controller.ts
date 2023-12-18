@@ -316,6 +316,8 @@ export const changeTenantStatus = async (id, status) => {
     { $set: { status } },
     { new: true }
   );
+
+
 };
 
 // Get tenant dashboard count

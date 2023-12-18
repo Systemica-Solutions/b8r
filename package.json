@@ -10,7 +10,7 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node -r dotenv/config dist/app.js",
-    "start:dev": "ts-node -r dotenv/config src/app.ts"
+    "dev": "node -r dotenv/config src/app.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.373.0",
@@ -41,8 +41,7 @@
     "nodemon": "^2.0.22",
     "rate-limiter-flexible": "^2.3.8",
     "redis": "^4.3.0",
-    "save-dev": "^0.0.1-security",
-    "ts-node": "^10.9.2"
+    "save-dev": "^0.0.1-security"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",

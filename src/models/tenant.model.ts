@@ -17,6 +17,10 @@ const TenantSchema: Schema = new Schema(
       enum: tenantBuyerStatus,
       default: 'WaitingForProperty',
     },
+    numberShortlisted: {
+      type: Schema.Types.Number,
+      default : 0,
+    },
     tenantDetails: [
       {
         type: Schema.Types.ObjectId,
