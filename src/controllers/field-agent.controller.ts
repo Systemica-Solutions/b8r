@@ -139,7 +139,7 @@ export const getFieldAgentPendingProperty = async (
       return failureResponse(res, 500, [], 'Something went wrong');
     }
     const pendingList = property.filter(
-      (x) => x.propertyId.fieldAgentStatus === 'Pending' || 'DetailsCompleted'
+      (x) => x.propertyId.fieldAgentStatus === 'Pending' || x.propertyId.fieldAgentStatus === 'DetailsCompleted'
     );
     pendingList.forEach((item) => {
       const lastElement = item.propertyId.propertyDetails[item.propertyId.propertyDetails.length - 1];

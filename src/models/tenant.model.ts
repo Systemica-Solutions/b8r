@@ -11,6 +11,11 @@ const TenantSchema: Schema = new Schema(
       type: Schema.Types.String,
       required: true,
     },
+    // added agentId here
+    agentId: {
+      type: Schema.Types.ObjectId,
+      ref: MODELS.AGENT,
+    },
     status: {
       type: Schema.Types.String,
       trim: true,
@@ -21,10 +26,11 @@ const TenantSchema: Schema = new Schema(
       type: Schema.Types.Number,
       default : 0,
     },
+    // made to have only one id
     tenantDetails: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'TenantDetails',
+        ref: MODELS.TENANTDETAILS,
       },
     ],
     deactivateStatus: {

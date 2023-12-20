@@ -16,16 +16,22 @@ export const addTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
     tempData.tenantData.agentId = new Types.ObjectId(req.user.user._id);
+    const agentId = tempData.tenantData.agentId;
+    console.log('AGENTID', agentId);
 
     //  Check version of tenant based on below conditions while add new tenant
     //   1. If same agent try to enter again same value for phoneNumber & status
     //         it should return as already exist tenant with this values
     //   2. If another agent try to add tenant and it matches with phoneNumber & status then increment it's version
     Tenant.find({
-      $and: [{ phoneNumber: tempData.phoneNumber }],
+      $and: [
+        { phoneNumber: tempData.phoneNumber },
+        { agentId: tempData.tenantData.agentId },
+      ],
     })
       .populate('tenantDetails')
       .exec(async (error: any, tenantExist: any) => {
+        console.log('tenantExist', tenantExist);
         if (error) {
           return failureResponse(
             res,
@@ -54,8 +60,13 @@ export const addTenant = async (req: Request, res: Response) => {
         } else {
           const detailObj = new TenantDetail(tempData.tenantData);
           const savedDetailObj: any = await detailObj.save();
-          const tenantObj = new Tenant(tempData);
-          const savedTenantObj = await tenantObj.save();
+          const newTenant = new Tenant({
+            phoneNumber: tempData.phoneNumber,
+            // tenantDetails: [savedDetailObj._id],
+            agentId: tempData.tenantData.agentId,
+            // version: tempData.tenantData.version,
+          });
+          const savedTenantObj = await newTenant.save();
           updateTenantDetails(savedTenantObj._id, savedDetailObj._id, res);
         }
       });
