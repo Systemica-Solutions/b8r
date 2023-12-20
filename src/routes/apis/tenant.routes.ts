@@ -6,7 +6,8 @@ import {
   deactivateTenant,
   tenantLogin,
   getBoardByAgentId,
-  getDashboardCount
+  getDashboardCount,
+  v2getboard
 } from '../../controllers/tenant.controller';
 import {
   addTenantValidation,
@@ -36,7 +37,12 @@ router.post(
 router.get('/:id', userAuth, getTenantById);
 
 // Get board by tenant agent id
+
 router.get('/board/:id', userAuth, getBoardByAgentId);
+
+// v2 of above api
+
+router.get('/v2/board/:id', userAuth, v2getboard);
 
 // Change status of tenant
 router.put('/deactivate/:id', userAuth, tenantStatusValidation, deactivateTenant);

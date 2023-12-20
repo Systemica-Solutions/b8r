@@ -308,7 +308,27 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     );
   }
 };
-
+// Get board by agent and tenant ID
+export const v2getboard =  async (req: Request, res: Response) => {
+try{
+const tenantboard = await Board.findOne({
+  agentId : req.user.user._id,
+  tenantId : req.params.id
+});
+if (!tenantboard){
+  return failureResponse(res, 404, [], 'Board not found.');
+}
+return successResponse(
+  res,
+  200,
+  { board: tenantboard },
+  'Board found successfully.'
+);
+}
+catch (error){
+  console.log(error);
+}
+};
 // Change tenant status
 export const changeTenantStatus = async (id, status) => {
   return await Tenant.findByIdAndUpdate(
