@@ -394,6 +394,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
     ]);
+    console.log('Step0', step0);
 
     // shared count
     const step1 = await Property.aggregate([
@@ -453,7 +454,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
       {
-        $unwind: '$propertyDetails', // Unwind the array created by $lookup
+        $unwind: '$propertyDetails',
       },
       {
         $lookup: {
@@ -464,7 +465,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
       {
-        $unwind: '$sharedProperty', // Unwind the array created by $lookup
+        $unwind: '$sharedProperty',
       },
       {
         $match: {
@@ -492,9 +493,9 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     },
   },
 ]);
-    // const shortlistedCount = step3.length;
 
-    // Now you can use shortlistedCount as the count of shortlisted properties for the specified agentId
+
+
     console.log('Shortlisted Count:', step3.length);
 
 
