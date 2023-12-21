@@ -16,8 +16,8 @@ export const addTenant = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
     tempData.tenantData.agentId = new Types.ObjectId(req.user.user._id);
-    const agentId = tempData.tenantData.agentId;
-    console.log('AGENTID', agentId);
+    // const agentId = tempData.tenantData.agentId;
+    // console.log('AGENTID', agentId);
 
     //  Check version of tenant based on below conditions while add new tenant
     //   1. If same agent try to enter again same value for phoneNumber & status
@@ -240,8 +240,8 @@ export const deactivateTenant = async (req: Request, res: Response) => {
             error.message || 'Something went wrong'
           );
         } else {
-          console.log('updatedRecord.......', updatedRecord);
-          updatedRecord.tenantDetails = [updatedRecord.tenantDetails[updatedRecord.tenantDetails.length - 1]];
+          // console.log('updatedRecord.......', updatedRecord);
+         // updatedRecord.tenantDetails = [updatedRecord.tenantDetails[updatedRecord.tenantDetails.length - 1]];
           return successResponse(
             res,
             200,
@@ -322,13 +322,16 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
 
 // Change tenant status
 export const changeTenantStatus = async (id, status) => {
-  return await Tenant.findByIdAndUpdate(
-    { _id: id },
-    { $set: { status } },
-    { new: true }
-  );
-
-
+const existingTenant = await Tenant.findById(id);
+if (existingTenant && existingTenant.status !== 'Shortlisted') {
+    return await Tenant.findByIdAndUpdate(
+      { _id: id },
+      { $set: { status } },
+      { new: true }
+    );
+  } else {
+  return existingTenant;
+  }
 };
 
 // Get tenant dashboard count
