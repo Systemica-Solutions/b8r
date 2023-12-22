@@ -26,6 +26,10 @@ const TenantSchema: Schema = new Schema(
       type: Schema.Types.Number,
       default : 0,
     },
+    numberShared: {
+      type: Schema.Types.Number,
+      default : 0,
+    },
     // made to have only one id
     tenantDetails: [
       {

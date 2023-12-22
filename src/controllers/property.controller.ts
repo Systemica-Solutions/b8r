@@ -378,6 +378,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       {
         $match: {
           'propertyDetails.agentId': agentId,
+
         },
       },
       {
