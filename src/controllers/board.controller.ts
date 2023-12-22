@@ -340,6 +340,10 @@ export const shareBoard = async (req: Request, res: Response) => {
     const board = await Board.findById(req.params.id)
       .populate('tenantId buyerId propertyId')
       .lean();
+    const tenantId = board.tenantId._id;
+    console.log('tenantId', tenantId);
+    const PropertiesinBoardLength = board?.propertyId.length || 0;
+    console.log('PropertiesBoardLength', PropertiesinBoardLength);
     console.log('board', board);
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
@@ -347,6 +351,12 @@ export const shareBoard = async (req: Request, res: Response) => {
     const update = updateSharedDate(board);
     if (board && board.boardFor && board.boardFor === 'Tenant') {
       const status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
+      const status3 = await Tenant.updateOne(
+        { _id: tenantId },
+        { $set: { numberShared: PropertiesinBoardLength } }
+      );
+
+
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
       const status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
     }

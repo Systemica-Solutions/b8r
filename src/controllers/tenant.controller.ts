@@ -380,6 +380,7 @@ export const getDashboardCount = async (req: Request, res: Response) => {
       tenant = aggregateQuery.reduce((obj, item) => {
         newObj[item.status] = item.count;
         newObj.Total += item.count;
+        console.log('newObj' , newObj);
         return newObj;
       }, {});
     }
