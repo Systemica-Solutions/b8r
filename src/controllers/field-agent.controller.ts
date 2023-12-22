@@ -139,7 +139,7 @@ export const getFieldAgentPendingProperty = async (
       return failureResponse(res, 500, [], 'Something went wrong');
     }
     const pendingList = property.filter(
-      (x) => x.propertyId.status === 'Pending'
+      (x) => x.propertyId.fieldAgentStatus === 'Pending' || x.propertyId.fieldAgentStatus === 'DetailsCompleted'
     );
     pendingList.forEach((item) => {
       const lastElement = item.propertyId.propertyDetails[item.propertyId.propertyDetails.length - 1];
@@ -174,7 +174,7 @@ export const getFieldAgentHomeCount = async (req: Request, res: Response) => {
       return failureResponse(res, 500, [], 'Something went wrong');
     }
     property.forEach(function(doc) {
-      if (doc.propertyId.fieldAgentStatus === 'Pending') {
+      if (doc.propertyId.fieldAgentStatus === 'Pending' || doc.propertyId.fieldAgentStatus === 'DetailsCompleted' ) {
         pendingProperties.push(doc);
       } else if (doc.propertyId.fieldAgentStatus === 'Completed') {
         completedProperties.push(doc);
