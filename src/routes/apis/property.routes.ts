@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   getAllPropertyList,
+  getAllPropertyinDB,
   addProperty,
   getPropertyById,
   closeListingProperty,
@@ -50,8 +51,11 @@ router.get('/count', userAuth, getPropertyCounts);
 // Check status of single property
 router.get('/check-status/:id', userAuth, getPropertyStatus);
 
-// Get all properties
+// Get all properties for property agent
 router.get('/', userAuth, getAllPropertyList);
+
+// Get all properties in database
+router.get('/all', getAllPropertyinDB);
 
 // Add new property
 router.post(

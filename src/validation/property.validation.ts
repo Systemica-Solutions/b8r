@@ -45,9 +45,9 @@ export const propertyDetailValidation = async (req, res, next) => {
     }),
     phoneNumber: Joi.string()
       .pattern(/^[0-9]{10}$/)
-      .required(),
+      .optional(),
     panNumber: Joi.string().optional(),
-    country: Joi.string().required(),
+    country: Joi.string().optional(),
     city: Joi.string().optional(),
   });
 
@@ -154,7 +154,7 @@ export const propertyDetailValidation = async (req, res, next) => {
     version: Joi.number().optional(),
     agentId: Joi.string().optional(),
     propertyInfo: propertyBasicInfo.required(),
-    ownerInfo: ownerBasicInfo.required(),
+    ownerInfo: ownerBasicInfo.optional(),
     featureInfo: featureBasicInfo.required(),
     verifyInfo: verifyBasicInfo.optional(),
   });
@@ -178,7 +178,7 @@ export const addPropertyValidation = async (req, res, next) => {
     name: Joi.string().optional(),
     phoneNumber: Joi.string()
       .pattern(/^[0-9]{10}$/)
-      .required(),
+      .optional(),
     rentAmount: Joi.number().optional(),
     agreementFor: Joi.number().integer().min(1).max(12).optional(),
     tenancyStartDate: Joi.date().iso().optional(),
@@ -415,9 +415,9 @@ export const propertyDetailVerificationValidation = async (req, res, next) => {
     }),
     phoneNumber: Joi.string()
       .pattern(/^[0-9]{10}$/)
-      .required(),
+      .optional(),
     panNumber: Joi.string().optional(),
-    country: Joi.string().required(),
+    country: Joi.string().optional(),
     city: Joi.string().optional(),
   });
 
@@ -524,7 +524,7 @@ export const propertyDetailVerificationValidation = async (req, res, next) => {
     version: Joi.number().optional(),
     agentId: Joi.any().optional(),
     propertyInfo: propertyBasicInfo.required(),
-    ownerInfo: ownerBasicInfo.required(),
+    ownerInfo: ownerBasicInfo.optional(),
     featureInfo: featureBasicInfo.required(),
     verifyInfo: verifyBasicInfo.optional(),
   });

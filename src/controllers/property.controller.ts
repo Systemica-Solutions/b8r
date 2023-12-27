@@ -285,6 +285,142 @@ export const getAllPropertyList = async (req: Request, res: Response) => {
   }
 };
 
+// Get all properties in dB
+
+export const getAllPropertyinDB = async (req: Request, res: Response) => {
+  try {
+    // It search based on houseName of property
+    const searchText: any = req.query.search;
+    // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingReason
+    const filter: any = req.query.filter;
+    const imagesApproved = req.query.imagesApproved;
+
+
+    let aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+
+    ];
+
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          houseName: {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() !== 'shortlisted' &&
+      filter.trim().toLowerCase() !== 'shared'
+    ) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              closeListingReason: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    if (filter && filter.trim() && filter.trim().toLowerCase() === 'shared') {
+      aggregationPipeline.push({
+        $match: {
+          $expr: {
+            $or: [
+              { $gt: [{ $size: '$sharedProperty' }, 0] },
+              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+            ],
+          },
+        },
+      });
+    }
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() === 'shortlisted'
+    ) {
+      aggregationPipeline = aggregationPipeline.concat([
+        {
+          $lookup: {
+            from: 'sharedbuyerproperties',
+            localField: 'sharedBuyerProperty',
+            foreignField: '_id',
+            as: 'sharedBuyerProperty',
+          },
+        },
+        {
+          $lookup: {
+            from: 'sharedproperties',
+            localField: 'sharedProperty',
+            foreignField: '_id',
+            as: 'sharedProperty',
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { 'sharedProperty.isShortlisted': true },
+              { 'sharedBuyerProperty.isShortlisted': true },
+            ],
+          },
+        },
+      ]);
+    }
+
+    if (imagesApproved === 'false') {
+      aggregationPipeline.push({ $match: { imagesApproved: false } });
+    }
+    if (imagesApproved === 'true') {
+      aggregationPipeline.push({ $match: { imagesApproved: true } });
+    }
+
+    const properties = await Property.aggregate(aggregationPipeline);
+    if (properties && properties.length) {
+      properties.map(
+        (x) =>
+          (x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1])
+      );
+    }
+    if (!properties) {
+      return failureResponse(res, 404, [], 'Properties not found.');
+    }
+    return successResponse(
+      res,
+      200,
+      { properties },
+      'Properties found successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
 // Get property by id
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
