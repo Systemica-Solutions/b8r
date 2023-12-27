@@ -81,17 +81,20 @@ export const propertyOwnerInfo: Schema = new Schema(
     },
     phoneNumber: {
       type: Schema.Types.String,
-      
+      required : false
     },
     panNumber: {
       type: Schema.Types.String,
+       required : false
     },
     country: {
       type: Schema.Types.String,
-    
+      required : false
+
     },
     city: {
       type: Schema.Types.String,
+      required : false
     },
   },
   { _id: false }
