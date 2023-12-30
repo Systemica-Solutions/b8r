@@ -262,8 +262,13 @@ export const deactivateTenant = async (req: Request, res: Response) => {
 
 // Tenant login by phoneNumber
 export const tenantLogin = async (req: Request, res: Response) => {
+
   try {
-    const tenant = await Tenant.findOne({ phoneNumber: req.body.phoneNumber });
+
+
+    const tenant = await Tenant.findOne({ phoneNumber: req.body.phoneNumber ,
+      boardId: req.body.boardId });
+
     if (!tenant) {
       return failureResponse(
         res,
@@ -273,6 +278,11 @@ export const tenantLogin = async (req: Request, res: Response) => {
       );
     }
     const jwtToken = generateJWTToken(tenant);
+    const status = await changeTenantStatusonLogin(
+      tenant._id,
+      'CurrentlyViewing'
+    );
+    console.log('tenata', tenant);
     return successResponse(
       res,
       200,
@@ -299,10 +309,7 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }
-    const status = await changeTenantStatus(
-      board.tenantId._id,
-      'CurrentlyViewing'
-    );
+
     const data = await getS3ImagesByRankingSystem(board);
     return successResponse(
       res,
@@ -323,16 +330,29 @@ export const getBoardByAgentId = async (req: Request, res: Response) => {
 // Change tenant status
 export const changeTenantStatus = async (id, status) => {
 const existingTenant = await Tenant.findById(id);
-if (existingTenant && existingTenant.status !== 'Shortlisted') {
-    return await Tenant.findByIdAndUpdate(
+
+return await Tenant.findByIdAndUpdate(
       { _id: id },
       { $set: { status } },
       { new: true }
     );
-  } else {
-  return existingTenant;
-  }
-};
+  };
+
+export const changeTenantStatusonLogin = async (id, status) => {
+    const existingTenant = await Tenant.findById(id);
+
+
+    if (existingTenant && existingTenant.status !== 'Shortlisted') {
+      return await Tenant.findByIdAndUpdate(
+        { _id: id },
+        { $set: { status } },
+        { new: true }
+      );
+    } else {
+
+      return existingTenant;
+    }
+  };
 
 // Get tenant dashboard count
 export const getDashboardCount = async (req: Request, res: Response) => {
