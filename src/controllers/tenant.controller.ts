@@ -240,9 +240,9 @@ export const deactivateTenant = async (req: Request, res: Response) => {
             error.message || 'Something went wrong'
           );
         } else {
-          // console.log('updatedRecord.......', updatedRecord);
-         // updatedRecord.tenantDetails = [updatedRecord.tenantDetails[updatedRecord.tenantDetails.length - 1]];
-          return successResponse(
+         console.log('updatedRecord.......', updatedRecord);
+         updatedRecord.tenantDetails = [updatedRecord.tenantDetails[updatedRecord.tenantDetails.length - 1]];
+         return successResponse(
             res,
             200,
             { tenant: updatedRecord },
