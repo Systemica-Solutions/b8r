@@ -15,62 +15,44 @@ import { changeBuyerStatus } from './buyer.controller';
 export const addBoard = async (req: Request, res: Response) => {
   try {
     const tempData = req.body;
-    const existingBoard = await Board.findOne({ tenantId: tempData.tenantId });
-
-    if (existingBoard) {
-      // Update existing board data here
-      existingBoard.someField = tempData.someField; // Replace with actual field updates
-      // Save the changes
-      const updatedBoard = await existingBoard.save();
-
-      return successResponse(
-        res,
-        200,
-        { board: updatedBoard },
-        'Board data updated successfully.'
-      );
+    if (!tempData.tenantId) {
+      tempData.boardFor = 'Buyer';
     } else {
-      // Create a new board
-      if (!tempData.tenantId) {
-        tempData.boardFor = 'Buyer';
-      } else {
-        tempData.boardFor = 'Tenant';
-      }
-      tempData.agentId = new Types.ObjectId(req.user.user._id);
-      tempData.key = await generateRandomKey(12);
-      const detailObj: any = new Board(tempData);
-      const savedRecord: any = await detailObj.save();
-      await savedRecord.populate({
-        path: 'propertyId',
-        populate: { path: 'propertyDetails' },
-      });
-      await savedRecord.populate({
-        path: 'tenantId',
-        populate: { path: 'tenantDetails' },
-      });
-      await savedRecord.populate({
-        path: 'buyerId',
-        populate: { path: 'buyerDetails' },
-      });
-      if (savedRecord && savedRecord.propertyId && savedRecord.propertyId.length) {
-        savedRecord.propertyId.map((x) => (x.propertyDetails = [x.propertyDetails[x.propertyDetails.length - 1]]));
-      }
-      const flagChanged = await changeFlag(savedRecord);
-      if (savedRecord && savedRecord.boardFor && savedRecord.boardFor === 'Tenant') {
-        savedRecord.tenantId.isOnBoard = true;
-        savedRecord.tenantId.boardId = savedRecord._id;
-      } else if (savedRecord && savedRecord.boardFor && savedRecord.boardFor === 'Buyer') {
-        savedRecord.buyerId.isOnBoard = true;
-        savedRecord.buyerId.boardId = savedRecord._id;
-      }
-
-      return successResponse(
-        res,
-        200,
-        { board: savedRecord },
-        'New board created successfully.'
-      );
+      tempData.boardFor = 'Tenant';
     }
+    tempData.agentId = new Types.ObjectId(req.user.user._id);
+    tempData.key = await generateRandomKey(12);
+    const detailObj: any = new Board(tempData);
+    const savedRecord: any = await detailObj.save();
+    await savedRecord.populate({
+      path: 'propertyId',
+      populate: { path: 'propertyDetails' },
+    });
+    await savedRecord.populate({
+      path: 'tenantId',
+      populate: { path: 'tenantDetails' },
+    });
+    await savedRecord.populate({
+      path: 'buyerId',
+      populate: { path: 'buyerDetails' },
+    });
+    if (savedRecord && savedRecord.propertyId && savedRecord.propertyId.length) {
+      savedRecord.propertyId.map((x) => x.propertyDetails = [x.propertyDetails[x.propertyDetails.length - 1]]);
+    }
+    const flagChanged = await changeFlag(savedRecord);
+    if (savedRecord && savedRecord.boardFor && savedRecord.boardFor === 'Tenant') {
+      savedRecord.tenantId.isOnBoard = true;
+      savedRecord.tenantId.boardId = savedRecord._id;
+    } else if (savedRecord && savedRecord.boardFor && savedRecord.boardFor === 'Buyer') {
+      savedRecord.buyerId.isOnBoard = true;
+      savedRecord.buyerId.boardId = savedRecord._id;
+    }
+    return successResponse(
+      res,
+      200,
+      { board: savedRecord },
+      'New board created successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,
@@ -80,7 +62,6 @@ export const addBoard = async (req: Request, res: Response) => {
     );
   }
 };
-
 const changeFlag = async (data) => {
   try {
     if (data && data.boardFor && data.boardFor === 'Tenant') {
@@ -326,6 +307,8 @@ const sharedPropertyTable = async (board) => {
     console.error('Error updating Shared Property Table:', error);
   }
 };
+
+
 const updateSharedProperty = async (propertyId, sharedPropertyId) => {
   try {
     const updatedProperty = await Property.findByIdAndUpdate(
@@ -403,6 +386,10 @@ export const shareBoard = async (req: Request, res: Response) => {
     const board = await Board.findById(req.params.id)
       .populate('tenantId buyerId propertyId')
       .lean();
+    const tenantId = board.tenantId._id;
+    console.log('tenantId', tenantId);
+    const PropertiesinBoardLength = board?.propertyId.length || 0;
+    console.log('PropertiesBoardLength', PropertiesinBoardLength);
     console.log('board', board);
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
@@ -410,6 +397,11 @@ export const shareBoard = async (req: Request, res: Response) => {
     const update = updateSharedDate(board);
     if (board && board.boardFor && board.boardFor === 'Tenant') {
       const status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
+      const status3 = await Tenant.updateOne(
+        { _id: tenantId },
+        { $set: { numberShared: PropertiesinBoardLength } }
+      );
+
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
       const status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
     }
