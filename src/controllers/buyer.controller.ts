@@ -22,7 +22,9 @@ export const addBuyer = async (req: Request, res: Response) => {
     //         it should return as already exist buyer with this values
     //   2. If another agent try to add buyer and it matches with phoneNumber & status then increment it's version
     Buyer.find({
-      $and: [{ phoneNumber: tempData.phoneNumber }],
+      $and: [{ phoneNumber: tempData.phoneNumber },
+        { agentId: tempData.buyerData.agentId },
+      ],
     })
       .populate('buyerDetails')
       .exec(async (error: any, buyerExist: any) => {
@@ -53,8 +55,11 @@ export const addBuyer = async (req: Request, res: Response) => {
         } else {
           const detailObj = new BuyerDetail(tempData.buyerData);
           const savedDetailObj: any = await detailObj.save();
-          const buyerObj = new Buyer(tempData);
-          const savedBuyerObj = await buyerObj.save();
+          const newBuyer = new Buyer({
+            phoneNumber: tempData.phoneNumber,
+            agentId: tempData.buyerData.agentId,
+          });
+          const savedBuyerObj = await newBuyer.save();
           updateBuyerDetails(savedBuyerObj._id, savedDetailObj._id, res);
         }
       });
@@ -155,16 +160,17 @@ export const getAllBuyerList = async (req: Request, res: Response) => {
       });
     }
     const buyers = await Buyer.aggregate(aggregationPipeline);
-    // const buyers = await Buyer.find().populate('buyerDetails').lean();
-    if (!buyers) {
-      throw { status: 404, message: 'Buyers not found.' };
-    }
     if (buyers && buyers.length) {
       buyers.map(
         (x) =>
           (x.buyerDetails = x.buyerDetails[x.buyerDetails.length - 1])
       );
     }
+    // const buyers = await Buyer.find().populate('buyerDetails').lean();
+    if (!buyers) {
+      throw { status: 404, message: 'Buyers not found.' };
+    }
+
     return successResponse(res, 200, { buyers }, 'Buyers found successfully.');
   } catch (error) {
     return failureResponse(
@@ -246,7 +252,8 @@ export const deactivateBuyer = async (req: Request, res: Response) => {
 // Buyer login by phoneNumber
 export const buyerLogin = async (req: Request, res: Response) => {
   try {
-    const buyer = await Buyer.findOne({ phoneNumber: req.body.phoneNumber });
+    const buyer = await Buyer.findOne({ phoneNumber: req.body.phoneNumber,
+      boardId: req.body.boardId });
     if (!buyer) {
       return failureResponse(
         res,
@@ -256,6 +263,9 @@ export const buyerLogin = async (req: Request, res: Response) => {
       );
     }
     const jwtToken = generateJWTToken(buyer);
+    const status = await changeBuyerStatusonLogin(buyer._id,
+      'CurrentlyViewing');
+
     return successResponse(
       res,
       200,
@@ -272,6 +282,61 @@ export const buyerLogin = async (req: Request, res: Response) => {
   }
 };
 
+// Get bords by buyer agent id
+export const getBoardByAgentId = async (req: Request, res: Response) => {
+  try {
+    const board = await Board.findOne({
+      _id: req.params.id,
+      buyerId: req.user.user._id,
+    }).populate('buyerId propertyId');
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+    const status = await changeBuyerStatus(
+      board.buyerId._id,
+      'CurrentlyViewing'
+    );
+    const data = await getS3ImagesByRankingSystem(board);
+    return successResponse(
+      res,
+      200,
+      { board: data },
+      'Board found successfully.'
+    );
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+// Change buyer status
+export const changeBuyerStatus = async (id, status) => {
+  return await Buyer.findByIdAndUpdate(
+    { _id: id },
+    { $set: { status } },
+    { new: true }
+  );
+};
+
+
+export const changeBuyerStatusonLogin = async (id, status) => {
+  const existingBuyer = await Buyer.findById(id);
+
+
+  if (existingBuyer && existingBuyer.status !== 'Shortlisted') {
+    return await Buyer.findByIdAndUpdate(
+      { _id: id },
+      { $set: { status } },
+      { new: true }
+    );
+  } else {
+
+    return existingBuyer;
+  }
+};
 // Get buyer dashboard count
 export const getDashboardCount = async (req: Request, res: Response) => {
   try {
@@ -339,42 +404,7 @@ export const getDashboardCount = async (req: Request, res: Response) => {
   }
 };
 
-// Change buyer status
-export const changeBuyerStatus = async (id, status) => {
-  return await Buyer.findByIdAndUpdate(
-    { _id: id },
-    { $set: { status } },
-    { new: true }
-  );
-};
 
-// Get bords by buyer agent id
-export const getBoardByAgentId = async (req: Request, res: Response) => {
-  try {
-    const board = await Board.findOne({
-      _id: req.params.id,
-      buyerId: req.user.user._id,
-    }).populate('buyerId propertyId');
-    if (!board) {
-      return failureResponse(res, 404, [], 'Board not found.');
-    }
-    const status = await changeBuyerStatus(
-      board.buyerId._id,
-      'CurrentlyViewing'
-    );
-    const data = await getS3ImagesByRankingSystem(board);
-    return successResponse(
-      res,
-      200,
-      { board: data },
-      'Board found successfully.'
-    );
-  } catch (error) {
-    return failureResponse(
-      res,
-      error.status || 500,
-      error,
-      error.message || 'Something went wrong'
-    );
-  }
-};
+
+
+
