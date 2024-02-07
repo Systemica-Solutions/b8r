@@ -12,7 +12,9 @@ import {
   getAllPropertyS3Images,
   getS3ImagesByPropertyId,
 } from './uploadImage.controller';
-import sharedProperty from '../models/sharedProperty.model';
+import Tenant from '../models/tenant.model';
+import SharedProperty from '../models/sharedProperty.model';
+// import sharedProperty from '../models/sharedProperty.model';
 import { staticStatus } from '../constants/global.constants';
 
 // Add new property
@@ -546,13 +548,14 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       {
         $match: {
           'propertyDetails.agentId': agentId,
+
           $expr: {
             $or: [
               { $gt: [{ $size: '$sharedProperty' }, 0] },
               { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
             ],
           },
-        },
+          },
       },
     ]);
 
@@ -579,8 +582,27 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         },
       },
     ]);
+    // new function to calculate distinct properties shortlisted tenants of a particular agent
+    async function step4(agentId) {
+  try {
+    const filteredTenants = await Tenant.find({ agentId, status: { $ne: 'Deactivate' } });
+    const tenantIds = filteredTenants.map(tenant => tenant._id);
+    const matchingSharedProperties = await SharedProperty.find({ tenantId: { $in: tenantIds } });
+    const distinctPropertyIds = new Set();
+    matchingSharedProperties.forEach(sharedProp => {
+      sharedProp.shortlistedProperties.forEach(propObj => {
+        distinctPropertyIds.add(propObj.propertyId);
+      });
+    });
+    return distinctPropertyIds.size;
+  } catch (error) {
+    console.error('Error in Shortlisted Count:', error);
+    throw error;
+  }
+}
 
-    // shortlisted property
+
+    // original faulty shortlisted property count
     const step3 = await Property.aggregate([
       {
         $lookup: {
@@ -608,12 +630,15 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         $match: {
            'propertyDetails.agentId': agentId,
            'sharedProperty.isShortlisted': true,
+           $expr: {
+            $in: ['$_id', '$sharedProperty.shortlistedProperties'],
+          },
 
         },
       },
       {
         $group: {
-          _id: null,
+          _id: '$sharedProperty',
           count: { $sum: 1 },
         },
       },
@@ -630,11 +655,8 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     },
   },
 ]);
-
-
-
-    console.log('Shortlisted Count:', step3.length);
-
+    const Shorlisted_Count = await step4(agentId);
+    console.log('Shortlisted Count', Shorlisted_Count);
 
     const newObj: any = {};
     for (const key in staticStatus) {
@@ -654,13 +676,13 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     }
     output.Shared = step1.length ? step1.length : 0;
     output.YetToShare = step2.length ? step2.length : 0;
-    output.Shortlisted = step3.length > 0 ? step3[0].result : 0;
+    output.Shortlisted = Shorlisted_Count;
     output = { ...output, ...newObj };
     return successResponse(
       res,
       200,
       { counts: output },
-      'Property dashboard count get successfully.'
+      'Property dashboard count fetched successfully.'
     );
   } catch (error) {
     return failureResponse(

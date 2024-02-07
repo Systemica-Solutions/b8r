@@ -5,7 +5,7 @@ export const sharedBuyerPropertyInfo: Schema = new Schema(
   {
     buyerId: {
       type: Schema.Types.ObjectId,
-      ref: MODELS.TENANT,
+      ref: MODELS.BUYER,
     },
     viewedAt: {
       type: Schema.Types.Date,
