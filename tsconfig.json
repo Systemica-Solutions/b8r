@@ -1,0 +1,36 @@
+{
+    "compileOnSave": false,
+    "allowSyntheticDefaultImports": true,
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "target": "es6",
+        "noImplicitAny": false,
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "sourceMap": true,
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "baseUrl": ".",
+        "skipLibCheck": true,
+        "paths": {
+            "*": [
+                "node_modules/*"
+            ],
+            "tslib": [
+                "node_modules/tslib/tslib.d.ts"
+            ]
+        },
+        "declaration": false,
+        "lib": [
+            "es2018",
+            "dom"
+        ],
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
