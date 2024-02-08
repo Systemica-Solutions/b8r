@@ -5,7 +5,6 @@ import Property from '../models/property.model';
 import Tenant from '../models/tenant.model';
 import Buyer from '../models/buyer.model';
 import SharedProperty from '../models/sharedProperty.model';
-import { sharedPropertyInfo } from '../models/sharedProperty.model';
 import SharedBuyerProperty from '../models/sharedBuyerProperty.model';
 import { Types } from 'mongoose';
 import { generateRandomKey } from '../services/crypto.service';
@@ -325,7 +324,26 @@ const updateSharedProperty = async (propertyId, sharedPropertyId) => {
     return updatedProperty;
   } catch (error) {
     console.error('Error updating Shared Property:', error);
+    throw error;
+  }
+};
 
+const updateSharedBuyerProperty = async (propertyId, sharedBuyerPropertyId) => {
+  try {
+    const updatedProperty = await Property.findByIdAndUpdate(
+      propertyId,
+      { $addToSet: { sharedBuyerProperty: sharedBuyerPropertyId } },
+      { new: true }
+    );
+
+    if (!updatedProperty) {
+      console.error('Property not found for propertyId:', propertyId);
+      return null;
+    }
+    console.log('Shared Property updated successfully:', updatedProperty);
+    return updatedProperty;
+  } catch (error) {
+    console.error('Error updating Shared Property:', error);
     throw error;
   }
 };
@@ -386,8 +404,6 @@ export const shareBoard = async (req: Request, res: Response) => {
     const board = await Board.findById(req.params.id)
       .populate('tenantId buyerId propertyId')
       .lean();
-    const tenantId = board.tenantId._id;
-    console.log('tenantId', tenantId);
     const PropertiesinBoardLength = board?.propertyId.length || 0;
     console.log('PropertiesBoardLength', PropertiesinBoardLength);
     console.log('board', board);
@@ -396,6 +412,7 @@ export const shareBoard = async (req: Request, res: Response) => {
     }
     const update = updateSharedDate(board);
     if (board && board.boardFor && board.boardFor === 'Tenant') {
+      const tenantId = board.tenantId._id;
       const status1 = await changeTenantStatus(board.tenantId._id, 'Shared');
       const status3 = await Tenant.updateOne(
         { _id: tenantId },
@@ -403,7 +420,12 @@ export const shareBoard = async (req: Request, res: Response) => {
       );
 
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
+      const buyerId = board.buyerId._id;
       const status2 = await changeBuyerStatus(board.buyerId._id, 'Shared');
+      const status3 = await Buyer.updateOne(
+        { _id: buyerId },
+        { $set: { numberShared: PropertiesinBoardLength } }
+      );
     }
     return successResponse(res, 200, { board }, 'Board shared successfully.');
   } catch (error) {
@@ -472,8 +494,7 @@ export const shortlistDate = async (req: Request, res: Response) => {
   try {
     const propertyId = req.body.propertyid;
     const shortListStatus =  req.body.shortListStatus;
-   // const tenantID = req.user.user._id;
-    const tenantID = req.body.globalTenantId;
+    const tenantBuyerID = req.user.user._id;
     const board = await Board.findById(req.params.id)
       .populate('tenantId buyerId propertyId')
       .lean();
@@ -481,10 +502,9 @@ export const shortlistDate = async (req: Request, res: Response) => {
       return failureResponse(res, 404, [], 'Board not found.');
     }
     if (board && board.boardFor && board.boardFor === 'Tenant') {
-      const update1 = await updateShortlistDate(board, propertyId, tenantID, 'Tenant', shortListStatus);
+      const update1 = await updateShortlistDate(board, propertyId, tenantBuyerID, 'Tenant', shortListStatus);
     } else if (board && board.boardFor && board.boardFor === 'Buyer') {
-      const status2 = await changeBuyerStatus(tenantID, 'Shortlisted');
-      const update2 = await updateShortlistDate(board, propertyId, tenantID, 'Buyer', shortListStatus);
+      const update2 = await updateShortlistDate(board, propertyId, tenantBuyerID, 'Buyer', shortListStatus);
     }
     if (shortListStatus === true){
     return successResponse(
@@ -511,20 +531,18 @@ export const shortlistDate = async (req: Request, res: Response) => {
     );
   }
 };
-
-const updateShortlistDate = async (data, propertyId, tenantID, boardFor, shortListStatus) => {
+// function governing shortlist
+const updateShortlistDate = async (data, propertyId, ID, boardFor, shortListStatus) => {
   try {
 if (boardFor === 'Tenant') {
     return await Promise.all(
         data.propertyId.map(async (singleProperty) => {
           if (
-            singleProperty._id.toString() === propertyId &&
-            singleProperty.sharedProperty &&
-            singleProperty.sharedProperty.length
+            singleProperty._id.toString() === propertyId
           ) {
             if (shortListStatus){
               const updatedSharedProperty = await SharedProperty.findOneAndUpdate(
-              {tenantId: tenantID, },
+              {tenantId: ID, },
               {$addToSet: {shortlistedProperties: {propertyId}, },
                 $set: {shortListedAt: Date.now()},
               },
@@ -534,7 +552,7 @@ if (boardFor === 'Tenant') {
           }
          else if (!shortListStatus){
                await SharedProperty.findOneAndUpdate(
-                {tenantId: tenantID, },
+                {tenantId: ID, },
                 {$pull: {
                     shortlistedProperties: {
                       propertyId: {
@@ -552,61 +570,92 @@ if (boardFor === 'Tenant') {
               );
 
             }
-            const sharedProperty = await SharedProperty.findOne({tenantId: tenantID, });
+            const sharedProperty = await SharedProperty.findOne({tenantId: ID, });
             const shortlistedPropertiesLength = sharedProperty?.shortlistedProperties.length || 0;
 
             if (shortlistedPropertiesLength > 0){
               await Tenant.updateOne(
-                { _id: tenantID },
+                { _id: ID },
                 { $set: { numberShortlisted: shortlistedPropertiesLength } }
               );
-              await changeTenantStatus(tenantID, 'Shortlisted');
+              await changeTenantStatus(ID, 'Shortlisted');
               await SharedProperty.updateMany(
-        {tenantId: tenantID, },
+        {tenantId: ID, },
         {$set: {isShortlisted: true, }});
        }
         else {
           await Tenant.updateOne(
-            { _id: tenantID },
+            { _id: ID },
             { $set: { numberShortlisted: shortlistedPropertiesLength } }
           );
-          await changeTenantStatus(tenantID, 'CurrentlyViewing');
+          await changeTenantStatus(ID, 'CurrentlyViewing');
           await SharedProperty.updateMany(
-            {tenantId: tenantID, },
+            {tenantId: ID, },
             {$set: {isShortlisted: false, }, });
          }}}));
-            // needs to be reworked
-    } else if (boardFor === 'Buyer') {
+    // updated
+    }
+    else if (boardFor === 'Buyer') {
+      console.log('HERE');
       return await Promise.all(
         data.propertyId.map(async (singleProperty) => {
           if (
-            singleProperty._id.toString() === propertyId &&
-            singleProperty.sharedBuyerProperty &&
-            singleProperty.sharedBuyerProperty.length
+            singleProperty._id.toString() === propertyId
           ) {
-            return await SharedBuyerProperty.updateMany(
-              {
-                buyerId: tenantID,
-                _id: { $in: singleProperty.sharedBuyerProperty },
+            if (shortListStatus){
+              console.log('HERE also');
+              const updatedSharedBuyerProperty = await SharedBuyerProperty.findOneAndUpdate(
+              {buyerId: ID, },
+              {$addToSet: {shortlistedProperties: {propertyId}, },
+                $set: {shortListedAt: Date.now()},
               },
-              {
-                $set: {
-                  shortListedAt: Date.now(),
-                  isShortlisted: true
-                },
-                $addToSet: {
-                  shortlistedProperties: {
-                    [propertyId]: {
-                      shortListStatus,
-                    },
-                  },
-                },
-              },
-              { upsert: true }
-            );
+              {upsert : true, new : true }
+              );
+              updateSharedBuyerProperty(propertyId, updatedSharedBuyerProperty._id);
           }
-        })
-      );
+         else if (!shortListStatus){
+               await SharedBuyerProperty.findOneAndUpdate(
+                {buyerId: ID, },
+                {$pull: {
+                    shortlistedProperties: {
+                      propertyId: {
+                        $in: [propertyId],
+                        $exists: true
+                      }
+                    }
+                  },
+                  $set: {
+                    shortListedAt: Date.now(),
+
+                 },
+                },
+                {new : true}
+              );
+
+            }
+            const sharedbuyerProperty = await SharedBuyerProperty.findOne({buyerId: ID, });
+            const shortlistedPropertiesLength = sharedbuyerProperty?.shortlistedProperties.length || 0;
+
+            if (shortlistedPropertiesLength > 0){
+              await Buyer.updateOne(
+                { _id: ID },
+                { $set: { numberShortlisted: shortlistedPropertiesLength } }
+              );
+              await changeBuyerStatus(ID, 'Shortlisted');
+              await SharedBuyerProperty.updateMany(
+        {buyerId: ID, },
+        {$set: {isShortlisted: true, }});
+       }
+        else {
+          await Buyer.updateOne(
+            { _id: ID },
+            { $set: { numberShortlisted: shortlistedPropertiesLength } }
+          );
+          await changeBuyerStatus(ID, 'CurrentlyViewing');
+          await SharedBuyerProperty.updateMany(
+            {buyerId: ID, },
+            {$set: {isShortlisted: false, }, });
+         }}}));
     }
         } catch (error) {
           return failureResponse(

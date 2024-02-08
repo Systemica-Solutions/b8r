@@ -282,7 +282,6 @@ export const tenantLogin = async (req: Request, res: Response) => {
       tenant._id,
       'CurrentlyViewing'
     );
-    console.log('tenata', tenant);
     return successResponse(
       res,
       200,
@@ -337,6 +336,8 @@ return await Tenant.findByIdAndUpdate(
       { new: true }
     );
   };
+
+
 
 export const changeTenantStatusonLogin = async (id, status) => {
     const existingTenant = await Tenant.findById(id);
