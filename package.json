@@ -10,7 +10,8 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node -r dotenv/config dist/app.js",
-    "dev": "node -r dotenv/config src/app.ts"
+    "dev": "node -r dotenv/config src/app.ts",
+    "start:dev": "ts-node -r dotenv/config src/app.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.373.0",
