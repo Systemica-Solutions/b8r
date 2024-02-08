@@ -12,16 +12,29 @@ const BuyerSchema: Schema = new Schema(
       type: Schema.Types.String,
       required: true,
     },
+    // added agentId here
+    agentId: {
+      type: Schema.Types.ObjectId,
+      ref: MODELS.AGENT,
+    },
     status: {
       type: Schema.Types.String,
       trim: true,
       enum: tenantBuyerStatus,
       default: 'WaitingForProperty',
     },
+    numberShortlisted: {
+      type: Schema.Types.Number,
+      default : 0,
+    },
+    numberShared: {
+      type: Schema.Types.Number,
+      default : 0,
+    },
     buyerDetails: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'BuyerDetails',
+        ref: MODELS.BUYERDETAILS,
       },
     ],
     deactivateStatus: {
