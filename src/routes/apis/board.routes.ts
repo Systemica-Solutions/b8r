@@ -35,7 +35,7 @@ router.put(
 router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
 
 // Add date while shortlist property
-router.put('/shortlist/:id', shortlistDate);
+router.put('/shortlist/:id', userAuth, shortlistDate);
 
 // Get board details
 router.get('/details/:id',userAuth, getBoardDetailsById);
