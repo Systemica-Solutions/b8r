@@ -140,9 +140,11 @@ export const getAllAgentList = async (_: Request, res: Response) => {
 export const signInAgent = async (req: Request, res: Response) => {
   try {
     const agentData = req.body;
+
     const agentExist = await Agent.findOne({
       phoneNumber: agentData.phoneNumber,
     });
+
     if (!agentExist) {
       return failureResponse(res, 404, [], 'Agent not found!');
     } else {
