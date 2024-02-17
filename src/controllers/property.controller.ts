@@ -16,6 +16,7 @@ import Tenant from '../models/tenant.model';
 import SharedProperty from '../models/sharedProperty.model';
 // import sharedProperty from '../models/sharedProperty.model';
 import { staticStatus } from '../constants/global.constants';
+import Board from '../models/board.model';
 
 // Add new property
 export const addProperty = async (req: Request, res: Response) => {
@@ -585,16 +586,31 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     // new function to calculate distinct properties shortlisted tenants of a particular agent
     async function step4(agentId) {
   try {
-    const filteredTenants = await Tenant.find({ agentId, status: { $ne: 'Deactivate' } });
-    const tenantIds = filteredTenants.map(tenant => tenant._id);
-    const matchingSharedProperties = await SharedProperty.find({ tenantId: { $in: tenantIds } });
+    // const filteredTenants = await Tenant.find({ agentId, status: { $ne: 'Deactivate' } });
+    // const tenantIds = filteredTenants.map(tenant => tenant._id);
+    // const matchingSharedProperties = await SharedProperty.find({ tenantId: { $in: tenantIds } });
+    // const distinctPropertyIds = new Set();
+    // matchingSharedProperties.forEach(sharedProp => {
+    //   sharedProp.shortlistedProperties.forEach(propObj => {
+    //     distinctPropertyIds.add(propObj.propertyId);
+    //   });
+    // });
+    const boards = await Board.find({agentId: agentId})
+    console.log(boards.length);
+    
     const distinctPropertyIds = new Set();
-    matchingSharedProperties.forEach(sharedProp => {
-      sharedProp.shortlistedProperties.forEach(propObj => {
-        distinctPropertyIds.add(propObj.propertyId);
-      });
-    });
+    boards.forEach((board) => {
+      console.log(board._id);
+      
+      board.isShortlisted.map((x, index) => {
+        console.log(x);
+        console.log(board.propertyId[index]);
+        if(x === true) distinctPropertyIds.add(board.propertyId[index])
+      })
+  })
     return distinctPropertyIds.size;
+    return 5;
+    
   } catch (error) {
     console.error('Error in Shortlisted Count:', error);
     throw error;
