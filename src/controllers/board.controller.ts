@@ -84,25 +84,47 @@ const changeFlag = async (data) => {
 
 // Add property in board by property agent
 export const addPropertyInBoard = async (req: Request, res: Response) => {
-  const board = await Board.findByIdAndUpdate(
-    req.params.id,
-    { $addToSet: { propertyId: req.body.propertyId } },
-    { new: true }
-  ).populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
-  if (!board) {
-    return failureResponse(res, 404, [], 'Board not found.');
+  try {
+    const board = await Board.findByIdAndUpdate(
+      req.params.id,
+      {
+        $pull: { propertyId: { $nin: req.body.propertyId } },
+      },
+      { new: true }
+    );
+
+    if (!board) {
+      return failureResponse(res, 404, [], 'Board not found.');
+    }
+
+    // Now add new properties
+    const updatedBoard = await Board.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: { propertyId: { $each: req.body.propertyId } },
+      },
+      { new: true }
+    ).populate({ path: 'propertyId', populate: { path: 'propertyDetails' } });
+
+    if (updatedBoard && updatedBoard.propertyId && updatedBoard.propertyId.length) {
+      updatedBoard.propertyId.forEach((property) => {
+        property.propertyDetails = [property.propertyDetails[property.propertyDetails.length - 1]];
+      });
+    }
+
+    console.log(updatedBoard);
+    return successResponse(
+      res,
+      200,
+      { board: updatedBoard },
+      'Properties added and removed from board successfully.'
+    );
+  } catch (error) {
+    console.error(error);
+    return failureResponse(res, 500, [], 'Internal Server Error');
   }
-  if (board && board.propertyId && board.propertyId.length) {
-    board.propertyId.map((x) => x.propertyDetails = [x.propertyDetails[x.propertyDetails.length - 1]]);
-  }
-  console.log(board);
-  return successResponse(
-    res,
-    200,
-    { board },
-    'Property added to board successfully.'
-  );
 };
+
 
 // Update viewedAt Date while view property
 export const updatePropertyViewAtDate = async (req: Request, res: Response) => {
