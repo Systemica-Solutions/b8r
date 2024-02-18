@@ -41,6 +41,18 @@ const BoardSchema: Schema = new Schema(
     shareBoardLink: {
       type: Schema.Types.String,
       default: null
+    },
+    sharedAt: {
+      type: Schema.Types.Date,
+      default: null,
+    },
+    shortlistedDate: {
+      type: [Schema.Types.Date],
+      default: [],
+    },
+    isShortlisted: {
+      type: [Schema.Types.Boolean],
+      default: [],
     }
   },
   { timestamps: true }

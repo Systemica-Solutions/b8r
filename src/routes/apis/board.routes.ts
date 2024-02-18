@@ -9,7 +9,8 @@ import {
   updateLastVisitDateTenantBoard,
   updateLastVisitDateBuyerBoard,
   getBoardById,
-  getBoardDetailsById
+  getBoardDetailsById,
+  updateBoard
 } from '../../controllers/board.controller';
 import {
   boardValidation,
@@ -37,7 +38,7 @@ router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
 router.put('/shortlist/:id', userAuth, shortlistDate);
 
 // Get board details
-router.get('/details/:id', getBoardDetailsById);
+router.get('/details/:id',userAuth, getBoardDetailsById);
 
 // Find board by board id
 router.get('/:id', userAuth, getBoardById);
@@ -53,5 +54,8 @@ router.put('/tenant/:id', userAuth, updateLastVisitDateTenantBoard);
 
 // Update last visited date of board by board-id
 router.put('/buyer/:id', userAuth, updateLastVisitDateBuyerBoard);
+
+// Add the update board collection to add isShortlisted, shortlistedDate, sharedAt
+// router.put('/update-board', updateBoard)
 
 export default router;
