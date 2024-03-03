@@ -38,7 +38,7 @@ router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
 router.put('/shortlist/:id', userAuth, shortlistDate);
 
 // Get board details
-router.get('/details/:id',userAuth, getBoardDetailsById);
+router.get('/details/:id', userAuth, getBoardDetailsById);
 
 // Find board by board id
 router.get('/:id', userAuth, getBoardById);

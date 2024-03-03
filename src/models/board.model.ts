@@ -31,8 +31,9 @@ const BoardSchema: Schema = new Schema(
       default: false,
     },
     lastVisitedAt: {
-      type: Schema.Types.Date,
-      default: null,
+      type: Schema.Types.Map,
+      of: Schema.Types.Date,
+      default: {},
     },
     boardFor: {
       type: Schema.Types.String,
@@ -43,16 +44,19 @@ const BoardSchema: Schema = new Schema(
       default: null
     },
     sharedAt: {
-      type: Schema.Types.Date,
-      default: null,
+      type: Schema.Types.Map,
+      of: Schema.Types.Date,
+      default: {},
     },
     shortlistedDate: {
-      type: [Schema.Types.Date],
-      default: [],
+      type: Schema.Types.Map,
+      of: Schema.Types.Date,
+      default: {},
     },
     isShortlisted: {
-      type: [Schema.Types.Boolean],
-      default: [],
+      type: Schema.Types.Map,
+      of: Schema.Types.Boolean,
+      default: {},
     }
   },
   { timestamps: true }
