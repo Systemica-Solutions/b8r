@@ -595,22 +595,17 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     //     distinctPropertyIds.add(propObj.propertyId);
     //   });
     // });
-    const boards = await Board.find({agentId: agentId})
+    const boards = await Board.find({agentId});
     console.log(boards.length);
-    
+
     const distinctPropertyIds = new Set();
     boards.forEach((board) => {
-      console.log(board._id);
-      
-      board.isShortlisted.map((x, index) => {
-        console.log(x);
-        console.log(board.propertyId[index]);
-        if(x === true) distinctPropertyIds.add(board.propertyId[index])
-      })
-  })
+      board.isShortlisted.forEach((value, key) => {
+        if (value === true) { distinctPropertyIds.add(key); }
+      });
+  });
     return distinctPropertyIds.size;
-    return 5;
-    
+
   } catch (error) {
     console.error('Error in Shortlisted Count:', error);
     throw error;

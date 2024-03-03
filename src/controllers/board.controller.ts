@@ -161,9 +161,11 @@ const updateViewedAtDate = async (data, propertyId, tenantID) => {
     // if (data && data.propertyId && data.propertyId.length) {
       const ID = data._id;
       if (data && data.boardFor && data.boardFor === 'Tenant') {
-        return await Board.findOneAndUpdate(
-          { _id: ID }, { $set: { viewedAt: Date.now() } }
-        )
+        data.lastVisitedAt[propertyId] = Date.now();
+        return await Board.findOneAndUpdate({_id: ID}, data);
+        // return await Board.findOneAndUpdate(
+        //   { _id: ID }, { $set: { lastVistedAt: updatedVisitedMap} }
+        // );
         // return await Promise.all(
         //   data.propertyId.map(async (singleProperty) => {
         //     if (
@@ -250,22 +252,25 @@ export const getBoardById = async (req: Request, res: Response) => {
 
 export const updateBoard = async (req: Request, res: Response) => {
   try {
-      await Board.updateMany({}, 
-      { $set: { "shortlistedDate": [] }},
-      {upsert: false,
-       multi: true });
-       
-      await Board.updateMany({}, 
-        { $set: { "isShortlisted": [] }},
-        {upsert: false, multi: true });
-      
-      await Board.updateMany({}, 
-        { $set: { "sharedAt": null }},
-        {upsert: false, multi: true });
+    const boards = await Board.find();
 
-      return successResponse(res, 200, {}, 'Board updated successfully.');
-      }
-  catch(error) {
+    for (const board of boards) {
+
+      const boardRes = await Board.findByIdAndUpdate(
+        { _id: board._id },
+        { $set: { shortlistedDate: {}, isShortlisted: {}, sharedAt: {}, lastVisitedAt: {} } }
+      );
+
+    }
+
+    console.log('Migration completed successfully');
+    return successResponse(
+      res,
+      200,
+      'Board updated successfully.'
+    );
+  } catch (error) {
+    console.error('Migration failed:', error);
     return failureResponse(
       res,
       error.status || 500,
@@ -273,7 +278,9 @@ export const updateBoard = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
-}
+
+
+};
 
 // Find board details by board id
 export const getBoardDetailsById = async (req: Request, res: Response) => {
@@ -315,7 +322,7 @@ export const getBoardDetailsById = async (req: Request, res: Response) => {
 export const finalizeBoard = async (req: Request, res: Response) => {
   try {
     console.log(req.body);
-    
+
     const board = await Board.findByIdAndUpdate(
       req.params.id,
       {
@@ -500,9 +507,12 @@ const updateSharedDate = async (data) => {
   const ID = data._id;
   try {
     if (data && data.boardFor && data.boardFor === 'Tenant') {
+      data.propertyId.map((x) => {
+        data.sharedAt[x._id] = Date.now();
+      });
       await Board.findOneAndUpdate(
-        {_id: ID}, { $set: { sharedAt: data.updatedAt } }
-      )
+        {_id: ID}, data
+      );
       // if (data && data.propertyId && data.propertyId.length) {
         // await Promise.all(
         //   data.propertyId.map(async (singleProperty) => {
@@ -516,10 +526,10 @@ const updateSharedDate = async (data) => {
         //       console.log('5');
         //       console.log(data._id);
         //       console.log(data.tenantId._id);
-              
-              
+
+
         //       return await Board.updateOne(
-                
+
         //           { _id: ID },
         //         //   tenantId: data.tenantId._id,
         //         //   _id: { $in: singleProperty.sharedProperty },
@@ -529,7 +539,7 @@ const updateSharedDate = async (data) => {
         //     }
         //   })
         // );
-        
+
       // }
     } else if (data && data.boardFor && data.boardFor === 'Buyer') {
       if (data && data.propertyId && data.propertyId.length) {
@@ -607,57 +617,39 @@ export const shortlistDate = async (req: Request, res: Response) => {
 const updateShortlistDate = async (data, propertyId, ID, boardFor, shortListStatus) => {
   try {
 if (boardFor === 'Tenant') {
-  if(data.isShortlisted && data.isShortlisted.length == 0){
-    data.propertyId.map((x) => {
-      if(x._id == propertyId) data.isShortlisted.push(shortListStatus);
-      else data.isShortlisted.push(false);
-    })
+  if (data.isShortlisted){
+    data.isShortlisted[propertyId] = shortListStatus;
   }
-  else{
-    data.propertyId.map((x, index) => {
-      if(x._id == propertyId) data.isShortlisted[index] = shortListStatus;
-    })
+  if (data.shortlistedDate && shortListStatus) {
+    data.shortlistedDate[propertyId] = Date.now();
   }
-  
-  
+  else if (data.shortlistedDate && !shortListStatus) {
+    data.shortlistedDate[propertyId] = null;
+ }
+
+
   const res = await Board.findOneAndUpdate(
     {_id: data._id},
-    { $set: {isShortlisted: data.isShortlisted} }
-  )
-  console.log(1);
-    
-  if(data.shortlistedDate && data.shortlistedDate.length == 0){
-    data.propertyId.map((x) => {
-      if(x._id == propertyId && shortListStatus === true) data.shortlistedDate.push(Date.now());
-      else data.shortlistedDate.push(null);
-    })
-  }
-  else{
-    data.propertyId.map((x, index) => {
-      if(x._id == propertyId && shortListStatus === true) data.shortlistedDate[index] = Date.now();
-      else if(x._id == propertyId && shortListStatus === false) data.shortlistedDate[index] = null;
-    })
-  }
+    data
+  );
 
-  const res1 = await Board.findOneAndUpdate(
-    {_id: data._id},
-    { $set: {shortlistedDate: data.shortlistedDate} }
-  )
-    
-    
-  const shortlistedNo = data.isShortlisted?.filter((x) => x === true).length;
-  
+  let shortlistedNo = 0;
+  data.propertyId.map((x) => {
+    if (data.isShortlisted[x._id] === true){
+      shortlistedNo++;
+    }
+  });
+
   await Tenant.updateOne(
     { _id: ID },
     { $set: { numberShortlisted: shortlistedNo }}
-  )
+  );
 
-  
-  if(shortlistedNo > 0){
+  if (shortlistedNo > 0){
     return await changeTenantStatus(ID, 'Shortlisted');
   }
   else{
-    return await changeTenantStatus(ID, 'Currently Viewing')
+    return await changeTenantStatus(ID, 'CurrentlyViewing');
   }
 
 
