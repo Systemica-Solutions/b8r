@@ -212,7 +212,7 @@ export const getS3ImagesByPropertyId = async (id) => {
       bucketName,
       uploadParams.fieldAgentId,
       uploadParams.propertyId,
-      'raw'
+      'final'
     );
     images.map(async (img) => {
       tempImgs.push({

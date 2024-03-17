@@ -19,7 +19,7 @@ import { userAuth } from '../../middleware/user-auth.middleware';
 const router = Router();
 
 // Get all agents
-router.get('/', userAuth, getAllAgentList);
+router.get('/', getAllAgentList);
 
 // Update agent details
 router.put('/', userAuth, updateAgentValidation, updateAgentDetails);

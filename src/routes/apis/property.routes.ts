@@ -12,7 +12,10 @@ import {
   getAllPropertyImages,
   getPropertyStatus,
   reactivateProperty,
-  editProperty
+  editProperty,
+  propertyViewingStatus,
+  addImages,
+  getPropertiesForAgent
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -53,6 +56,9 @@ router.get('/check-status/:id', userAuth, getPropertyStatus);
 
 // Get all properties for property agent
 router.get('/', userAuth, getAllPropertyList);
+
+//Get properties for property agent used by Admin(no need of Auth)
+router.get('/agent-property/:id', getPropertiesForAgent);
 
 // Get all properties in database
 router.get('/all', getAllPropertyinDB);
@@ -96,5 +102,16 @@ router.put(
   reactivateValidation,
   reactivateProperty
 );
+
+router.get(
+  '/viewing-status/:id',
+  userAuth,
+  propertyViewingStatus
+)
+
+router.post(
+  '/add-images/:id',
+  addImages
+)
 
 export default router;
