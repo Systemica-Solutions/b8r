@@ -1,0 +1,34 @@
+# DOCKER_USERNAME = systemicasubs
+# DOCKER_HUBTOKEN = dckr_pat_z3VLy1gMROMtad2JrbmjNYolzCE
+# AWS_ACCESS_KEY = AKIAXFTHGIOESPHERSNW
+# AWS_SECRET_KEY = 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
+name: Deploy BetterHomes Backend
+on:
+  push:
+    branches:
+      - server-dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+        - run: docker login -u systemicasubs -p dckr_pat_z3VLy1gMROMtad2JrbmjNYolzCE
+        - run: docker build -t systemicasubs/b8r-backend .
+        - run: docker push systemicasubs/b8r-backend
+
+        - name: Generate deployment package
+          run: zip -r deploy.zip . -x '*.git*'
+
+        - name: Deploy to EB
+          uses: einaregilsson/beanstalk-deploy@v21
+          with:
+            use_existing_version_if_available: true
+            aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            application_name: b8rhomes-api
+            environment_name: B8rhomes-api-env
+           # existing_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
+            region: ${{ secrets.AWS_REGION }}
+            version_label: ${{ github.sha }}
+            deployment_package: deploy.zip
