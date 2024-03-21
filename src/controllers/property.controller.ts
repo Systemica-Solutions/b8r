@@ -10,7 +10,8 @@ import { PipelineStage, Types, set } from 'mongoose';
 import {
   copyAndRenameS3Images,
   getAllPropertyS3Images,
-  getS3ImagesByPropertyId,
+  getS3ImagesByPropertyIdRaw,
+  getS3ImagesFromFinalFolder,
 } from './uploadImage.controller';
 import Tenant from '../models/tenant.model';
 import SharedProperty from '../models/sharedProperty.model';
@@ -875,9 +876,23 @@ export const closeListingProperty = async (req: Request, res: Response) => {
 };
 
 // Get property images from s3 by propertyId
-export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
+export const getPropertyImagesFromS3Final = async (req: Request, res: Response) => {
   try {
-    const images = await getS3ImagesByPropertyId(req.params.id);
+    const images = await getS3ImagesFromFinalFolder(req.params.id);
+    return successResponse(res, 200, { images }, 'S3 images get successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+export const getPropertyImagesFromS3Raw = async (req: Request, res: Response) => {
+  try {
+    const images = await getS3ImagesByPropertyIdRaw(req.params.id);
     return successResponse(res, 200, { images }, 'S3 images get successfully.');
   } catch (error) {
     return failureResponse(
