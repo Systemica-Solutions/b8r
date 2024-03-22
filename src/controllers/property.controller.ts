@@ -10,7 +10,8 @@ import { PipelineStage, Types, set } from 'mongoose';
 import {
   copyAndRenameS3Images,
   getAllPropertyS3Images,
-  getS3ImagesByPropertyId,
+  getS3ImagesByPropertyIdRaw,
+  getS3ImagesFromFinalFolder,
 } from './uploadImage.controller';
 import Tenant from '../models/tenant.model';
 import SharedProperty from '../models/sharedProperty.model';
@@ -759,6 +760,71 @@ export const getPropertyStatus = async (req: Request, res: Response) => {
   }
 };
 
+function daysAgo(date) {
+  const now = new Date();
+  const differenceInMs = now.getTime() - date.getTime();
+  const days = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+  return days;
+}
+
+export const propertyViewingStatus = async (req: Request, res: Response) => {
+  try{
+    const propertyId = req.params.id;
+    const agentId = req.body.agentId;
+    // const boards = await Board.find({agentId});
+
+    let tenantDetails = [];
+    let tenantStatus = [];
+    let shortListedDate = [];
+    let viewedDate = [];
+
+    const pipeline = [
+      {
+        $match: {
+          agentId: agentId,
+          // propertyId: { $in: [propertyId] }
+        }
+      }
+    ];
+
+    const boards = await Board.find({agentId}).populate('tenantId')
+    boards.forEach((board) => {
+      board.propertyId.forEach((property) => {
+        if(property.toString() === propertyId){
+          tenantDetails.push(board.tenantId)
+          tenantStatus.push(board.tenantId.status)
+          
+          const shortlistedAt = board.shortlistedDate.get(propertyId) ? board.shortlistedDate.get(propertyId): null;
+          const viewedAt = board.lastVisitedAt.get(propertyId) ? board.lastVisitedAt.get(propertyId): null;
+          if (shortlistedAt !== null) shortListedDate.push(daysAgo(shortlistedAt));
+          else shortListedDate.push(-1);
+          if (viewedAt !== null) viewedDate.push(daysAgo(viewedAt));
+          else viewedDate.push(-1);
+
+        }
+      })
+    })
+    
+    const result = {tenantDetails, tenantStatus, shortListedDate, viewedDate};
+
+    return successResponse(
+      res,
+      200,
+      result,
+      'Property status updated successfully.'
+    );
+  }
+  catch(error){
+    console.log(error);
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+}
+
 // Edit property status with close listing property
 export const closeListingProperty = async (req: Request, res: Response) => {
   try {
@@ -810,9 +876,23 @@ export const closeListingProperty = async (req: Request, res: Response) => {
 };
 
 // Get property images from s3 by propertyId
-export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
+export const getPropertyImagesFromS3Final = async (req: Request, res: Response) => {
   try {
-    const images = await getS3ImagesByPropertyId(req.params.id);
+    const images = await getS3ImagesFromFinalFolder(req.params.id);
+    return successResponse(res, 200, { images }, 'S3 images get successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+export const getPropertyImagesFromS3Raw = async (req: Request, res: Response) => {
+  try {
+    const images = await getS3ImagesByPropertyIdRaw(req.params.id);
     return successResponse(res, 200, { images }, 'S3 images get successfully.');
   } catch (error) {
     return failureResponse(
@@ -957,6 +1037,179 @@ export const reactivateProperty = async (req: Request, res: Response) => {
           );
         }
       });
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+export const addImages = async (req: Request, res: Response) => {
+  try{
+    const propertyId = req.params.id;
+    const images = req.body;
+
+    let imagesByRank: string[] = [];
+
+    Object.entries(images).forEach(([link, position]: [string, number]) => {
+      imagesByRank[position-1] = link;
+    })
+    console.log(imagesByRank);
+    console.log(propertyId);
+    const property = await Property.findByIdAndUpdate(propertyId, {
+      $set: {
+        images: imagesByRank
+      },
+    });
+    
+    return successResponse(
+      res,
+      200,
+      'Images Added Successfully by Rank'
+    );
+  }
+  catch(error){
+    console.log(error);
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+}
+
+export const getPropertiesForAgent = async (req: Request, res: Response) => {
+  try {
+    // It search based on houseName of property
+    const searchText: any = req.query.search;
+    // It filters based on status of property like New/Pending/Verified/Closed and also for archive filter of closeListingReason
+    const filter: any = req.query.filter;
+    const imagesApproved = req.query.imagesApproved;
+    const agentId = new Types.ObjectId(req.params.id);
+
+    let aggregationPipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'propertydetails',
+          localField: 'propertyDetails',
+          foreignField: '_id',
+          as: 'propertyDetails',
+        },
+      },
+      {
+        $match: {
+          'propertyDetails.agentId': agentId,
+        },
+      },
+    ];
+
+    if (searchText && searchText.trim()) {
+      aggregationPipeline.push({
+        $match: {
+          houseName: {
+            $regex: new RegExp('^' + searchText.trim().toLowerCase(), 'i'),
+          },
+        },
+      });
+    }
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() !== 'shortlisted' &&
+      filter.trim().toLowerCase() !== 'shared'
+    ) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            {
+              status: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+            {
+              closeListingReason: {
+                $regex: new RegExp('^' + filter.trim().toLowerCase(), 'i'),
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    if (filter && filter.trim() && filter.trim().toLowerCase() === 'shared') {
+      aggregationPipeline.push({
+        $match: {
+          $expr: {
+            $or: [
+              { $gt: [{ $size: '$sharedProperty' }, 0] },
+              { $gt: [{ $size: '$sharedBuyerProperty' }, 0] },
+            ],
+          },
+        },
+      });
+    }
+
+    if (
+      filter &&
+      filter.trim() &&
+      filter.trim().toLowerCase() === 'shortlisted'
+    ) {
+      aggregationPipeline = aggregationPipeline.concat([
+        {
+          $lookup: {
+            from: 'sharedbuyerproperties',
+            localField: 'sharedBuyerProperty',
+            foreignField: '_id',
+            as: 'sharedBuyerProperty',
+          },
+        },
+        {
+          $lookup: {
+            from: 'sharedproperties',
+            localField: 'sharedProperty',
+            foreignField: '_id',
+            as: 'sharedProperty',
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { 'sharedProperty.isShortlisted': true },
+              { 'sharedBuyerProperty.isShortlisted': true },
+            ],
+          },
+        },
+      ]);
+    }
+
+    if (imagesApproved === 'false') {
+      aggregationPipeline.push({ $match: { imagesApproved: false } });
+    }
+    if (imagesApproved === 'true') {
+      aggregationPipeline.push({ $match: { imagesApproved: true } });
+    }
+
+    const properties = await Property.aggregate(aggregationPipeline);
+    if (properties && properties.length) {
+      properties.map(
+        (x) =>
+          (x.propertyDetails = x.propertyDetails[x.propertyDetails.length - 1])
+      );
+    }
+    if (!properties) {
+      return failureResponse(res, 404, [], 'Properties not found.');
+    }
+    return successResponse(
+      res,
+      200,
+      { properties },
+      'Properties found successfully.'
+    );
   } catch (error) {
     return failureResponse(
       res,

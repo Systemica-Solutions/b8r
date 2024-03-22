@@ -197,7 +197,7 @@ function imageRankingSort(a, b) {
 }
 
 // Get s3 images and move those in final folder
-export const getS3ImagesByPropertyId = async (id) => {
+export const getS3ImagesByPropertyIdRaw = async (id) => {
   const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
   try {
     const tempImgs = [];
@@ -305,5 +305,40 @@ export const copyAndRenameS3Images = async (id, imgs) => {
     return await linkArray;
   } else {
     return failureResponse(null, 404, [], 'Data not found');
+  }
+};
+
+export const getS3ImagesFromFinalFolder = async (id) => {
+  const prefix = `https://${bucketName}.s3.ap-south-1.amazonaws.com/`;
+  try {
+    const tempImgs = [];
+    const uploadParams = await AssignedProperty.findOne({
+      propertyId: id,
+    });
+    if (!uploadParams) {
+      throw { status: 404, message: 'Property does not exist on s3' };
+    }
+    let images: any = [];
+    images = await getNumberOfImagesInBucket(
+      bucketName,
+      uploadParams.fieldAgentId,
+      uploadParams.propertyId,
+      'final'
+    );
+    images.map(async (img) => {
+      tempImgs.push({
+        link: prefix.concat(img.Key),
+        name: img.Key.split('/').pop(),
+      });
+    });
+    return await tempImgs;
+  } catch (error) {
+    console.error('Error:', error);
+    return failureResponse(
+      null,
+      error.status || 500,
+      error,
+      error.message || 'Property does not exist on s3'
+    );
   }
 };
