@@ -285,13 +285,11 @@ export const updateBoard = async (req: Request, res: Response) => {
 // Find board details by board id
 export const getBoardDetailsById = async (req: Request, res: Response) => {
   try {
-    console.log('hello');
     const board = await Board.findById(req.params.id)
       .populate({ path: 'propertyId', populate: { path: 'propertyDetails' } })
       .populate({ path: 'tenantId', populate: { path: 'tenantDetails' } })
       .populate({ path: 'buyerId', populate: { path: 'buyerDetails' } })
       .lean();
-    console.log(board);
     if (!board) {
       return failureResponse(res, 404, [], 'Board not found.');
     }

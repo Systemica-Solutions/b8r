@@ -12,7 +12,7 @@ export const userAuth = async (
   try {
     if (typeof token !== 'undefined') {
       const tokenWithoutPrefix = token.split(' ')[1]; // Remove the "Bearer " prefix from the token
-      jwt.verify(tokenWithoutPrefix, 'b8r_home', (err, user) => {
+      jwt.verify(tokenWithoutPrefix, process.env.SECRET, (err, user) => {
         if (err) {
           return failureResponse(res, 403, [err], 'Forbidden Error.');
         }
