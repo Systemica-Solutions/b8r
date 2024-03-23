@@ -108,17 +108,6 @@ router.put(
   reactivateProperty
 );
 
-router.get(
-  '/viewing-status/:id',
-  userAuth,
-  propertyViewingStatus
-)
-
-router.post(
-  '/add-images/:id',
-  addImages
-)
-
 router.get('/shared/:id', userAuth, sharedPropertiesList)
 
 router.get('/shortlisted/:id', userAuth, shortlistedPropertiesList)
