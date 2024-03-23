@@ -19,9 +19,6 @@ import {
   getPropertiesForAgent,
   sharedPropertiesList,
   shortlistedPropertiesList
-  editProperty,
-  propertyViewingStatus,
-  addImages
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
