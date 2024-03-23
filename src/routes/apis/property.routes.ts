@@ -12,7 +12,9 @@ import {
   getAllPropertyImages,
   getPropertyStatus,
   reactivateProperty,
-  editProperty
+  editProperty,
+  propertyViewingStatus,
+  addImages
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -95,6 +97,16 @@ router.put(
   userAuth,
   reactivateValidation,
   reactivateProperty
+);
+router.post(
+  '/viewing-status/:id',
+  userAuth,
+  propertyViewingStatus
+);
+
+router.post(
+  '/add-images/:id',
+  addImages
 );
 
 export default router;
