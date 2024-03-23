@@ -7,11 +7,18 @@ import {
   closeListingProperty,
   assignPropertyToFA,
   getPropertyCounts,
-  getPropertyImagesFromS3,
+  getPropertyImagesFromS3Final,
+  getPropertyImagesFromS3Raw,
   renameAndCopyBoardImagesOfS3,
   getAllPropertyImages,
   getPropertyStatus,
   reactivateProperty,
+  editProperty,
+  propertyViewingStatus,
+  addImages,
+  getPropertiesForAgent,
+  sharedPropertiesList,
+  shortlistedPropertiesList
   editProperty,
   propertyViewingStatus,
   addImages
@@ -39,7 +46,9 @@ router.use('/upload', uploadRoutes);
 router.get('/s3-img', getAllPropertyImages);
 
 // Get s3 images of property
-router.get('/s3-img/:id', getPropertyImagesFromS3);
+router.get('/s3-img/:id', getPropertyImagesFromS3Final);
+
+router.get('/s3-img-raw/:id', getPropertyImagesFromS3Raw);
 
 // Rename and copy s3 files to files folder
 router.put('/s3-img/:id', renameAndCopyBoardImagesOfS3);
@@ -55,6 +64,9 @@ router.get('/check-status/:id', userAuth, getPropertyStatus);
 
 // Get all properties for property agent
 router.get('/', userAuth, getAllPropertyList);
+
+//Get properties for property agent used by Admin(no need of Auth)
+router.get('/agent-property/:id', getPropertiesForAgent);
 
 // Get all properties in database
 router.get('/all', getAllPropertyinDB);
@@ -98,6 +110,10 @@ router.put(
   reactivateValidation,
   reactivateProperty
 );
+
+router.get('/shared/:id', userAuth, sharedPropertiesList)
+
+router.get('/shortlisted/:id', userAuth, shortlistedPropertiesList)
 router.post(
   '/viewing-status/:id',
   userAuth,

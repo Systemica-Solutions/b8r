@@ -164,7 +164,7 @@ const updateViewedAtDate = async (data, propertyId, tenantID) => {
         data.lastVisitedAt[propertyId] = Date.now();
         return await Board.findOneAndUpdate({_id: ID}, data);
         // return await Board.findOneAndUpdate(
-        //   { _id: ID }, { $set: { viewedAt: Date.now() } }
+        //   { _id: ID }, { $set: { lastVistedAt: updatedVisitedMap} }
         // );
         // return await Promise.all(
         //   data.propertyId.map(async (singleProperty) => {
@@ -278,6 +278,8 @@ export const updateBoard = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
+
+
 };
 
 // Find board details by board id
@@ -513,10 +515,6 @@ const updateSharedDate = async (data) => {
       await Board.findOneAndUpdate(
         {_id: ID}, data
       );
-    // if (data && data.boardFor && data.boardFor === 'Tenant') {
-    //   await Board.findOneAndUpdate(
-    //     {_id: ID}, { $set: { sharedAt: data.updatedAt } }
-    //   );
       // if (data && data.propertyId && data.propertyId.length) {
         // await Promise.all(
         //   data.propertyId.map(async (singleProperty) => {
@@ -581,6 +579,7 @@ export const shortlistDate = async (req: Request, res: Response) => {
     const propertyId = req.body.propertyid;
     const shortListStatus =  req.body.shortListStatus;
     const tenantBuyerID = req.body.globalTenantId;
+    console.log(req.body.propertyid);
     const board = await Board.findById(req.params.id)
       .populate('tenantId buyerId propertyId')
       .lean();
@@ -630,31 +629,30 @@ if (boardFor === 'Tenant') {
   else if (data.shortlistedDate && !shortListStatus) {
     data.shortlistedDate[propertyId] = null;
  }
-
-
-  const res = await Board.findOneAndUpdate(
-    {_id: data._id},
-    data
-  );
-  console.log('res' + res);
+ 
+ const res = await Board.findOneAndUpdate(
+   {_id: data._id},
+   data
+   );
+  
   let shortlistedNo = 0;
   data.propertyId.map((x) => {
-     if (data.isShortlisted[x._id] === true){
-       shortlistedNo++;
-     }
-   });
-
+    if (data.isShortlisted[x._id] === true){
+      shortlistedNo++;
+    }
+  });
+  
   await Tenant.updateOne(
-     { _id: ID },
-     { $set: { numberShortlisted: shortlistedNo }}
-     );
-
-  if (shortlistedNo > 0){
-       return await changeTenantStatus(ID, 'Shortlisted');
-     }
-     else{
-       return await changeTenantStatus(ID, 'CurrentlyViewing');
-   }
+    { _id: ID },
+    { $set: { numberShortlisted: shortlistedNo }}
+    );
+    
+    if (shortlistedNo > 0){
+      return await changeTenantStatus(ID, 'Shortlisted');
+    }
+    else{
+      return await changeTenantStatus(ID, 'CurrentlyViewing');
+  }
 
 
 

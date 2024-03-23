@@ -6,11 +6,12 @@ import {
 import Property from '../models/property.model';
 import PropertyDetail from '../models/propertyDetail.model';
 import AssignedProperty from '../models/assignedProperty.model';
-import { PipelineStage, Types } from 'mongoose';
+import { PipelineStage, Types, set } from 'mongoose';
 import {
   copyAndRenameS3Images,
   getAllPropertyS3Images,
-  getS3ImagesByPropertyId,
+  getS3ImagesByPropertyIdRaw,
+  getS3ImagesFromFinalFolder,
 } from './uploadImage.controller';
 import Tenant from '../models/tenant.model';
 import SharedProperty from '../models/sharedProperty.model';
@@ -504,6 +505,27 @@ const changePropertyStatus = async (id, status) => {
   }
 };
 
+const sharedProperties = async (agentId: Types.ObjectId) => {
+  try {
+    const boards = await Board.find({agentId});
+    let sharedProperties = new Set()
+    let propertyArray = [];
+    boards.forEach((board) => {
+      board.propertyId.forEach((property) => {
+        const propertyId = property.toString()
+        var length = sharedProperties.size;
+        sharedProperties.add(propertyId);
+        if(length < sharedProperties.size)
+          propertyArray.push(property)
+      });
+    })  
+    const result = await Property.find({ _id: { $in: propertyArray } });
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // Get property dashboard count
 export const getPropertyCounts = async (req: Request, res: Response) => {
   try {
@@ -566,7 +588,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
       },
     ]);
 
-    // yet to shared count
+    // Verified Properties
     const step2 = await Property.aggregate([
       {
         $lookup: {
@@ -580,12 +602,12 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
         $match: {
            'propertyDetails.agentId': agentId,
           status: 'Verified',
-          $expr: {
-            $or: [
-              { $eq: [{ $size: '$sharedProperty' }, 0] },
-              { $eq: [{ $size: '$sharedBuyerProperty' }, 0] },
-            ],
-          },
+          // $expr: {
+          //   $or: [
+          //     { $eq: [{ $size: '$sharedProperty' }, 0] },
+          //     { $eq: [{ $size: '$sharedBuyerProperty' }, 0] },
+          //   ],
+          // },
         },
       },
     ]);
@@ -674,6 +696,10 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
 ]);
     const Shorlisted_Count = await step4(agentId);
     console.log('Shortlisted Count', Shorlisted_Count);
+    const sharedPropertiesNumber = (await sharedProperties(agentId)).length;
+    // const yetToShareNumber = (await yetToShareNo(agentId)).size;
+    // console.log('Shared Properties', (await sharedPropertiesNo(agentId)).size);
+    // console.log('Yet to Share', (await yetToShareNo(agentId)).size)
 
     const newObj: any = {};
     for (const key in staticStatus) {
@@ -691,8 +717,8 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     } else {
       output = newObj;
     }
-    output.Shared = step1.length ? step1.length : 0;
-    output.YetToShare = step2.length ? step2.length : 0;
+    output.Shared = sharedPropertiesNumber ? sharedPropertiesNumber : 0;
+    output.YetToShare = newObj.Verified - output.Shared ? newObj.Verified - output.Shared : 0;
     output.Shortlisted = Shorlisted_Count;
     output = { ...output, ...newObj };
     return successResponse(
@@ -739,44 +765,52 @@ export const getPropertyStatus = async (req: Request, res: Response) => {
     );
   }
 };
+
+function daysAgo(date) {
+  const now = new Date();
+  const differenceInMs = now.getTime() - date.getTime();
+  const days = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+  return days;
+}
+
 export const propertyViewingStatus = async (req: Request, res: Response) => {
   try{
     const propertyId = req.params.id;
     const agentId = req.body.agentId;
     // const boards = await Board.find({agentId});
 
-    const tenantDetails = [];
-    const tenantStatus = [];
-    const shortListedDate = [];
-    const viewedDate = [];
+    let tenantDetails = [];
+    let tenantStatus = [];
+    let shortListedDate = [];
+    let viewedDate = [];
 
     const pipeline = [
       {
         $match: {
-          agentId,
+          agentId: agentId,
           // propertyId: { $in: [propertyId] }
         }
       }
     ];
 
-    const boards = await Board.find({agentId}).populate('tenantId');
+    const boards = await Board.find({agentId}).populate('tenantId')
     boards.forEach((board) => {
       board.propertyId.forEach((property) => {
-        if (property.toString() === propertyId){
-          tenantDetails.push(board.tenantId);
-          tenantStatus.push(board.tenantId.status);
-
-          const shortlistedAt = board.shortlistedDate.get(propertyId) ? board.shortlistedDate.get(propertyId) : null;
-          const viewedAt = board.lastVisitedAt.get(propertyId) ? board.lastVisitedAt.get(propertyId) : null;
-          if (shortlistedAt !== null) { shortListedDate.push(daysAgo(shortlistedAt)); }
-          else { shortListedDate.push(-1); }
-          if (viewedAt !== null) { viewedDate.push(daysAgo(viewedAt)); }
-          else { viewedDate.push(-1); }
+        if(property.toString() === propertyId){
+          tenantDetails.push(board.tenantId)
+          tenantStatus.push(board.tenantId.status)
+          
+          const shortlistedAt = board.shortlistedDate.get(propertyId) ? board.shortlistedDate.get(propertyId): null;
+          const viewedAt = board.lastVisitedAt.get(propertyId) ? board.lastVisitedAt.get(propertyId): null;
+          if (shortlistedAt !== null) shortListedDate.push(daysAgo(shortlistedAt));
+          else shortListedDate.push(-1);
+          if (viewedAt !== null) viewedDate.push(daysAgo(viewedAt));
+          else viewedDate.push(-1);
 
         }
-      });
-    });
-
+      })
+    })
+    
     const result = {tenantDetails, tenantStatus, shortListedDate, viewedDate};
 
     return successResponse(
@@ -786,7 +820,7 @@ export const propertyViewingStatus = async (req: Request, res: Response) => {
       'Property status updated successfully.'
     );
   }
-  catch (error){
+  catch(error){
     console.log(error);
     return failureResponse(
       res,
@@ -795,7 +829,7 @@ export const propertyViewingStatus = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
-};
+}
 
 // Edit property status with close listing property
 export const closeListingProperty = async (req: Request, res: Response) => {
@@ -848,9 +882,23 @@ export const closeListingProperty = async (req: Request, res: Response) => {
 };
 
 // Get property images from s3 by propertyId
-export const getPropertyImagesFromS3 = async (req: Request, res: Response) => {
+export const getPropertyImagesFromS3Final = async (req: Request, res: Response) => {
   try {
-    const images = await getS3ImagesByPropertyId(req.params.id);
+    const images = await getS3ImagesFromFinalFolder(req.params.id);
+    return successResponse(res, 200, { images }, 'S3 images get successfully.');
+  } catch (error) {
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+};
+
+export const getPropertyImagesFromS3Raw = async (req: Request, res: Response) => {
+  try {
+    const images = await getS3ImagesByPropertyIdRaw(req.params.id);
     return successResponse(res, 200, { images }, 'S3 images get successfully.');
   } catch (error) {
     return failureResponse(
@@ -1010,11 +1058,11 @@ export const addImages = async (req: Request, res: Response) => {
     const propertyId = req.params.id;
     const images = req.body;
 
-    const imagesByRank: string[] = [];
+    let imagesByRank: string[] = [];
 
     Object.entries(images).forEach(([link, position]: [string, number]) => {
-      imagesByRank[position - 1] = link;
-    });
+      imagesByRank[position-1] = link;
+    })
     console.log(imagesByRank);
     console.log(propertyId);
     const property = await Property.findByIdAndUpdate(propertyId, {
@@ -1022,14 +1070,14 @@ export const addImages = async (req: Request, res: Response) => {
         images: imagesByRank
       },
     });
-
+    
     return successResponse(
       res,
       200,
       'Images Added Successfully by Rank'
     );
   }
-  catch (error){
+  catch(error){
     console.log(error);
     return failureResponse(
       res,
@@ -1038,7 +1086,7 @@ export const addImages = async (req: Request, res: Response) => {
       error.message || 'Something went wrong'
     );
   }
-};
+}
 
 export const getPropertiesForAgent = async (req: Request, res: Response) => {
   try {
@@ -1177,3 +1225,70 @@ export const getPropertiesForAgent = async (req: Request, res: Response) => {
     );
   }
 };
+
+export const sharedPropertiesList = async (req: Request, res: Response) => {
+  try {
+    console.log('1');
+    // const temp = req.params.id;
+    const agentId = req.user.user._id;
+    // const agentId = new Types.ObjectId(req.user.user._id);
+    const boards = await Board.find({agentId});
+    let sharedProperties = new Set()
+    let propertyArray = [];
+    boards.forEach((board) => {
+      board.propertyId.forEach((property) => {
+        const propertyId = property.toString()
+        var length = sharedProperties.size;
+        sharedProperties.add(propertyId);
+        if(length < sharedProperties.size)
+          propertyArray.push(property)
+      });
+    })  
+    const result = await Property.find({ _id: { $in: propertyArray } });
+    return successResponse(
+      res,
+      200,
+      result,
+      'Properties found successfully.'
+    );
+  } catch (error) {
+    console.log(error);
+    console.log('1');
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+}
+
+export const shortlistedPropertiesList = async (req: Request, res: Response) => {
+  try {
+    const agentId = req.user.user._id;
+    const boards = await Board.find({agentId});
+
+    const distinctPropertyIds = new Set();
+    boards.forEach((board) => {
+      board.isShortlisted.forEach((value, key) => {
+        if (value === true) { distinctPropertyIds.add(key); }
+      });
+    });
+    const propertyArray = [...distinctPropertyIds]
+    const result = await Property.find({ _id: { $in: propertyArray } });
+    return successResponse(
+      res,
+      200,
+      result,
+      'Properties found successfully.'
+    );
+  } catch (error) {
+    console.log(error);
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+}
