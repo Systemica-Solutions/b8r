@@ -1219,3 +1219,70 @@ export const getPropertiesForAgent = async (req: Request, res: Response) => {
     );
   }
 };
+
+export const sharedPropertiesList = async (req: Request, res: Response) => {
+  try {
+    console.log('1');
+    // const temp = req.params.id;
+    const agentId = req.user.user._id;
+    // const agentId = new Types.ObjectId(req.user.user._id);
+    const boards = await Board.find({agentId});
+    let sharedProperties = new Set()
+    let propertyArray = [];
+    boards.forEach((board) => {
+      board.propertyId.forEach((property) => {
+        const propertyId = property.toString()
+        var length = sharedProperties.size;
+        sharedProperties.add(propertyId);
+        if(length < sharedProperties.size)
+          propertyArray.push(property)
+      });
+    })  
+    const result = await Property.find({ _id: { $in: propertyArray } });
+    return successResponse(
+      res,
+      200,
+      result,
+      'Properties found successfully.'
+    );
+  } catch (error) {
+    console.log(error);
+    console.log('1');
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+}
+
+export const shortlistedPropertiesList = async (req: Request, res: Response) => {
+  try {
+    const agentId = req.user.user._id;
+    const boards = await Board.find({agentId});
+
+    const distinctPropertyIds = new Set();
+    boards.forEach((board) => {
+      board.isShortlisted.forEach((value, key) => {
+        if (value === true) { distinctPropertyIds.add(key); }
+      });
+    });
+    const propertyArray = [...distinctPropertyIds]
+    const result = await Property.find({ _id: { $in: propertyArray } });
+    return successResponse(
+      res,
+      200,
+      result,
+      'Properties found successfully.'
+    );
+  } catch (error) {
+    console.log(error);
+    return failureResponse(
+      res,
+      error.status || 500,
+      error,
+      error.message || 'Something went wrong'
+    );
+  }
+}
