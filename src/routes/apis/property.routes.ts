@@ -19,9 +19,6 @@ import {
   getPropertiesForAgent,
   sharedPropertiesList,
   shortlistedPropertiesList
-  editProperty,
-  propertyViewingStatus,
-  addImages
 } from '../../controllers/property.controller';
 import {
   addPropertyValidation,
@@ -114,7 +111,7 @@ router.put(
 router.get('/shared/:id', userAuth, sharedPropertiesList)
 
 router.get('/shortlisted/:id', userAuth, shortlistedPropertiesList)
-router.post(
+router.get(
   '/viewing-status/:id',
   userAuth,
   propertyViewingStatus

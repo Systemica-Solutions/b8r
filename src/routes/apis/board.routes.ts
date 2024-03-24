@@ -14,7 +14,7 @@ import {
 } from '../../controllers/board.controller';
 import {
   boardValidation,
-  addProeprtyInboardValidation,
+  addPropertyInboardValidation,
 } from '../../validation/board.validation';
 import { userAuth } from '../../middleware/user-auth.middleware';
 
@@ -27,7 +27,7 @@ router.post('/', userAuth, boardValidation, addBoard);
 router.put(
   '/property/:id',
   userAuth,
-  addProeprtyInboardValidation,
+  addPropertyInboardValidation,
   addPropertyInBoard
 );
 
@@ -38,7 +38,7 @@ router.put('/view-property/:id', userAuth, updatePropertyViewAtDate);
 router.put('/shortlist/:id', userAuth, shortlistDate);
 
 // Get board details
-router.get('/details/:id', userAuth, getBoardDetailsById);
+router.get('/details/:id', getBoardDetailsById);
 
 // Find board by board id
 router.get('/:id', userAuth, getBoardById);
