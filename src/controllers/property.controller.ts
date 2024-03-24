@@ -150,12 +150,6 @@ export const updatePropertyDetails = (id, detailsId, res, flag) => {
     });
 };
 
-function daysAgo(date) {
-  const now = new Date();
-  const differenceInMs = now.getTime() - date.getTime();
-  const days = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
-  return days;
-}
 //  Get all properties
 export const getAllPropertyList = async (req: Request, res: Response) => {
   try {
@@ -694,8 +688,8 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     },
   },
 ]);
-    const Shorlisted_Count = await step4(agentId);
-    console.log('Shortlisted Count', Shorlisted_Count);
+    const Shortlisted_Count = await step4(agentId);
+    console.log('Shortlisted Count', Shortlisted_Count);
     const sharedPropertiesNumber = (await sharedProperties(agentId)).length;
     // const yetToShareNumber = (await yetToShareNo(agentId)).size;
     // console.log('Shared Properties', (await sharedPropertiesNo(agentId)).size);
@@ -719,7 +713,7 @@ export const getPropertyCounts = async (req: Request, res: Response) => {
     }
     output.Shared = sharedPropertiesNumber ? sharedPropertiesNumber : 0;
     output.YetToShare = newObj.Verified - output.Shared ? newObj.Verified - output.Shared : 0;
-    output.Shortlisted = Shorlisted_Count;
+    output.Shortlisted = Shortlisted_Count;
     output = { ...output, ...newObj };
     return successResponse(
       res,
@@ -776,7 +770,7 @@ function daysAgo(date) {
 export const propertyViewingStatus = async (req: Request, res: Response) => {
   try{
     const propertyId = req.params.id;
-    const agentId = req.body.agentId;
+    const agentId = req.user.user._id;
     // const boards = await Board.find({agentId});
 
     let tenantDetails = [];

@@ -38,7 +38,7 @@ export const boardValidation = async (req, res, next) => {
   }
 };
 
-export const addProeprtyInboardValidation = async (req, res, next) => {
+export const addPropertyInboardValidation = async (req, res, next) => {
   const schema = Joi.object().keys({
     propertyId: Joi.array().items(Joi.string()).required(),  // Updated to accept an array
   });
