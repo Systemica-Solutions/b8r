@@ -150,6 +150,12 @@ export const updatePropertyDetails = (id, detailsId, res, flag) => {
     });
 };
 
+function daysAgo(date) {
+  const now = new Date();
+  const differenceInMs = now.getTime() - date.getTime();
+  const days = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+  return days;
+}
 //  Get all properties
 export const getAllPropertyList = async (req: Request, res: Response) => {
   try {

@@ -111,5 +111,15 @@ router.put(
 router.get('/shared/:id', userAuth, sharedPropertiesList)
 
 router.get('/shortlisted/:id', userAuth, shortlistedPropertiesList)
+router.post(
+  '/viewing-status/:id',
+  userAuth,
+  propertyViewingStatus
+);
+
+router.post(
+  '/add-images/:id',
+  addImages
+);
 
 export default router;
